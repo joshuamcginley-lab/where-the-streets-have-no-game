@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Where the Streets Have No Game</title>
+<meta name="description" content="A U2 trivia party game. Put it on the TV, join on your phones, play as Bono, Edge, Adam or Larry.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=IBM+Plex+Sans:wght@400;500;600&family=VT323&display=swap">
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* TV layout: one 16:9 screen, everything sized in rem off the viewport width so it reads from the sofa. */
+  html { font-size: clamp(13px, 1.2vw, 30px); }
+  body { overflow: hidden; }
+  .tv {
+    height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 1.2rem;
+    padding-block: max(1.2rem, env(safe-area-inset-top, 0px)) max(1.2rem, env(safe-area-inset-bottom, 0px));
+    padding-left: max(1.6rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1.6rem, env(safe-area-inset-right, 0px));
+  }
+  .bar { display: flex; align-items: center; gap: 1.2rem; font-size: 1.35rem; color: var(--signal); }
+  .bar .rec::before { content: "● "; color: var(--bad); }
+  .bar .slogan { flex: 1; text-align: center; color: var(--muted); }
+  .bar button {
+    background: transparent; border: 1px solid var(--line); border-radius: .5rem; cursor: pointer;
+    font-family: var(--font-crt); font-size: 1.1rem; color: var(--muted); padding: .2rem .6rem;
+  }
+  .bar button:hover { color: var(--fg); border-color: var(--muted); }
+  .stage { min-height: 0; display: grid; }
+  .stage > section { min-height: 0; }
+
+  /* ---------- avatars ---------- */
+  .av {
+    --mc: var(--muted);
+    display: inline-grid; place-items: center; aspect-ratio: 1; width: 3rem; max-width: 100%;
+    border-radius: 50%; background: var(--mc); color: var(--ink-on-ch); overflow: hidden; flex: none;
+  }
+  .av svg { width: 64%; height: 64%; }
+  .av img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ---------- lobby ---------- */
+  .lobby { display: grid; grid-template-columns: 1fr 22rem; gap: 2rem; align-content: start; }
+  .lobby-main { display: grid; gap: 1.3rem; align-content: start; min-width: 0; }
+  h1 {
+    font-family: var(--font-display); font-weight: 900; text-transform: uppercase;
+    font-size: 4.4rem; line-height: .86; margin: 0; letter-spacing: -.01em; text-wrap: balance;
+  }
+  h1 span { color: var(--signal); }
+  .label { font-family: var(--font-crt); font-size: 1.35rem; color: var(--muted); letter-spacing: .08em; margin: 0 0 .5rem; }
+  .modes { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+  .mode {
+    text-align: left; cursor: pointer; background: transparent; border: 2px solid var(--line);
+    border-radius: .8rem; padding: .9rem 1.1rem; display: grid; gap: .2rem;
+  }
+  .mode b { font-family: var(--font-display); font-size: 2rem; text-transform: uppercase; line-height: 1; }
+  .mode span { color: var(--muted); font-size: .95rem; line-height: 1.35; }
+  .mode[aria-pressed="true"] { border-color: var(--signal); background: color-mix(in srgb, var(--signal) 9%, transparent); }
+  .mode:hover { border-color: var(--muted); }
+  .mode[aria-pressed="true"]:hover { border-color: var(--signal); }
+
+  .slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
+  .slot {
+    --mc: var(--muted);
+    position: relative; text-align: left; cursor: pointer; background: var(--screen);
+    border: 2px dashed var(--line); border-radius: .9rem; padding: .7rem .8rem;
+    display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: .8rem; align-items: center; min-width: 0;
+  }
+  .slot .av { width: 3.4rem; grid-row: 1 / 3; opacity: .35; filter: grayscale(.6); }
+  .slot .who { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; text-transform: uppercase; line-height: 1; align-self: end; }
+  .slot .role { display: none; }
+  .slot .pname { font-family: var(--font-crt); font-size: 1.15rem; align-self: start; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+  .slot.taken .pname { font-family: var(--font-body); font-weight: 600; font-size: 1.05rem; }
+  .slot.taken { border-style: solid; border-color: var(--mc); background: color-mix(in srgb, var(--mc) 10%, var(--screen)); }
+  .slot.taken .av { opacity: 1; filter: none; }
+  .slot.taken .pname { color: var(--fg); }
+  .slot.away { opacity: .5; }
+  .slot:hover:not(.taken) { border-color: var(--muted); }
+  .slot.taken:not(.couch) { cursor: default; }
+  .vip {
+    position: absolute; top: .5rem; right: .5rem; font-family: var(--font-crt); font-size: .95rem;
+    background: var(--signal); color: var(--ink-on-signal); border-radius: .3rem; padding: 0 .35rem;
+  }
+  .lobby-foot { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; font-size: 1.05rem; }
+  .lobby-foot .btn { font-size: 1.35rem; }
+  .lobby-foot .hint { color: var(--muted); }
+
+  .joinbox {
+    background: var(--screen); border: 1px solid var(--line); border-radius: 1rem;
+    padding: 1.4rem; display: grid; gap: 1rem; justify-items: center; text-align: center; align-content: start;
+  }
+  .joinbox .qr { background: #fff; padding: .7rem; border-radius: .6rem; width: 13rem; max-width: 100%; aspect-ratio: 1; }
+  .joinbox .qr svg { width: 100%; height: 100%; display: block; }
+  .joinbox .url { font-size: 1rem; color: var(--muted); word-break: break-all; }
+  .code { font-family: var(--font-crt); font-size: 5rem; line-height: .9; letter-spacing: .14em; color: var(--signal); padding-left: .14em; }
+  .netmsg { font-size: .95rem; color: var(--muted); max-width: 18rem; }
+  .netmsg.bad { color: var(--bad); }
+
+  /* ---------- question / reveal ---------- */
+  .play { display: grid; grid-template-rows: auto auto 1fr auto; gap: 1.1rem; }
+  .hud { display: flex; align-items: center; gap: 1.4rem; font-size: 1.5rem; color: var(--muted); }
+  .hud b { color: var(--fg); font-weight: 400; }
+  .hud .grow { flex: 1; }
+  .timer { display: flex; align-items: center; gap: .8rem; }
+  .timer .num { font-size: 2.6rem; line-height: 1; color: var(--fg); min-width: 2ch; text-align: right; }
+  .meter { width: 16rem; height: .55rem; background: var(--line); border-radius: 1rem; overflow: hidden; }
+  .meter i { display: block; height: 100%; width: 100%; background: var(--signal); transform-origin: left; }
+  .meter.low i { background: var(--bad); }
+  .question {
+    font-family: var(--font-display); font-weight: 700; font-size: 3.6rem; line-height: 1.02; margin: 0;
+    text-wrap: balance; max-width: 40ch;
+  }
+  .answers { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 1rem; align-content: center; min-height: 0; }
+  .ans {
+    --c: var(--ch1);
+    background: var(--screen); border: 2px solid var(--line); border-radius: 1rem;
+    padding: 1rem 1.2rem; display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: center;
+    font-size: 1.75rem; font-weight: 500; line-height: 1.2; text-align: left; min-width: 0; cursor: default;
+    transition: opacity .3s, border-color .3s, background .3s;
+  }
+  .ans:nth-child(2) { --c: var(--ch2); }
+  .ans:nth-child(3) { --c: var(--ch3); }
+  .ans:nth-child(4) { --c: var(--ch4); }
+  .ans .ch { font-family: var(--font-crt); font-size: 2rem; line-height: 1; background: var(--c); color: var(--ink-on-ch); border-radius: .4rem; padding: .25rem .5rem .1rem; }
+  .ans .pickers { display: flex; gap: .3rem; }
+  .ans .pickers .av { width: 2.6rem; }
+  .couch-on .ans { cursor: pointer; }
+  .couch-on .ans:hover { border-color: var(--c); }
+  .ans.right { border-color: var(--good); background: color-mix(in srgb, var(--good) 16%, var(--screen)); }
+  .ans.dim { opacity: .45; }
+  .ans.mine { border-color: var(--c); }
+
+  .strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; }
+  .pl {
+    --mc: var(--muted);
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .8rem;
+    background: var(--screen); border: 1px solid var(--line); border-radius: .8rem; padding: .6rem .8rem; min-width: 0;
+  }
+  .pl .nm { min-width: 0; }
+  .pl .nm b { display: block; font-size: 1.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pl .nm span { font-family: var(--font-crt); font-size: 1.05rem; color: var(--muted); }
+  .pl .sc { font-family: var(--font-crt); font-size: 1.9rem; text-align: right; line-height: 1; }
+  .pl .st { font-family: var(--font-crt); font-size: 1.05rem; color: var(--muted); display: block; text-align: right; }
+  .pl.locked { border-color: var(--mc); }
+  .pl.locked .st { color: var(--mc); }
+  .pl.gain .st { color: var(--good); }
+  .pl.miss .st { color: var(--bad); }
+  .pl.away { opacity: .45; }
+  .pl.empty { visibility: hidden; }
+
+  .fact { display: grid; grid-template-columns: 1fr auto; gap: 1.4rem; align-items: center; border-top: 1px solid var(--line); padding-top: 1rem; }
+  .fact p { margin: 0; font-size: 1.35rem; line-height: 1.45; max-width: 60ch; }
+  .fact .next { display: grid; gap: .5rem; justify-items: end; }
+  .fact .meter { width: 12rem; }
+  .fact .btn { font-size: 1.15rem; }
+
+  /* ---------- final ---------- */
+  .final { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4rem; align-content: center; }
+  .winner { display: grid; gap: 1rem; align-content: center; justify-items: start; }
+  .winner .av { width: 11rem; }
+  .winner .tag { font-family: var(--font-crt); font-size: 1.6rem; color: var(--signal); letter-spacing: .08em; }
+  .winner h2 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 5rem; line-height: .9; margin: 0; text-wrap: balance; }
+  .winner .rank { font-size: 1.5rem; color: var(--muted); margin: 0; }
+  .winner .rank b { color: var(--fg); }
+  .board { list-style: none; margin: 0; padding: 0; display: grid; gap: .8rem; align-content: center; }
+  .board li { display: grid; grid-template-columns: 2.4rem auto 1fr auto; gap: 1rem; align-items: center; background: var(--screen); border: 1px solid var(--line); border-radius: .9rem; padding: .8rem 1.1rem; }
+  .board .pos { font-family: var(--font-crt); font-size: 2.2rem; color: var(--muted); }
+  .board li:first-child { border-color: var(--signal); }
+  .board li:first-child .pos { color: var(--signal); }
+  .board .av { width: 3.4rem; }
+  .board .who b { display: block; font-size: 1.4rem; }
+  .board .who span { font-family: var(--font-crt); font-size: 1.15rem; color: var(--muted); }
+  .board .pts { font-family: var(--font-crt); font-size: 2.6rem; }
+  .final-actions { grid-column: 1 / -1; display: flex; gap: 1rem; justify-content: center; }
+  .final-actions .btn { font-size: 1.25rem; }
+
+  @media (max-aspect-ratio: 1/1) {
+    /* A portrait screen (someone opened the TV page on a phone): stack. */
+    html { font-size: clamp(11px, 2.4vw, 22px); }
+    body { overflow: auto; }
+    .lobby, .final { grid-template-columns: 1fr; }
+    .slots, .strip { grid-template-columns: 1fr 1fr; }
+    .answers { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="tv">
+  <div class="bar crt">
+    <span class="rec">ZOO TV · LIVE</span>
+    <span class="slogan" id="slogan">EVERYTHING YOU KNOW IS WRONG</span>
+    <button type="button" id="btn-sound" title="Sound (M)">SOUND ON</button>
+    <button type="button" id="btn-full" title="Full screen (F)">FULL SCREEN</button>
+  </div>
+  <main class="stage" id="stage"></main>
+</div>
+
+<script src="vendor/peerjs.min.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="questions.js"></script>
+<script src="members.js"></script>
+<script src="net.js"></script>
+<script>
+(() => {
+  const { MODES, Q, RANKS } = U2;
+  const { MEMBERS, byId, avatar, loadPhotos } = U2M;
+  const MAX = 4, ROUND = 10, SECS = 20, REVEAL_MS = 12000, LOBBY_GRACE_MS = 60000, STALE_MS = 12000;
+  const CODE_CHARS = "BCDFGHJKLMNPQRSTVWXZ";
+  const SLOGANS = ["EVERYTHING YOU KNOW IS WRONG", "WATCH MORE TV", "BELIEVE", "TASTE IS THE ENEMY OF ART", "CALL THE WHITE HOUSE"];
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  const S = { code: "", net: "connecting", netErr: "", phase: "lobby", mode: "casual", players: [], deck: [], i: 0, endsAt: 0, revealEndsAt: 0 };
+  let room = null, qTimer = null, rTimer = null;
+
+  // ---------- sound
+  const Sound = {
+    ctx: null, on: true,
+    init() { if (!this.ctx) try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch {} },
+    tone(f, dur = .12, type = "square", vol = .04, delay = 0) {
+      if (!this.on || !this.ctx) return;
+      const t = this.ctx.currentTime + delay, o = this.ctx.createOscillator(), g = this.ctx.createGain();
+      o.type = type; o.frequency.value = f;
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+      o.connect(g).connect(this.ctx.destination); o.start(t); o.stop(t + dur + .02);
+    },
+    join() { this.tone(660, .08); this.tone(990, .12, "square", .04, .08); },
+    tick() { this.tone(1200, .04, "square", .025); },
+    lock() { this.tone(520, .06, "triangle", .06); },
+    reveal() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, .22, "triangle", .07, i * .08)); },
+    start() { [392, 523, 659].forEach((f, i) => this.tone(f, .18, "square", .04, i * .12)); },
+  };
+  ["pointerdown", "keydown"].forEach(ev => addEventListener(ev, () => Sound.init(), { once: true }));
+
+  // ---------- players
+  const active = () => S.players.filter(p => p.local || p.connected);
+  const vip = () => S.players.find(p => !p.local && p.connected && p.member);
+  const canStart = () => active().length > 0 && active().every(p => p.member);
+  const placeOf = p => 1 + S.players.filter(x => x.score > p.score).length;
+  const rankFor = p => RANKS.find(r => Math.round((p.correct / Math.max(1, S.deck.length)) * 10) >= r.min).name;
+  const displayName = p => p.name || (byId(p.member)?.name ?? "Choosing…");
+
+  function newPlayer(pid, name, local = false) {
+    return { pid, name, local, member: null, conn: null, connected: local, seen: Date.now(), lostAt: 0,
+             score: 0, streak: 0, best: 0, correct: 0, answer: null, gain: 0, ok: false };
+  }
+  function resetScores() {
+    S.players.forEach(p => Object.assign(p, { score: 0, streak: 0, best: 0, correct: 0, answer: null, gain: 0, ok: false }));
+  }
+
+  // ---------- room
+  function openRoom(tries = 0) {
+    if (room) room.close();
+    S.code = Array.from({ length: 4 }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join("");
+    S.net = "connecting"; render();
+    room = Net.host(S.code, {
+      onOpen() { S.net = "open"; render(); },
+      onError(type) {
+        if (type === "unavailable-id" && tries < 5) return openRoom(tries + 1);
+        S.net = "failed"; S.netErr = type; render();
+      },
+      onConnection: handleConn,
+    });
+  }
+
+  function handleConn(c) {
+    c.on("data", m => {
+      if (m.t === "join") return onJoin(c, m);
+      const p = S.players.find(x => x.conn === c);
+      if (!p) return;
+      p.seen = Date.now();
+      if (m.t === "ping") return c.send({ t: "pong" });
+      if (m.t === "pick") return pick(p, m.member);
+      if (m.t === "answer") return submit(p, m.k);
+      if (p !== vip()) return;
+      if (m.t === "mode" && S.phase === "lobby" && MODES.some(x => x.id === m.mode)) { S.mode = m.mode; sync(); }
+      else if (m.t === "start" && S.phase === "lobby") startGame();
+      else if (m.t === "next" && S.phase === "reveal") nextQuestion();
+      else if (m.t === "again" && S.phase === "final") startGame();
+      else if (m.t === "lobby" && S.phase === "final") toLobby();
+    });
+    c.on("close", () => {
+      const p = S.players.find(x => x.conn === c);
+      if (p) { p.conn = null; p.connected = false; p.lostAt = Date.now(); sync(); maybeAllAnswered(); }
+    });
+  }
+
+  function onJoin(c, m) {
+    const pid = String(m.pid || "").slice(0, 40);
+    const name = String(m.name || "").replace(/\s+/g, " ").trim().slice(0, 14);
+    let p = S.players.find(x => x.pid === pid && !x.local);
+    if (!p) {
+      if (S.phase !== "lobby") return c.send({ t: "reject", reason: "A game is in progress. You can join when it finishes." });
+      if (S.players.length >= MAX) return c.send({ t: "reject", reason: "The game is full. Four players is the limit." });
+      p = newPlayer(pid, name);
+      S.players.push(p);
+      Sound.join();
+    } else if (S.phase === "lobby" && name) p.name = name;
+    if (p.conn && p.conn !== c) p.conn = null;
+    Object.assign(p, { conn: c, connected: true, seen: Date.now(), lostAt: 0 });
+    sync();
+  }
+
+  function pick(p, memberId) {
+    if (S.phase !== "lobby" || !byId(memberId)) return;
+    if (S.players.some(x => x !== p && x.member === memberId)) return sync();
+    p.member = memberId;
+    Sound.join();
+    sync();
+  }
+
+  // The TV can also seat one player who uses this screen (mouse, or keys 1–4).
+  function toggleCouch(memberId) {
+    if (S.phase !== "lobby") return;
+    const couch = S.players.find(p => p.local);
+    const holder = S.players.find(p => p.member === memberId);
+    if (holder && holder !== couch) return;
+    if (couch && couch.member === memberId) S.players.splice(S.players.indexOf(couch), 1);
+    else if (couch) couch.member = memberId;
+    else if (S.players.length < MAX) { const p = newPlayer("tv", "On the TV", true); p.member = memberId; S.players.push(p); }
+    Sound.join();
+    sync();
+  }
+
+  // ---------- game flow
+  function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+  function startGame() {
+    // Drop anyone who left; everyone still here must have a member.
+    S.players = S.players.filter(p => p.local || p.connected);
+    if (!canStart()) return sync();
+    S.deck = shuffle(Q.filter(q => q.m === S.mode)).slice(0, ROUND).map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) }));
+    resetScores();
+    S.i = 0;
+    Sound.start();
+    beginQuestion();
+  }
+
+  function beginQuestion() {
+    clearTimeout(rTimer);
+    S.phase = "question";
+    S.players.forEach(p => { p.answer = null; p.gain = 0; p.ok = false; });
+    S.endsAt = Date.now() + SECS * 1000;
+    clearTimeout(qTimer);
+    qTimer = setTimeout(reveal, SECS * 1000 + 200);
+    sync();
+  }
+
+  function submit(p, k) {
+    if (S.phase !== "question" || p.answer || !(k >= 0 && k < 4) || !p.member) return;
+    p.answer = { k, at: Date.now() };
+    Sound.lock();
+    sync();
+    maybeAllAnswered();
+  }
+
+  function maybeAllAnswered() {
+    if (S.phase !== "question") return;
+    const live = active();
+    if (live.length && live.every(p => p.answer)) { clearTimeout(qTimer); qTimer = setTimeout(reveal, 700); }
+  }
+
+  function reveal() {
+    if (S.phase !== "question") return;
+    clearTimeout(qTimer);
+    const q = S.deck[S.i], right = q.opts.indexOf(q.a);
+    S.players.forEach(p => {
+      p.ok = !!p.answer && p.answer.k === right;
+      if (p.ok) {
+        p.streak++; p.correct++; p.best = Math.max(p.best, p.streak);
+        const frac = Math.max(0, Math.min(1, (S.endsAt - p.answer.at) / (SECS * 1000)));
+        p.gain = 100 + Math.round(frac * 100) + Math.min(100, (p.streak - 1) * 25);
+        p.score += p.gain;
+      } else { p.streak = 0; p.gain = 0; }
+    });
+    S.phase = "reveal";
+    S.revealEndsAt = Date.now() + REVEAL_MS;
+    rTimer = setTimeout(nextQuestion, REVEAL_MS);
+    Sound.reveal();
+    sync();
+  }
+
+  function nextQuestion() {
+    if (S.phase !== "reveal") return;
+    clearTimeout(rTimer);
+    S.i++;
+    if (S.i < S.deck.length) beginQuestion();
+    else { S.phase = "final"; Sound.start(); sync(); }
+  }
+
+  function toLobby() {
+    clearTimeout(qTimer); clearTimeout(rTimer);
+    S.phase = "lobby";
+    S.players = S.players.filter(p => p.local || p.connected);
+    resetScores();
+    sync();
+  }
+
+  // Heartbeat: phones ping every few seconds. Silent phones are marked away;
+  // in the lobby their seat is freed after a grace period.
+  setInterval(() => {
+    const now = Date.now();
+    let changed = false;
+    S.players.forEach(p => {
+      if (!p.local && p.connected && now - p.seen > STALE_MS) { p.connected = false; p.conn = null; p.lostAt = now; changed = true; }
+    });
+    if (S.phase === "lobby") {
+      const keep = S.players.filter(p => p.local || p.connected || now - p.lostAt < LOBBY_GRACE_MS);
+      if (keep.length !== S.players.length) { S.players = keep; changed = true; }
+    }
+    if (changed) { sync(); maybeAllAnswered(); }
+  }, 2000);
+
+  // ---------- what each phone sees
+  function viewFor(p) {
+    const now = Date.now(), q = S.deck[S.i];
+    const v = {
+      t: "state", phase: S.phase, code: S.code, mode: S.mode, vip: p === vip(),
+      me: { name: p.name, member: p.member, score: p.score },
+      taken: Object.fromEntries(MEMBERS.map(m => [m.id, S.players.some(x => x !== p && x.member === m.id)])),
+      canStart: canStart(),
+      waiting: active().filter(x => !x.member).length,
+    };
+    if (S.phase === "question" || S.phase === "reveal") {
+      v.q = { n: S.i + 1, total: S.deck.length, opts: q.opts, left: Math.max(0, S.endsAt - now) };
+      v.my = p.answer ? p.answer.k : null;
+    }
+    if (S.phase === "reveal") v.rv = { right: q.opts.indexOf(q.a), ok: p.ok, gain: p.gain, streak: p.streak, place: placeOf(p), of: S.players.length, left: Math.max(0, S.revealEndsAt - now) };
+    if (S.phase === "final") v.fin = { place: placeOf(p), of: S.players.length, score: p.score, correct: p.correct, total: S.deck.length, rank: rankFor(p) };
+    return v;
+  }
+
+  function sync() {
+    S.players.forEach(p => { if (p.conn) p.conn.send(viewFor(p)); });
+    render();
+  }
+
+  // ---------- rendering
+  function joinUrl() {
+    const u = new URL("play.html", location.href);
+    u.search = "";
+    u.searchParams.set("room", S.code);
+    if (Net.LOCAL) u.searchParams.set("net", "local");
+    return u;
+  }
+
+  function render() {
+    const focusId = document.activeElement?.id;
+    const st = $("stage");
+    st.className = "stage" + (S.players.some(p => p.local) ? " couch-on" : "");
+    st.innerHTML = S.phase === "lobby" ? lobbyHtml() : S.phase === "final" ? finalHtml() : playHtml();
+    if (S.phase === "lobby") drawQr();
+    if (focusId && $(focusId)) $(focusId).focus({ preventScroll: true });
+  }
+
+  function lobbyHtml() {
+    const modes = MODES.map(m =>
+      `<button type="button" class="mode" id="mode-${m.id}" data-mode="${m.id}" aria-pressed="${S.mode === m.id}"><b>${m.name}</b><span>${m.blurb}</span></button>`).join("");
+    const v = vip();
+    const slots = MEMBERS.map(m => {
+      const p = S.players.find(x => x.member === m.id);
+      const cls = ["slot", p && "taken", p && p.local && "couch", p && !p.local && !p.connected && "away"].filter(Boolean).join(" ");
+      const who = p ? (p.local ? "On this screen" : esc(p.name || "Phone player") + (p.connected ? "" : " · reconnecting")) : m.role.toUpperCase() + " · OPEN";
+      return `<button type="button" class="${cls}" id="slot-${m.id}" data-member="${m.id}" style="--mc:${m.color}"
+        title="${p ? (p.local ? "Click to free this seat" : "") : "Click to play as " + m.name + " on this screen"}">
+        ${p && p === v ? '<span class="vip">VIP</span>' : ""}
+        ${avatar(m.id)}<span class="who">${m.name}</span><span class="role">${m.role.toUpperCase()}</span><span class="pname">${who}</span></button>`;
+    }).join("");
+    const unpicked = active().filter(p => !p.member).length;
+    const hint = !active().length ? "Scan the code to join on your phone, or click a member to play on this screen."
+      : unpicked ? `Waiting for ${unpicked} player${unpicked > 1 ? "s" : ""} to pick a character.`
+      : `${active().length} of 4 in the band. ${v ? esc(displayName(v)) + " (VIP) can start from their phone." : "Press Enter to start."}`;
+    const u = joinUrl();
+    const net = S.net === "open" ? `<div class="netmsg">Open the link or scan the code, then enter the room code.</div>`
+      : S.net === "connecting" ? `<div class="netmsg">Opening the room…</div>`
+      : `<div class="netmsg bad">Phones can't connect right now (${esc(S.netErr)}). You can still play on this screen. <button type="button" class="btn ghost" id="btn-retry">Try again</button></div>`;
+    return `<section class="lobby">
+      <div class="lobby-main">
+        <h1>Where the Streets Have No <span>Game</span></h1>
+        <div><p class="label">MODE</p><div class="modes">${modes}</div></div>
+        <div><p class="label">PICK A CHARACTER · UP TO 4 PLAYERS</p><div class="slots">${slots}</div></div>
+        <div class="lobby-foot"><button type="button" class="btn" id="btn-start" ${canStart() ? "" : "disabled"}>Start the show</button><span class="hint">${hint}</span></div>
+      </div>
+      <aside class="joinbox">
+        <p class="label" style="margin:0">JOIN ON YOUR PHONE</p>
+        <div class="qr" id="qr" aria-label="QR code to join"></div>
+        <div class="url">${esc(u.host + u.pathname.replace(/\/[^/]*$/, "/play"))}</div>
+        <div><p class="label" style="margin:0">ROOM CODE</p><div class="code">${S.code || "····"}</div></div>
+        ${net}
+      </aside>
+    </section>`;
+  }
+
+  function drawQr() {
+    const box = $("qr");
+    if (!box || !S.code || typeof qrcode !== "function") return;
+    try {
+      const qr = qrcode(0, "M"); qr.addData(joinUrl().href); qr.make();
+      box.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+    } catch {}
+  }
+
+  function playerCard(p, mode) {
+    if (!p) return `<div class="pl empty"></div>`;
+    const m = byId(p.member);
+    let st = "", cls = "pl";
+    if (mode === "question") { st = p.answer ? "LOCKED IN" : (p.local || p.connected) ? "THINKING…" : "AWAY"; if (p.answer) cls += " locked"; }
+    else if (mode === "reveal") { st = p.ok ? `+${p.gain}` : p.answer ? "MISSED" : "NO ANSWER"; cls += p.ok ? " gain" : " miss"; }
+    if (!p.local && !p.connected) cls += " away";
+    return `<div class="${cls}" style="--mc:${m.color}">${avatar(p.member)}
+      <div class="nm"><b>${esc(p.local ? m.name : (p.name || m.name))}</b><span>${p.local ? "ON THE TV" : m.name.toUpperCase()}</span></div>
+      <div><span class="sc">${p.score}</span><span class="st">${st}</span></div></div>`;
+  }
+
+  function playHtml() {
+    const q = S.deck[S.i], rev = S.phase === "reveal", right = q.opts.indexOf(q.a);
+    const couch = S.players.find(p => p.local);
+    const answers = q.opts.map((o, k) => {
+      let cls = "ans";
+      if (rev) cls += k === right ? " right" : " dim";
+      else if (couch?.answer?.k === k) cls += " mine";
+      const pickers = rev ? S.players.filter(p => p.answer?.k === k).map(p => avatar(p.member)).join("") : "";
+      return `<button type="button" class="${cls}" id="ans-${k}" data-k="${k}" ${rev || !couch || couch.answer ? "tabindex=\"-1\"" : ""}>
+        <span class="ch">${k + 1}</span><span>${esc(o)}</span><span class="pickers">${pickers}</span></button>`;
+    }).join("");
+    const strip = [0, 1, 2, 3].map(i => playerCard(S.players[i], S.phase)).join("");
+    const mode = MODES.find(m => m.id === S.mode).name.toUpperCase();
+    const bottom = rev
+      ? `<div class="fact"><p>${esc(q.f)}</p><div class="next"><button type="button" class="btn" id="btn-next">${S.i + 1 < S.deck.length ? "Next question" : "Final scores"}</button><div class="meter"><i id="rv-bar"></i></div></div></div>`
+      : `<div class="strip">${strip}</div>`;
+    return `<section class="play">
+      <div class="hud crt"><span>${mode}</span><span>Q <b>${S.i + 1}</b>/${S.deck.length}</span><span class="grow"></span>
+        ${rev ? `<span>ANSWER: <b>${right + 1}</b></span>` : `<span class="timer"><span class="meter" id="meter"><i id="bar"></i></span><span class="num" id="num">${SECS}</span></span>`}</div>
+      <p class="question">${esc(q.q)}</p>
+      <div class="answers">${answers}</div>
+      ${rev ? `<div class="strip">${strip}</div>${bottom}` : bottom}
+    </section>`;
+  }
+
+  function finalHtml() {
+    const order = S.players.slice().sort((a, b) => b.score - a.score);
+    const w = order[0], wm = byId(w.member);
+    const tie = order.length > 1 && order[1].score === w.score;
+    const board = order.map(p => {
+      const m = byId(p.member);
+      return `<li>${`<span class="pos">${placeOf(p)}</span>`}${avatar(p.member)}
+        <span class="who"><b>${esc(p.local ? m.name : (p.name || m.name))}</b><span>${m.name.toUpperCase()} · ${p.correct}/${S.deck.length} RIGHT · BEST STREAK ${p.best}</span></span>
+        <span class="pts">${p.score}</span></li>`;
+    }).join("");
+    return `<section class="final">
+      <div class="winner">
+        ${avatar(w.member)}
+        <span class="tag">${tie ? "IT'S A TIE AT THE TOP" : order.length > 1 ? "TONIGHT'S HEADLINER" : "FINAL BROADCAST"}</span>
+        <h2>${esc(w.local ? wm.name : (w.name || wm.name))}</h2>
+        <p class="rank">Rank: <b>${rankFor(w)}</b></p>
+      </div>
+      <ol class="board">${board}</ol>
+      <div class="final-actions">
+        <button type="button" class="btn" id="btn-again">Play again</button>
+        <button type="button" class="btn ghost" id="btn-lobby">Change mode or players</button>
+      </div>
+    </section>`;
+  }
+
+  // ---------- animation: timers
+  let lastTickSec = null;
+  function frame() {
+    const now = Date.now();
+    if (S.phase === "question" && $("bar")) {
+      const left = Math.max(0, S.endsAt - now), sec = Math.ceil(left / 1000);
+      $("bar").style.transform = `scaleX(${left / (SECS * 1000)})`;
+      $("num").textContent = sec;
+      $("meter").classList.toggle("low", left < 5000);
+      if (sec !== lastTickSec && sec <= 5 && sec > 0) Sound.tick();
+      lastTickSec = sec;
+    }
+    if (S.phase === "reveal" && $("rv-bar")) $("rv-bar").style.transform = `scaleX(${Math.max(0, S.revealEndsAt - now) / REVEAL_MS})`;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // ---------- input
+  $("stage").addEventListener("click", e => {
+    const t = e.target.closest("button");
+    if (!t) return;
+    if (t.dataset.mode) { S.mode = t.dataset.mode; sync(); }
+    else if (t.dataset.member) toggleCouch(t.dataset.member);
+    else if (t.dataset.k !== undefined) { const c = S.players.find(p => p.local); if (c) submit(c, Number(t.dataset.k)); }
+    else if (t.id === "btn-start") startGame();
+    else if (t.id === "btn-next") nextQuestion();
+    else if (t.id === "btn-again") startGame();
+    else if (t.id === "btn-lobby") toLobby();
+    else if (t.id === "btn-retry") openRoom();
+  });
+  addEventListener("keydown", e => {
+    if (e.target.tagName === "INPUT") return;
+    const k = e.key.toLowerCase();
+    if (k === "f") return toggleFull();
+    if (k === "m") return toggleSound();
+    if (S.phase === "question" && ["1", "2", "3", "4"].includes(k)) {
+      const c = S.players.find(p => p.local); if (c) submit(c, Number(k) - 1);
+    } else if (k === "enter" && document.activeElement?.tagName !== "BUTTON") {
+      if (S.phase === "lobby") startGame();
+      else if (S.phase === "reveal") nextQuestion();
+      else if (S.phase === "final") startGame();
+    }
+  });
+  function toggleFull() {
+    const d = document;
+    if (d.fullscreenElement) d.exitFullscreen?.().catch(() => {});
+    else d.documentElement.requestFullscreen?.().catch(() => {});
+  }
+  function toggleSound() { Sound.on = !Sound.on; $("btn-sound").textContent = Sound.on ? "SOUND ON" : "SOUND OFF"; }
+  $("btn-full").onclick = toggleFull;
+  $("btn-sound").onclick = toggleSound;
+
+  // ZOO TV slogan flicker
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    let s = 0; setInterval(() => { s = (s + 1) % SLOGANS.length; $("slogan").textContent = SLOGANS[s]; }, 3500);
+  }
+
+  // Keep the TV awake while hosting (not all browsers allow it).
+  try { navigator.wakeLock?.request("screen").catch(() => {}); } catch {}
+
+  window.__game = S; // handy for debugging from the console
+  loadPhotos(() => render());
+  openRoom();
+})();
+</script>
+</body>
+</html>

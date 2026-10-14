@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c0f">
+<title>Where the Streets Have No Game · Controller</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=IBM+Plex+Sans:wght@400;500;600&family=VT323&display=swap">
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* Phone controller: one column, thumb-sized targets, the TV does the talking. */
+  body {
+    font-size: 16px; line-height: 1.45; -webkit-tap-highlight-color: transparent;
+    padding-block: max(14px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .app { max-width: 480px; margin: 0 auto; min-height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 18px; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 20px; color: var(--muted); }
+  .top b { color: var(--signal); font-weight: 400; }
+  .me { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .me span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .screen { display: grid; gap: 16px; align-content: start; }
+
+  h1 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 44px; line-height: .9; margin: 0; text-wrap: balance; }
+  h1 span { color: var(--signal); }
+  h2 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 34px; line-height: .95; margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  .muted { color: var(--muted); }
+  .label { font-family: var(--font-crt); font-size: 19px; letter-spacing: .08em; color: var(--muted); }
+
+  form { display: grid; gap: 14px; }
+  label { display: grid; gap: 6px; }
+  input {
+    font: 500 18px var(--font-body); color: var(--fg); background: var(--screen);
+    border: 1px solid var(--line); border-radius: 10px; padding: 14px; width: 100%;
+  }
+  input:focus { outline: 2px solid var(--signal); outline-offset: 1px; }
+  #room { font-family: var(--font-crt); font-size: 34px; letter-spacing: .3em; text-transform: uppercase; padding: 8px 14px; }
+  .btn { font-size: 18px; padding: 16px 24px; width: 100%; }
+  .err { color: var(--bad); }
+
+  .av { --mc: var(--muted); display: inline-grid; place-items: center; aspect-ratio: 1; width: 40px; border-radius: 50%; background: var(--mc); color: var(--ink-on-ch); overflow: hidden; flex: none; }
+  .av svg { width: 64%; height: 64%; }
+  .av img { width: 100%; height: 100%; object-fit: cover; }
+  .top .av { width: 30px; }
+
+  .chars { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .char {
+    --mc: var(--muted);
+    background: var(--screen); border: 2px solid var(--line); border-radius: 12px; cursor: pointer;
+    padding: 14px 10px; display: grid; justify-items: center; gap: 6px; text-align: center;
+  }
+  .char .av { width: 60px; }
+  .char b { font-family: var(--font-display); font-size: 22px; text-transform: uppercase; line-height: 1; }
+  .char small { font-family: var(--font-crt); font-size: 16px; color: var(--muted); }
+  .char[aria-pressed="true"] { border-color: var(--mc); background: color-mix(in srgb, var(--mc) 14%, var(--screen)); }
+  .char:disabled { opacity: .3; cursor: default; }
+
+  .hero { display: grid; justify-items: center; text-align: center; gap: 12px; padding-block: 10px; }
+  .hero .av { width: 120px; }
+
+  .vipbox { border: 1px solid var(--signal); border-radius: 12px; padding: 14px; display: grid; gap: 12px; }
+  .vipbox .label { color: var(--signal); }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .seg button { background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 12px; cursor: pointer; font-weight: 600; }
+  .seg button[aria-pressed="true"] { border-color: var(--signal); color: var(--signal); }
+
+  .qhead { display: flex; justify-content: space-between; font-size: 22px; color: var(--muted); }
+  .meter { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+  .meter i { display: block; height: 100%; width: 100%; background: var(--signal); transform-origin: left; }
+  .pad { display: grid; gap: 10px; }
+  .key {
+    --c: var(--ch1);
+    background: var(--screen); border: 2px solid var(--line); border-radius: 14px; cursor: pointer;
+    display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; text-align: left;
+    padding: 16px; min-height: 76px; font-size: 18px; font-weight: 500; line-height: 1.25;
+    transition: opacity .2s, border-color .2s, background .2s, transform .08s;
+  }
+  .key:nth-child(2) { --c: var(--ch2); }
+  .key:nth-child(3) { --c: var(--ch3); }
+  .key:nth-child(4) { --c: var(--ch4); }
+  .key .ch { font-family: var(--font-crt); font-size: 28px; line-height: 1; background: var(--c); color: var(--ink-on-ch); border-radius: 6px; padding: 6px 10px 3px; }
+  .key:active:not(:disabled) { transform: scale(.98); }
+  .key.picked { border-color: var(--c); background: color-mix(in srgb, var(--c) 18%, var(--screen)); }
+  .key.right { border-color: var(--good); background: color-mix(in srgb, var(--good) 16%, var(--screen)); }
+  .key.off { opacity: .3; }
+  .key:disabled { cursor: default; }
+
+  .verdict { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 64px; line-height: .9; }
+  .verdict.ok { color: var(--good); }
+  .verdict.no { color: var(--bad); }
+  .big { font-family: var(--font-crt); font-size: 56px; line-height: 1; color: var(--signal); }
+  .stats { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; font-family: var(--font-crt); font-size: 20px; color: var(--muted); }
+  .stats b { color: var(--fg); font-weight: 400; }
+  .row { display: grid; gap: 10px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top crt" id="top"></div>
+  <main class="screen" id="screen"></main>
+</div>
+
+<script src="vendor/peerjs.min.js"></script>
+<script src="questions.js"></script>
+<script src="members.js"></script>
+<script src="net.js"></script>
+<script>
+(() => {
+  const { MODES } = U2;
+  const { MEMBERS, byId, avatar, loadPhotos } = U2M;
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const store = (k, v) => { try { v === undefined ? null : localStorage.setItem(k, v); return localStorage.getItem(k); } catch { return null; } };
+  const ordinal = n => n + (["th", "st", "nd", "rd"][(n % 100 - 20) % 10] || ["th", "st", "nd", "rd"][n % 100] || "th");
+
+  // pid lives in sessionStorage so two tabs in one browser are two players,
+  // while a reload in the same tab gets your seat back.
+  let pid;
+  try { pid = sessionStorage.getItem("wtshng-pid") || Math.random().toString(36).slice(2, 12); sessionStorage.setItem("wtshng-pid", pid); }
+  catch { pid = Math.random().toString(36).slice(2, 12); }
+
+  const params = new URLSearchParams(location.search);
+  const C = {
+    status: "form",            // form | connecting | live | lost | error
+    code: (params.get("room") || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4),
+    name: store("wtshng-name") || "",
+    error: "", v: null, deadline: 0, revealDeadline: 0,
+    conn: null, handle: null, lastPong: 0, retries: 0, everJoined: false,
+  };
+
+  // ---------- connection
+  function connect() {
+    if (C.handle) C.handle.close();
+    C.conn = null;
+    C.status = C.everJoined ? "lost" : "connecting";
+    render();
+    C.handle = Net.join(C.code, {
+      onOpen(conn) {
+        C.conn = conn; C.lastPong = Date.now(); C.retries = 0;
+        conn.on("data", onMsg);
+        conn.on("close", () => { if (C.conn === conn) lost(); });
+        conn.send({ t: "join", pid, name: C.name });
+      },
+      onError(type) {
+        if (type === "no-room") {
+          C.status = "error";
+          C.error = C.everJoined ? `Room ${C.code} has closed. If the TV started a new room, enter its code.` : `There's no room called ${C.code}. Check the code on the TV.`;
+          C.everJoined = false; render();
+        } else retry();
+      },
+    });
+  }
+  function lost() { C.conn = null; if (C.status === "live" || C.status === "lost") retry(); }
+  function retry() {
+    C.status = "lost"; render();
+    C.retries++;
+    setTimeout(connect, Math.min(8000, 1000 * C.retries));
+  }
+  function send(m) { if (C.conn) C.conn.send(m); }
+
+  setInterval(() => {
+    if (!C.conn) return;
+    send({ t: "ping" });
+    if (Date.now() - C.lastPong > 10000) { const c = C.conn; C.conn = null; C.handle?.close(); lost(); }
+  }, 3000);
+  document.addEventListener("visibilitychange", () => {
+    // Phones often drop the connection when the screen locks. Come straight back.
+    if (document.visibilityState === "visible" && C.everJoined && !C.conn && C.status !== "error") { C.retries = 0; connect(); }
+  });
+
+  function onMsg(m) {
+    C.lastPong = Date.now();
+    if (m.t === "pong") return;
+    if (m.t === "reject") { C.status = "error"; C.error = m.reason; C.handle?.close(); C.conn = null; return render(); }
+    if (m.t !== "state") return;
+    const prev = C.v;
+    C.v = m; C.status = "live"; C.everJoined = true;
+    if (m.q) C.deadline = Date.now() + m.q.left;
+    if (m.rv) C.revealDeadline = Date.now() + m.rv.left;
+    if (m.phase !== "lobby") wake();
+    if (m.rv && prev?.phase !== "reveal") buzz(m.rv.ok ? [40, 60, 40] : [160]);
+    render();
+  }
+
+  let lock = null;
+  function wake() { if (!lock && navigator.wakeLock) navigator.wakeLock.request("screen").then(l => { lock = l; l.addEventListener("release", () => lock = null); }).catch(() => {}); }
+  function buzz(p) { try { navigator.vibrate?.(p); } catch {} }
+
+  // ---------- views
+  function render() {
+    const v = C.v, m = v?.me?.member && byId(v.me.member);
+    $("top").innerHTML = C.status === "live" && v
+      ? `<span class="me">${m ? avatar(m.id) : ""}<span>${esc(v.me.name || m?.name || "You")}</span></span><span>ROOM <b>${v.code}</b></span>`
+      : `<span>U2 TRIVIA</span><span>${C.code ? `ROOM <b>${esc(C.code)}</b>` : ""}</span>`;
+    const s = $("screen");
+    const focusId = document.activeElement?.id;
+    if (C.status === "form" || C.status === "error") s.innerHTML = formView();
+    else if (C.status === "connecting") s.innerHTML = msgView("Connecting", `Finding room ${esc(C.code)}…`);
+    else if (C.status === "lost") s.innerHTML = msgView("Reconnecting", "Lost the TV for a moment. Hang on, your seat is saved.");
+    else if (v.phase === "lobby") s.innerHTML = lobbyView(v);
+    else if (v.phase === "question") s.innerHTML = questionView(v);
+    else if (v.phase === "reveal") s.innerHTML = revealView(v);
+    else if (v.phase === "final") s.innerHTML = finalView(v);
+    if (focusId && $(focusId) && $(focusId).tagName === "INPUT") $(focusId).focus();
+  }
+
+  function formView() {
+    return `<h1>Where the Streets Have No <span>Game</span></h1>
+      <p class="muted">Enter the room code shown on the TV.</p>
+      <form id="join-form" autocomplete="off">
+        <label><span class="label">ROOM CODE</span><input id="room" name="room" maxlength="4" inputmode="text" autocapitalize="characters" spellcheck="false" value="${esc(C.code)}" required></label>
+        <label><span class="label">YOUR NAME</span><input id="name" name="name" maxlength="14" placeholder="Optional" value="${esc(C.name)}"></label>
+        ${C.status === "error" ? `<p class="err">${esc(C.error)}</p>` : ""}
+        <button class="btn" type="submit">Join the game</button>
+      </form>`;
+  }
+
+  function msgView(title, text) { return `<div class="hero"><h2>${title}</h2><p class="muted">${text}</p></div>`; }
+
+  function lobbyView(v) {
+    const mine = v.me.member;
+    const chars = MEMBERS.map(m => {
+      const taken = v.taken[m.id];
+      return `<button type="button" class="char" id="char-${m.id}" data-member="${m.id}" style="--mc:${m.color}" aria-pressed="${mine === m.id}" ${taken ? "disabled" : ""}>
+        ${avatar(m.id)}<b>${m.name}</b><small>${taken ? "TAKEN" : m.role.toUpperCase()}</small></button>`;
+    }).join("");
+    const head = mine
+      ? `<div class="hero" style="padding-block:0">${avatar(mine)}<h2>You're ${byId(mine).name}</h2><p class="muted">Watch the TV. Tap another character to switch.</p></div>`
+      : `<h2>Pick your character</h2><p class="muted">Each character can only be taken once.</p>`;
+    const vip = v.vip ? `<div class="vipbox">
+        <span class="label">YOU'RE THE VIP · YOU RUN THE SHOW</span>
+        <div class="seg">${MODES.map(m => `<button type="button" id="mode-${m.id}" data-mode="${m.id}" aria-pressed="${v.mode === m.id}">${m.name}</button>`).join("")}</div>
+        <button type="button" class="btn" id="btn-start" ${v.canStart ? "" : "disabled"}>Start the show</button>
+        ${v.waiting ? `<p class="muted">Waiting for ${v.waiting} player${v.waiting > 1 ? "s" : ""} to pick a character.</p>` : ""}
+      </div>` : mine ? `<p class="muted" style="text-align:center">Mode: <b>${MODES.find(m => m.id === v.mode).name}</b>. The VIP starts the game.</p>` : "";
+    return `${head}${mine ? vip : ""}<div class="chars">${chars}</div>${mine ? "" : vip}`;
+  }
+
+  function questionView(v) {
+    const picked = v.my;
+    const keys = v.q.opts.map((o, k) =>
+      `<button type="button" class="key ${picked === k ? "picked" : picked !== null ? "off" : ""}" data-k="${k}" ${picked !== null ? "disabled" : ""}><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
+    return `<div class="qhead crt"><span>Q ${v.q.n}/${v.q.total}</span><span id="secs"></span></div>
+      <div class="meter"><i id="bar"></i></div>
+      <p class="muted">${picked === null ? "The question is on the TV. Pick your answer." : "Locked in. Waiting for the others."}</p>
+      <div class="pad">${keys}</div>`;
+  }
+
+  function revealView(v) {
+    const r = v.rv;
+    const keys = v.q.opts.map((o, k) =>
+      `<button type="button" class="key ${k === r.right ? "right" : v.my === k ? "picked" : "off"}" disabled><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
+    const head = r.ok ? `<div class="verdict ok">Correct</div><div class="big">+${r.gain}</div>`
+      : `<div class="verdict no">${v.my === null ? "Too slow" : "Not quite"}</div>`;
+    return `<div class="hero">${head}
+        <div class="stats"><span>Score <b>${v.me.score}</b></span><span>Place <b>${ordinal(r.place)}</b> of ${r.of}</span>${r.streak > 1 ? `<span>Streak <b>${r.streak}</b></span>` : ""}</div></div>
+      ${v.vip ? `<button type="button" class="btn" id="btn-next">${v.q.n < v.q.total ? "Next question" : "Final scores"}</button>` : ""}
+      <div class="pad">${keys}</div>`;
+  }
+
+  function finalView(v) {
+    const f = v.fin;
+    return `<div class="hero">${avatar(v.me.member)}
+        <div class="label">${f.place === 1 ? "TONIGHT'S HEADLINER" : "FINAL BROADCAST"}</div>
+        <div class="verdict ${f.place === 1 ? "ok" : ""}">${ordinal(f.place)} place</div>
+        <div class="big">${f.score}</div>
+        <div class="stats"><span>Right <b>${f.correct}/${f.total}</b></span><span>Rank <b>${esc(f.rank)}</b></span></div></div>
+      ${v.vip ? `<div class="row"><button type="button" class="btn" id="btn-again">Play again</button><button type="button" class="btn ghost" id="btn-lobby">Change mode or players</button></div>`
+        : `<p class="muted" style="text-align:center">The VIP decides what happens next.</p>`}`;
+  }
+
+  // ---------- timers
+  function frame() {
+    if (C.v?.phase === "question" && $("bar")) {
+      const left = Math.max(0, C.deadline - Date.now());
+      $("bar").style.transform = `scaleX(${left / 20000})`;
+      $("secs").textContent = Math.ceil(left / 1000) + "s";
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // ---------- input
+  $("screen").addEventListener("submit", e => {
+    e.preventDefault();
+    C.code = $("room").value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4);
+    C.name = $("name").value.replace(/\s+/g, " ").trim().slice(0, 14);
+    store("wtshng-name", C.name);
+    if (C.code.length !== 4) { C.status = "error"; C.error = "Room codes are four letters."; return render(); }
+    C.retries = 0; C.everJoined = false;
+    connect();
+  });
+  $("screen").addEventListener("input", e => {
+    if (e.target.id === "room") e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
+  });
+  $("screen").addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b || b.disabled) return;
+    if (b.dataset.member) { send({ t: "pick", member: b.dataset.member }); buzz(15); }
+    else if (b.dataset.mode) send({ t: "mode", mode: b.dataset.mode });
+    else if (b.dataset.k !== undefined && C.v?.phase === "question" && C.v.my === null) {
+      const k = Number(b.dataset.k);
+      C.v.my = k; render(); buzz(25);   // show it right away; the TV confirms
+      send({ t: "answer", k });
+    }
+    else if (b.id === "btn-start") send({ t: "start" });
+    else if (b.id === "btn-next") send({ t: "next" });
+    else if (b.id === "btn-again") send({ t: "again" });
+    else if (b.id === "btn-lobby") send({ t: "lobby" });
+  });
+
+  loadPhotos(() => render());
+  // Arriving from the QR code with a name saved from last time: go straight in.
+  if (C.code.length === 4 && params.get("room") && C.name) connect(); else render();
+})();
+</script>
+</body>
+</html>

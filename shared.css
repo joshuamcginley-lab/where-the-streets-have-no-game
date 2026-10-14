@@ -1,0 +1,53 @@
+/* ZOO TV broadcast look, shared by the TV screen and the phone controller.
+   Deliberately a single dark theme: it is a television picture. */
+:root {
+  color-scheme: dark;
+  --bg: #0b0c0f;
+  --screen: #14161b;
+  --raise: #1b1e25;
+  --line: #2a2e37;
+  --fg: #ecebe6;
+  --muted: #9a9ca5;
+  --signal: #f2d14b;            /* broadcast yellow */
+  --ink-on-signal: #16140a;
+  /* answer channels: Trabant red, yellow, blue, green */
+  --ch1: #e0533d;
+  --ch2: #e8b931;
+  --ch3: #3f86d6;
+  --ch4: #46a86c;
+  --ink-on-ch: #0b0c0f;
+  --good: #6fd08c;
+  --bad: #ff6b5a;
+  --font-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-crt: "VT323", ui-monospace, "Courier New", monospace;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+
+.crt { font-family: var(--font-crt); letter-spacing: .05em; font-variant-numeric: tabular-nums; }
+.display { font-family: var(--font-display); text-transform: uppercase; }
+
+.btn {
+  font: 600 1em/1 var(--font-body); cursor: pointer;
+  background: var(--signal); color: var(--ink-on-signal); border: 0; border-radius: 999px;
+  padding: .85em 1.6em;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:disabled { opacity: .4; cursor: default; filter: none; }
+.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+
+/* Scanlines for anything that should look like it's on the monitor */
+.scan { position: relative; isolation: isolate; }
+.scan::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2; border-radius: inherit;
+  background: repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0,0,0,.26) 2px 3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
