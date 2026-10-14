@@ -34,7 +34,7 @@
   }
   .controls button:hover { color: var(--fg); opacity: 1; }
   .toast {
-    position: fixed; z-index: 6; left: 50%; bottom: 2.4rem; transform: translateX(-50%); max-width: min(40rem, 90vw);
+    position: fixed; z-index: 6; left: 50%; top: 7rem; transform: translateX(-50%); max-width: min(40rem, 90vw);
     background: var(--fg); color: #000; font-size: 1rem; line-height: 1.4; padding: .7rem 1.1rem; border-radius: .3rem;
     animation: rise .3s backwards;
   }
@@ -222,7 +222,13 @@
   .board .who b { display: block; font-size: 1.4rem; }
   .board .who span { font: 500 .85rem var(--font-mono); letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
   .board .pts { font-family: var(--font-stencil); font-weight: 900; font-size: 2.8rem; }
-  .final-actions { grid-column: 1 / -1; display: flex; gap: 1rem; justify-content: center; }
+  .final-actions { grid-column: 1 / -1; display: flex; gap: 1rem; justify-content: center; align-items: flex-end; flex-wrap: wrap; }
+  .next-mode { display: grid; gap: .4rem; }
+  .next-mode .label { margin: 0; }
+  .picks { display: flex; gap: .5rem; }
+  .pick { background: transparent; border: 2px solid var(--line); border-radius: .3rem; padding: .7rem 1rem; cursor: pointer; font-weight: 600; font-size: 1.05rem; }
+  .pick:hover { border-color: var(--muted); }
+  .pick[aria-pressed="true"] { border-color: var(--red); background: color-mix(in srgb, var(--red) 16%, transparent); }
   .final-actions .btn { font-size: 1.2rem; }
 
   @media (max-aspect-ratio: 1/1) {
@@ -432,10 +438,10 @@
       if (m.t === "pick") return pick(p, m.member);
       if (m.t === "answer") return submit(p, m.k);
       if (p !== vip()) return;
-      if (m.t === "mode" && S.phase === "lobby" && MODES.some(x => x.id === m.mode)) { S.mode = m.mode; sync(); }
+      if (m.t === "mode" && (S.phase === "lobby" || S.phase === "final") && MODES.some(x => x.id === m.mode)) setMode(m.mode);
       else if (m.t === "start" && S.phase === "lobby") startGame();
       else if (m.t === "next" && S.phase === "reveal") nextQuestion();
-      else if (m.t === "again" && S.phase === "final") startGame();
+      else if (m.t === "again" && S.phase === "final") nextRound();
       else if (m.t === "lobby" && S.phase === "final") toLobby();
     });
     c.on("close", () => {
@@ -498,15 +504,37 @@
 
   // Ten questions. Name That Song is all clips (mostly hits, some deep cuts);
   // the other modes are trivia with one clip slipped in somewhere in the middle.
+  // No repeats: the TV remembers every question and clip it has used (in this browser, across
+  // nights) and only deals unused ones. When a pool runs low it starts over on that pool.
+  const Used = {
+    key: "wtshng-used",
+    data: (() => { try { return JSON.parse(localStorage.getItem("wtshng-used")) || {}; } catch { return {}; } })(),
+    save() { try { localStorage.setItem(this.key, JSON.stringify(this.data)); } catch {} },
+    // Take n items from list that haven't been used in this pool; reset the pool if too few remain.
+    take(pool, list, n, id) {
+      let seen = new Set(this.data[pool] || []);
+      let fresh = list.filter(x => !seen.has(id(x)));
+      if (fresh.length < n) { seen = new Set(); fresh = list.slice(); }
+      const picked = shuffle(fresh).slice(0, n);
+      picked.forEach(x => seen.add(id(x)));
+      this.data[pool] = [...seen];
+      this.save();
+      return picked;
+    },
+  };
+
   function buildDeck(mode) {
     if (mode === "songs" && !SONGS.length) mode = "casual";   // song list didn't load
+    const songId = x => x.id;
     if (mode === "songs") {
-      const hits = shuffle(SONGS.filter(x => x.tier === "hit")), deep = shuffle(SONGS.filter(x => x.tier === "deep"));
-      return shuffle([...hits.slice(0, 6), ...deep.slice(0, 4)]).slice(0, ROUND).map(songQuestion);
+      const hits = Used.take("song-hit", SONGS.filter(x => x.tier === "hit"), 6, songId);
+      const deep = Used.take("song-deep", SONGS.filter(x => x.tier === "deep"), 4, songId);
+      return shuffle([...hits, ...deep]).map(songQuestion);
     }
-    const deck = shuffle(Q.filter(q => q.m === mode)).slice(0, ROUND);
-    const pool = SONGS.filter(x => x.tier === (mode === "deep" ? "deep" : "hit"));
-    if (pool.length) deck[2 + Math.floor(Math.random() * 6)] = songQuestion(pool[Math.floor(Math.random() * pool.length)]);
+    const deck = Used.take(mode, Q.filter(q => q.m === mode), ROUND, q => q.q);
+    const tier = mode === "deep" ? "deep" : "hit";
+    const pool = SONGS.filter(x => x.tier === tier);
+    if (pool.length) deck[2 + Math.floor(Math.random() * 6)] = songQuestion(Used.take("song-" + tier, pool, 1, songId)[0]);
     return deck;
   }
 
@@ -542,12 +570,22 @@
     } catch {}
   })();
 
-  function startGame() {
+  // A game is a run of rounds. Scores carry over from round to round; each round can be a
+  // different mode. Going back to the start screen ends the game.
+  function startGame() { startRound(true); }
+  function nextRound() { startRound(false); }
+
+  function startRound(fresh) {
     // Drop anyone who left; everyone still here must have a character.
     S.players = S.players.filter(p => p.local || p.connected);
     if (!canStart()) return sync();
     S.deck = buildDeck(S.mode).map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) }));
-    resetScores();
+    if (fresh || !S.round) { resetScores(); S.round = 1; }
+    else {
+      S.round++;
+      S.players.forEach(p => Object.assign(p, { streak: 0, best: 0, correct: 0, answer: null, gain: 0, ok: false }));
+    }
+    S.players.forEach(p => p.roundStart = p.score);
     S.i = 0; S.game++;
     // "Unos, dos, tres, catorce!" before the first question
     S.phase = "countin";
@@ -614,8 +652,16 @@
     else { S.phase = "final"; Player.stop(); Sound.win(); sync(); }
   }
 
+  // Mode can change in the lobby or between rounds; the results screen is rebuilt to show it.
+  function setMode(id) {
+    S.mode = id;
+    if (S.phase === "final") builtKey = "";
+    sync();
+  }
+
   function toLobby() {
     clearTimeout(qTimer); clearTimeout(rTimer);
+    S.round = 0;
     Player.stop(); Clip.stop();
     S.phase = "lobby";
     S.players = S.players.filter(p => p.local || p.connected);
@@ -654,7 +700,7 @@
       v.my = p.answer ? p.answer.k : null;
     }
     if (S.phase === "reveal") v.rv = { right: q.opts.indexOf(q.a), ok: p.ok, gain: p.gain, streak: p.streak, place: placeOf(p), of: S.players.length, left: Math.max(0, S.revealEndsAt - now) };
-    if (S.phase === "final") v.fin = { place: placeOf(p), of: S.players.length, score: p.score, correct: p.correct, total: S.deck.length, rank: rankFor(p) };
+    if (S.phase === "final") v.fin = { place: placeOf(p), of: S.players.length, score: p.score, gained: p.score - (p.roundStart || 0), correct: p.correct, total: S.deck.length, rank: rankFor(p), round: S.round };
     return v;
   }
 
@@ -771,7 +817,7 @@
       ? `<div class="song"><img class="art" src="${esc(s.art)}" alt=""><p>From <b>${esc(s.album)}</b> (${s.year}).<span class="credit">Preview courtesy of Apple Music</span></p></div>`
       : `<p>${esc(q.f)}</p>`;
     return `<section class="play">
-      <div class="hud mono"><span class="tag">${mode}</span><span>Question <b>${S.i + 1}</b> of ${S.deck.length}</span><span class="grow"></span><span id="hud-right"></span></div>
+      <div class="hud mono"><span class="tag">${mode}</span><span>Round <b>${S.round}</b></span><span>Question <b>${S.i + 1}</b> of ${S.deck.length}</span><span class="grow"></span><span id="hud-right"></span></div>
       <p class="question">${esc(q.q)}${s ? `<span class="listening" aria-label="Playing on the TV"><i></i><i></i><i></i><i></i><i></i></span>` : ""}</p>
       <div class="answers">${answers}</div>
       <div class="strip" id="strip"></div>
@@ -827,22 +873,23 @@
     const w = order[0];
     const tie = order.length > 1 && order[1].score === w.score;
     const board = order.map(p => {
-      const m = byId(p.member);
       return `<li><span class="pos">${placeOf(p)}</span>${avatar(p.member)}
-        <span class="who"><b>${esc(shownName(p))}</b><span>${m.name} · ${p.correct}/${S.deck.length} right · best streak ${p.best}</span></span>
+        <span class="who"><b>${esc(shownName(p))}</b><span>${p.correct}/${S.deck.length} right this round · +${p.score - (p.roundStart || 0)}</span></span>
         <span class="pts">${p.score}</span></li>`;
     }).join("");
+    const modes = MODES.map(m => `<button type="button" class="pick" id="next-${m.id}" data-mode="${m.id}" aria-pressed="${S.mode === m.id}">${m.name}</button>`).join("");
     return `<section class="final">
       <div class="winner">
         <span class="ring">${avatar(w.member)}</span>
-        <span class="tag">${tie ? "Tie at the top" : order.length > 1 ? "Tonight's headliner" : "Final score"}</span>
+        <span class="tag">${S.round > 1 ? `After round ${S.round} · ` : ""}${tie ? "Tie at the top" : order.length > 1 ? "Tonight's headliner" : "Final score"}</span>
         <h2>${esc(shownName(w))}</h2>
         <p class="rank">Rank: <b>${rankFor(w)}</b></p>
       </div>
       <ol class="board">${board}</ol>
       <div class="final-actions">
-        <button type="button" class="btn" id="btn-again">Play again</button>
-        <button type="button" class="btn ghost" id="btn-lobby">Change mode or players</button>
+        <div class="next-mode"><span class="label">Next round</span><div class="picks">${modes}</div></div>
+        <button type="button" class="btn" id="btn-again">Start round ${S.round + 1}</button>
+        <button type="button" class="btn ghost" id="btn-lobby">New game</button>
       </div>
     </section>`;
   }
@@ -881,12 +928,12 @@
   $("stage").addEventListener("click", e => {
     const t = e.target.closest("button");
     if (!t) return;
-    if (t.dataset.mode) { S.mode = t.dataset.mode; sync(); }
+    if (t.dataset.mode) setMode(t.dataset.mode);
     else if (t.dataset.member) toggleCouch(t.dataset.member);
     else if (t.dataset.k !== undefined) { const c = S.players.find(p => p.local); if (c) submit(c, Number(t.dataset.k)); }
     else if (t.id === "btn-start") startGame();
     else if (t.id === "btn-next") nextQuestion();
-    else if (t.id === "btn-again") startGame();
+    else if (t.id === "btn-again") nextRound();
     else if (t.id === "btn-lobby") toLobby();
     else if (t.id === "btn-retry") openRoom();
   });
@@ -899,7 +946,7 @@
     } else if (k === "enter" && document.activeElement?.tagName !== "BUTTON") {
       if (S.phase === "lobby") startGame();
       else if (S.phase === "reveal") nextQuestion();
-      else if (S.phase === "final") startGame();
+      else if (S.phase === "final") nextRound();
     }
   });
   function toggleFull() {

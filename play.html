@@ -217,7 +217,7 @@
     const focusId = document.activeElement?.id;
     // Screens with entrance animations are only rebuilt when they change, so another
     // player's update doesn't replay them.
-    const key = C.status !== "live" ? C.status : v.phase === "question" || v.phase === "reveal" ? `${v.phase}:${v.q.n}` : v.phase;
+    const key = C.status !== "live" ? C.status : v.phase === "question" || v.phase === "reveal" ? `${v.phase}:${v.q.n}` : v.phase === "final" ? `final:${v.fin.round}:${v.mode}:${v.vip}` : v.phase;
     const fresh = key !== C.shownKey;
     C.shownKey = key;
     if (!fresh && (key.startsWith("reveal") || key === "final" || key === "countin")) return;
@@ -302,12 +302,15 @@
   function finalView(v) {
     const f = v.fin;
     return `<div class="hero">${avatar(v.me.member)}
-        <div class="label">${f.place === 1 ? "TONIGHT'S HEADLINER" : "FINAL BROADCAST"}</div>
+        <div class="label">${f.round > 1 ? `AFTER ROUND ${f.round} · ` : ""}${f.place === 1 ? "TONIGHT'S HEADLINER" : "STANDINGS"}</div>
         <div class="verdict ${f.place === 1 ? "ok" : ""}">${ordinal(f.place)} place</div>
         <div class="big">${f.score}</div>
-        <div class="stats"><span>Right <b>${f.correct}/${f.total}</b></span><span>Rank <b>${esc(f.rank)}</b></span></div></div>
-      ${v.vip ? `<div class="row"><button type="button" class="btn" id="btn-again">Play again</button><button type="button" class="btn ghost" id="btn-lobby">Change mode or players</button></div>`
-        : `<p class="muted" style="text-align:center">The VIP decides what happens next.</p>`}`;
+        <div class="stats"><span>This round <b>+${f.gained}</b></span><span>Right <b>${f.correct}/${f.total}</b></span></div></div>
+      ${v.vip ? `<div class="vipbox"><span class="label">NEXT ROUND</span>
+          <div class="seg">${MODES.map(m => `<button type="button" id="mode-${m.id}" data-mode="${m.id}" aria-pressed="${v.mode === m.id}">${m.name}</button>`).join("")}</div>
+          <button type="button" class="btn" id="btn-again">Start round ${f.round + 1}</button>
+          <button type="button" class="btn ghost" id="btn-lobby">New game</button></div>`
+        : `<p class="muted" style="text-align:center">The VIP picks the next round.</p>`}`;
   }
 
   // ---------- timers
