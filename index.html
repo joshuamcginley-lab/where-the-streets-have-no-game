@@ -4,175 +4,212 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Where the Streets Have No Game</title>
-<meta name="description" content="A U2 trivia party game. Put it on the TV, join on your phones, play as Bono, Edge, Adam or Larry.">
+<meta name="description" content="A U2 trivia party game. Put it on the TV, join on your phones, play as Bono, Edge, Adam, Larry, MacPhisto or Mirror Ball Man.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=IBM+Plex+Sans:wght@400;500;600&family=VT323&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Big+Shoulders+Stencil+Display:wght@800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="shared.css">
 <style>
-  /* TV layout: one 16:9 screen, everything sized in rem off the viewport width so it reads from the sofa. */
+  /* TV layout: one 16:9 screen between two scrolling hazard-stripe bands. Everything is
+     sized in rem off the viewport width so it reads from the sofa. */
   html { font-size: clamp(13px, 1.2vw, 30px); }
-  body { overflow: hidden; }
+  body { overflow: hidden; --sw: .5rem; }
+  /* stripes run faster as the pressure goes up */
+  body[data-phase="countin"] { --stripe-speed: .45s; }
+  body.hurry { --stripe-speed: .35s; }
+  #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+  .band { position: fixed; left: 0; right: 0; height: .75rem; z-index: 2; }
+  .band.top { top: 0; }
+  .band.bottom { bottom: 0; }
   .tv {
-    height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 1.2rem;
-    padding-block: max(1.2rem, env(safe-area-inset-top, 0px)) max(1.2rem, env(safe-area-inset-bottom, 0px));
+    position: relative; z-index: 1;
+    height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 1.1rem;
+    padding-block: max(1.8rem, env(safe-area-inset-top, 0px)) max(1.9rem, env(safe-area-inset-bottom, 0px));
     padding-left: max(1.6rem, env(safe-area-inset-left, 0px));
     padding-right: max(1.6rem, env(safe-area-inset-right, 0px));
   }
-  .bar { display: flex; align-items: center; gap: 1.2rem; font-size: 1.35rem; color: var(--signal); }
-  .bar .rec::before { content: "● "; color: var(--bad); }
-  .bar .slogan { flex: 1; text-align: center; color: var(--muted); }
-  .bar button {
-    background: transparent; border: 1px solid var(--line); border-radius: .5rem; cursor: pointer;
-    font-family: var(--font-crt); font-size: 1.1rem; color: var(--muted); padding: .2rem .6rem;
+
+  /* ---------- header bar ---------- */
+  .bar { display: flex; align-items: center; gap: 1.2rem; font-size: .95rem; }
+  .live {
+    background: var(--red); color: var(--ink-on-signal); padding: .35rem .7rem; border-radius: .2rem; transform: skewX(-10deg);
+    font-weight: 600; letter-spacing: .14em;
   }
-  .bar button:hover { color: var(--fg); border-color: var(--muted); }
+  .live::before { content: ""; display: inline-block; width: .55em; height: .55em; border-radius: 50%; background: var(--fg); margin-right: .55em; vertical-align: .05em; animation: blink 1.2s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .bar .slogan { flex: 1; text-align: center; color: var(--muted); letter-spacing: .3em; }
+  .bar .slogan span { display: inline-block; animation: rise .5s backwards; }
+  .bar button {
+    background: transparent; border: 1px solid var(--line); border-radius: .25rem; cursor: pointer;
+    font: 500 .8rem var(--font-mono); letter-spacing: .1em; color: var(--muted); padding: .3rem .6rem;
+  }
+  .bar button:hover { color: var(--fg); border-color: var(--fg); }
   .stage { min-height: 0; display: grid; }
   .stage > section { min-height: 0; }
-
-  /* ---------- avatars ---------- */
-  .av {
-    --mc: var(--muted);
-    display: inline-grid; place-items: center; aspect-ratio: 1; width: 3rem; max-width: 100%;
-    border-radius: 50%; background: var(--mc); color: var(--ink-on-ch); overflow: hidden; flex: none;
-  }
-  .av svg { width: 64%; height: 64%; }
-  .av img { width: 100%; height: 100%; object-fit: cover; }
+  .label { font: 600 .9rem var(--font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 0 0 .55rem; }
 
   /* ---------- lobby ---------- */
-  .lobby { display: grid; grid-template-columns: 1fr 22rem; gap: 2rem; align-content: start; }
-  .lobby-main { display: grid; gap: 1.3rem; align-content: start; min-width: 0; }
+  .lobby { display: grid; grid-template-columns: 1fr 21rem; gap: 2rem; align-content: start; }
+  .lobby-main { display: grid; gap: 1.25rem; align-content: start; min-width: 0; }
   h1 {
     font-family: var(--font-display); font-weight: 900; text-transform: uppercase;
-    font-size: 4.4rem; line-height: .86; margin: 0; letter-spacing: -.01em; text-wrap: balance;
+    font-size: 4.6rem; line-height: .84; margin: 0; letter-spacing: -.005em; text-wrap: balance;
   }
-  h1 span { color: var(--signal); }
-  .label { font-family: var(--font-crt); font-size: 1.35rem; color: var(--muted); letter-spacing: .08em; margin: 0 0 .5rem; }
+  .lobby.intro h1 { animation: slam .7s cubic-bezier(.2,.9,.3,1.2) backwards; }
+  h1 em {
+    font-style: normal; font-family: var(--font-stencil); color: var(--ink-on-signal);
+    background: var(--red); padding: 0 .16em; margin-left: .04em; display: inline-block; transform: skewX(-10deg);
+  }
   .modes { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
   .mode {
-    text-align: left; cursor: pointer; background: transparent; border: 2px solid var(--line);
-    border-radius: .8rem; padding: .9rem 1.1rem; display: grid; gap: .2rem;
+    text-align: left; cursor: pointer; background: color-mix(in srgb, var(--screen) 88%, transparent); border: 2px solid var(--line);
+    border-radius: .4rem; padding: .85rem 1.1rem; display: grid; gap: .25rem; transition: border-color .2s, background .2s, transform .15s;
   }
-  .mode b { font-family: var(--font-display); font-size: 2rem; text-transform: uppercase; line-height: 1; }
+  .mode b { font-family: var(--font-display); font-weight: 900; font-size: 2.1rem; text-transform: uppercase; line-height: 1; }
   .mode span { color: var(--muted); font-size: .95rem; line-height: 1.35; }
-  .mode[aria-pressed="true"] { border-color: var(--signal); background: color-mix(in srgb, var(--signal) 9%, transparent); }
-  .mode:hover { border-color: var(--muted); }
-  .mode[aria-pressed="true"]:hover { border-color: var(--signal); }
+  .mode:hover { border-color: var(--muted); transform: translateY(-2px); }
+  .mode[aria-pressed="true"] { --fw: .4rem; border: var(--fw) solid transparent; padding: calc(.85rem - .4rem + 2px) calc(1.1rem - .4rem + 2px);
+    background: linear-gradient(var(--screen), var(--screen)) padding-box, var(--stripes) border-box; animation: stripe-run-border var(--stripe-speed) linear infinite; }
 
   .slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
   .slot {
     --mc: var(--muted);
-    position: relative; text-align: left; cursor: pointer; background: var(--screen);
-    border: 2px dashed var(--line); border-radius: .9rem; padding: .7rem .8rem;
+    position: relative; text-align: left; cursor: pointer; background: color-mix(in srgb, var(--screen) 88%, transparent);
+    border: 2px dashed var(--line); border-radius: .4rem; padding: .65rem .8rem;
     display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: .8rem; align-items: center; min-width: 0;
+    transition: border-color .2s, transform .15s;
   }
-  .slot .av { width: 3.4rem; grid-row: 1 / 3; opacity: .35; filter: grayscale(.6); }
-  .slot .who { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; text-transform: uppercase; line-height: 1; align-self: end; }
-  .slot .role { display: none; }
-  .slot .pname { font-family: var(--font-crt); font-size: 1.15rem; align-self: start; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
-  .slot.taken .pname { font-family: var(--font-body); font-weight: 600; font-size: 1.05rem; }
-  .slot.taken { border-style: solid; border-color: var(--mc); background: color-mix(in srgb, var(--mc) 10%, var(--screen)); }
+  .slot .av { width: 3.4rem; grid-row: 1 / 3; opacity: .3; filter: grayscale(.8); transition: opacity .3s, filter .3s; }
+  .slot .who { font-family: var(--font-display); font-weight: 900; font-size: 1.55rem; text-transform: uppercase; line-height: 1; align-self: end; }
+  .slot .pname { font: 500 .85rem var(--font-mono); letter-spacing: .08em; text-transform: uppercase; align-self: start; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); margin-top: .2rem; }
+  .slot.taken { border-style: solid; border-color: var(--mc); background: color-mix(in srgb, var(--mc) 14%, var(--screen)); }
   .slot.taken .av { opacity: 1; filter: none; }
-  .slot.taken .pname { color: var(--fg); }
+  .slot.taken .pname { font: 700 1.05rem var(--font-body); letter-spacing: 0; text-transform: none; color: var(--fg); }
+  .slot.pop .av { animation: pop .55s cubic-bezier(.2,.9,.3,1.4) both; }
+  .slot.pop { animation: flash .7s ease-out; --fx: var(--mc); }
   .slot.away { opacity: .5; }
-  .slot:hover:not(.taken) { border-color: var(--muted); }
+  .slot:hover:not(.taken) { border-color: var(--muted); transform: translateY(-2px); }
   .slot.taken:not(.couch) { cursor: default; }
   .vip {
-    position: absolute; top: .5rem; right: .5rem; font-family: var(--font-crt); font-size: .95rem;
-    background: var(--signal); color: var(--ink-on-signal); border-radius: .3rem; padding: 0 .35rem;
+    position: absolute; top: -.6rem; right: .6rem; font: 700 .75rem var(--font-mono); letter-spacing: .12em;
+    background: var(--fg); color: var(--bg); border-radius: .2rem; padding: .1rem .4rem;
   }
   .lobby-foot { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; font-size: 1.05rem; }
   .lobby-foot .btn { font-size: 1.35rem; }
+  .lobby-foot .btn:not(:disabled) { animation: thump 1.6s ease-in-out infinite; }
   .lobby-foot .hint { color: var(--muted); }
 
   .joinbox {
-    background: var(--screen); border: 1px solid var(--line); border-radius: 1rem;
-    padding: 1.4rem; display: grid; gap: 1rem; justify-items: center; text-align: center; align-content: start;
+    --fw: 1rem; border-radius: 0; box-shadow: 0 0 3rem rgba(0,0,0,.6);
+    padding: 1.3rem; display: grid; gap: .9rem; justify-items: center; text-align: center; align-content: start;
   }
-  .joinbox .qr { background: #fff; padding: .7rem; border-radius: .6rem; width: 13rem; max-width: 100%; aspect-ratio: 1; }
+  .joinbox .qr { background: #fff; padding: .7rem; border-radius: .3rem; width: 12.5rem; max-width: 100%; aspect-ratio: 1; }
   .joinbox .qr svg { width: 100%; height: 100%; display: block; }
-  .joinbox .url { font-size: 1rem; color: var(--muted); word-break: break-all; }
-  .code { font-family: var(--font-crt); font-size: 5rem; line-height: .9; letter-spacing: .14em; color: var(--signal); padding-left: .14em; }
+  .joinbox .url { font: 500 .9rem var(--font-mono); color: var(--muted); word-break: break-all; }
+  .code { font-family: var(--font-stencil); font-weight: 900; font-size: 5.4rem; line-height: .9; letter-spacing: .08em; color: var(--red); padding-left: .08em; }
   .netmsg { font-size: .95rem; color: var(--muted); max-width: 18rem; }
   .netmsg.bad { color: var(--bad); }
 
-  /* ---------- question / reveal ---------- */
-  .play { display: grid; grid-template-rows: auto auto 1fr auto; gap: 1.1rem; }
-  .hud { display: flex; align-items: center; gap: 1.4rem; font-size: 1.5rem; color: var(--muted); }
-  .hud b { color: var(--fg); font-weight: 400; }
-  .hud .grow { flex: 1; }
-  .timer { display: flex; align-items: center; gap: .8rem; }
-  .timer .num { font-size: 2.6rem; line-height: 1; color: var(--fg); min-width: 2ch; text-align: right; }
-  .meter { width: 16rem; height: .55rem; background: var(--line); border-radius: 1rem; overflow: hidden; }
-  .meter i { display: block; height: 100%; width: 100%; background: var(--signal); transform-origin: left; }
-  .meter.low i { background: var(--bad); }
-  .question {
-    font-family: var(--font-display); font-weight: 700; font-size: 3.6rem; line-height: 1.02; margin: 0;
-    text-wrap: balance; max-width: 40ch;
+  /* ---------- count-in: the whole screen goes to racing stripes ---------- */
+  .countin { position: fixed; inset: 0; z-index: 3; display: grid; place-items: center; --sw: 1.6rem; }
+  .countin .w {
+    grid-area: 1 / 1; font-family: var(--font-stencil); font-weight: 900; font-size: 14rem; line-height: .9; color: var(--fg);
+    background: var(--bg); padding: .04em .25em 0; opacity: 0;
+    animation: word .62s cubic-bezier(.2,.9,.3,1.1) both;
   }
-  .answers { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 1rem; align-content: center; min-height: 0; }
+  .countin .w:last-child { background: var(--fg); color: var(--red); font-size: 11rem; animation: pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
+
+  /* ---------- question / reveal ---------- */
+  .play { display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 1rem; }
+  .hud { display: flex; align-items: center; gap: 1.2rem; font-size: 1.05rem; color: var(--muted); }
+  .hud b { color: var(--fg); }
+  .hud .tag { background: var(--red); color: var(--ink-on-signal); padding: .25rem .6rem; border-radius: .2rem; }
+  .hud .grow { flex: 1; }
+  .timer { display: flex; align-items: center; gap: .9rem; }
+  .timer .num { font-family: var(--font-stencil); font-weight: 900; font-size: 3.4rem; line-height: .8; color: var(--fg); min-width: 2ch; text-align: right; }
+  .timer.low .num { color: var(--red); animation: thump .5s ease-in-out infinite; }
+  .meter { width: 18rem; height: .9rem; background: var(--line); overflow: hidden; transform: skewX(-20deg); }
+  .meter i { display: block; height: 100%; width: 100%; background: var(--fg); transform-origin: left; }
+  .timer .meter i { --sw: .3rem; background: var(--stripes); animation: stripe-run var(--stripe-speed) linear infinite; }
+  .answer-is { font-family: var(--font-display); font-weight: 900; font-size: 1.8rem; color: var(--good); letter-spacing: .04em; animation: pop .45s both; }
+  .question {
+    font-family: var(--font-display); font-weight: 900; font-size: 3.7rem; line-height: 1; margin: 0;
+    text-wrap: balance; max-width: 40ch; animation: slam .55s cubic-bezier(.2,.9,.3,1.1) both;
+  }
+  .answers { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: .9rem; align-content: center; min-height: 0; }
   .ans {
     --c: var(--ch1);
-    background: var(--screen); border: 2px solid var(--line); border-radius: 1rem;
-    padding: 1rem 1.2rem; display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: center;
-    font-size: 1.75rem; font-weight: 500; line-height: 1.2; text-align: left; min-width: 0; cursor: default;
-    transition: opacity .3s, border-color .3s, background .3s;
+    background: color-mix(in srgb, var(--screen) 92%, transparent); border: 2px solid var(--line); border-radius: .45rem;
+    padding: .9rem 1.2rem; display: grid; grid-template-columns: auto 1fr auto; gap: 1.1rem; align-items: center;
+    font-size: 1.8rem; font-weight: 600; line-height: 1.15; text-align: left; min-width: 0; cursor: default;
+    animation: rise .45s cubic-bezier(.2,.9,.3,1.1) backwards;
+    transition: opacity .35s, border-color .3s, background .3s, transform .3s;
   }
-  .ans:nth-child(2) { --c: var(--ch2); }
-  .ans:nth-child(3) { --c: var(--ch3); }
-  .ans:nth-child(4) { --c: var(--ch4); }
-  .ans .ch { font-family: var(--font-crt); font-size: 2rem; line-height: 1; background: var(--c); color: var(--ink-on-ch); border-radius: .4rem; padding: .25rem .5rem .1rem; }
+  .ans.ch2 { --c: var(--ch2); animation-delay: .08s; }
+  .ans.ch3 { --c: var(--ch3); animation-delay: .16s; }
+  .ans.ch4 { --c: var(--ch4); animation-delay: .24s; }
+  .ans .ch { font-size: 2.4rem; }
   .ans .pickers { display: flex; gap: .3rem; }
-  .ans .pickers .av { width: 2.6rem; }
-  .couch-on .ans { cursor: pointer; }
-  .couch-on .ans:hover { border-color: var(--c); }
-  .ans.right { border-color: var(--good); background: color-mix(in srgb, var(--good) 16%, var(--screen)); }
-  .ans.dim { opacity: .45; }
-  .ans.mine { border-color: var(--c); }
+  .ans .pickers .av { width: 2.7rem; animation: pop .4s cubic-bezier(.2,.9,.3,1.4) both; }
+  .couch-on .ans:not(.done) { cursor: pointer; }
+  .couch-on .ans:not(.done):hover { border-color: var(--fg); transform: translateY(-2px); }
+  .ans.mine { border-color: var(--fg); background: color-mix(in srgb, var(--fg) 10%, var(--screen)); }
+  .ans.right { border-color: var(--good); background: color-mix(in srgb, var(--good) 22%, var(--screen)); transform: scale(1.02); animation: flash .8s ease-out; --fx: var(--good); transition: none; }
+  .ans.dim { opacity: .4; transform: scale(.98); }
 
   .strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; }
   .pl {
     --mc: var(--muted);
     display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .8rem;
-    background: var(--screen); border: 1px solid var(--line); border-radius: .8rem; padding: .6rem .8rem; min-width: 0;
+    background: var(--screen); border: 2px solid var(--line); border-radius: .45rem; padding: .55rem .8rem; min-width: 0;
+    transition: border-color .25s;
   }
+  .pl .av { width: 3rem; }
   .pl .nm { min-width: 0; }
   .pl .nm b { display: block; font-size: 1.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .pl .nm span { font-family: var(--font-crt); font-size: 1.05rem; color: var(--muted); }
-  .pl .sc { font-family: var(--font-crt); font-size: 1.9rem; text-align: right; line-height: 1; }
-  .pl .st { font-family: var(--font-crt); font-size: 1.05rem; color: var(--muted); display: block; text-align: right; }
+  .pl .nm span { font: 500 .78rem var(--font-mono); letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+  .pl .sc { font-family: var(--font-stencil); font-weight: 900; font-size: 2.2rem; line-height: .9; display: block; text-align: right; }
+  .pl .st { font: 600 .78rem var(--font-mono); letter-spacing: .1em; color: var(--muted); display: block; text-align: right; }
   .pl.locked { border-color: var(--mc); }
   .pl.locked .st { color: var(--mc); }
-  .pl.gain .st { color: var(--good); }
+  .pl.just { animation: thump .45s ease-out; }
+  .pl.just .av { animation: pop .45s cubic-bezier(.2,.9,.3,1.4); }
+  .pl.gain { border-color: var(--good); }
+  .pl.gain .st { color: var(--good); font-size: 1rem; animation: pop .5s .2s cubic-bezier(.2,.9,.3,1.4) both; }
   .pl.miss .st { color: var(--bad); }
   .pl.away { opacity: .45; }
   .pl.empty { visibility: hidden; }
 
-  .fact { display: grid; grid-template-columns: 1fr auto; gap: 1.4rem; align-items: center; border-top: 1px solid var(--line); padding-top: 1rem; }
+  .fact { display: grid; grid-template-columns: 1fr auto; gap: 1.4rem; align-items: center; padding-top: .9rem; animation: rise .5s .3s backwards; position: relative; }
+  .fact::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: .35rem; --sw: .25rem; background: var(--stripes); }
   .fact p { margin: 0; font-size: 1.35rem; line-height: 1.45; max-width: 60ch; }
   .fact .next { display: grid; gap: .5rem; justify-items: end; }
   .fact .meter { width: 12rem; }
-  .fact .btn { font-size: 1.15rem; }
+  .fact .btn { font-size: 1.05rem; }
 
   /* ---------- final ---------- */
   .final { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4rem; align-content: center; }
-  .winner { display: grid; gap: 1rem; align-content: center; justify-items: start; }
-  .winner .av { width: 11rem; }
-  .winner .tag { font-family: var(--font-crt); font-size: 1.6rem; color: var(--signal); letter-spacing: .08em; }
-  .winner h2 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 5rem; line-height: .9; margin: 0; text-wrap: balance; }
-  .winner .rank { font-size: 1.5rem; color: var(--muted); margin: 0; }
+  .winner { display: grid; gap: .9rem; align-content: center; justify-items: start; }
+  .winner .av { width: 11rem; animation: pop .8s cubic-bezier(.2,.9,.3,1.4) both; }
+  .winner .ring { --sw: .45rem; padding: .7rem; border-radius: 50%; background: var(--stripes); animation: stripe-run var(--stripe-speed) linear infinite; display: inline-grid; }
+  .winner .tag { font: 600 1.05rem var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-on-signal); background: var(--red); padding: .3rem .7rem; border-radius: .2rem; animation: rise .5s .3s backwards; }
+  .winner h2 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 6rem; line-height: .85; margin: 0; text-wrap: balance; animation: slam .7s .45s backwards; }
+  .winner .rank { font-size: 1.5rem; color: var(--muted); margin: 0; animation: rise .5s .7s backwards; }
   .winner .rank b { color: var(--fg); }
   .board { list-style: none; margin: 0; padding: 0; display: grid; gap: .8rem; align-content: center; }
-  .board li { display: grid; grid-template-columns: 2.4rem auto 1fr auto; gap: 1rem; align-items: center; background: var(--screen); border: 1px solid var(--line); border-radius: .9rem; padding: .8rem 1.1rem; }
-  .board .pos { font-family: var(--font-crt); font-size: 2.2rem; color: var(--muted); }
-  .board li:first-child { border-color: var(--signal); }
-  .board li:first-child .pos { color: var(--signal); }
+  .board li { display: grid; grid-template-columns: 2.6rem auto 1fr auto; gap: 1rem; align-items: center; background: var(--screen); border: 2px solid var(--line); border-radius: .45rem; padding: .8rem 1.1rem; animation: rise .5s backwards; }
+  .board li:nth-child(2) { animation-delay: .1s; }
+  .board li:nth-child(3) { animation-delay: .2s; }
+  .board li:nth-child(4) { animation-delay: .3s; }
+  .board .pos { font-family: var(--font-stencil); font-weight: 900; font-size: 2.6rem; color: var(--muted); line-height: 1; }
+  .board li:first-child { --fw: .35rem; border: var(--fw) solid transparent; padding: calc(.8rem - .35rem + 2px) calc(1.1rem - .35rem + 2px); background: linear-gradient(var(--screen), var(--screen)) padding-box, var(--stripes) border-box; }
+  .board li:first-child .pos { color: var(--red); }
   .board .av { width: 3.4rem; }
   .board .who b { display: block; font-size: 1.4rem; }
-  .board .who span { font-family: var(--font-crt); font-size: 1.15rem; color: var(--muted); }
-  .board .pts { font-family: var(--font-crt); font-size: 2.6rem; }
+  .board .who span { font: 500 .85rem var(--font-mono); letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+  .board .pts { font-family: var(--font-stencil); font-weight: 900; font-size: 2.8rem; }
   .final-actions { grid-column: 1 / -1; display: flex; gap: 1rem; justify-content: center; }
-  .final-actions .btn { font-size: 1.25rem; }
+  .final-actions .btn { font-size: 1.2rem; }
 
   @media (max-aspect-ratio: 1/1) {
     /* A portrait screen (someone opened the TV page on a phone): stack. */
@@ -185,10 +222,13 @@
 </style>
 </head>
 <body>
+<div class="band top stripes moving" aria-hidden="true"></div>
+<div class="band bottom stripes moving" aria-hidden="true"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
 <div class="tv">
-  <div class="bar crt">
-    <span class="rec">ZOO TV · LIVE</span>
-    <span class="slogan" id="slogan">EVERYTHING YOU KNOW IS WRONG</span>
+  <div class="bar mono">
+    <span class="live">VERTIGO // LIVE</span>
+    <span class="slogan" id="slogan"><span>UNO, DOS, TRES, CATORCE!</span></span>
     <button type="button" id="btn-sound" title="Sound (M)">SOUND ON</button>
     <button type="button" id="btn-full" title="Full screen (F)">FULL SCREEN</button>
   </div>
@@ -204,13 +244,15 @@
 (() => {
   const { MODES, Q, RANKS } = U2;
   const { MEMBERS, byId, avatar, loadPhotos } = U2M;
-  const MAX = 4, ROUND = 10, SECS = 20, REVEAL_MS = 12000, LOBBY_GRACE_MS = 60000, STALE_MS = 12000;
+  const MAX = 4, ROUND = 10, SECS = 20, REVEAL_MS = 12000, COUNT_MS = 2900, LOBBY_GRACE_MS = 60000, STALE_MS = 12000;
   const CODE_CHARS = "BCDFGHJKLMNPQRSTVWXZ";
-  const SLOGANS = ["EVERYTHING YOU KNOW IS WRONG", "WATCH MORE TV", "BELIEVE", "TASTE IS THE ENEMY OF ART", "CALL THE WHITE HOUSE"];
+  const COUNT_WORDS = ["UNO", "DOS", "TRES", "¡CATORCE!"];
+  const SLOGANS = ["UNO, DOS, TRES, CATORCE!", "HELLO, HELLO", "¡HOLA!", "COEXIST", "A PLACE CALLED VERTIGO", "CITY OF BLINDING LIGHTS", "HOW TO DISMANTLE AN ATOMIC BOMB"];
+  const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  const S = { code: "", net: "connecting", netErr: "", phase: "lobby", mode: "casual", players: [], deck: [], i: 0, endsAt: 0, revealEndsAt: 0 };
+  const S = { code: "", net: "connecting", netErr: "", phase: "lobby", mode: "casual", players: [], deck: [], i: 0, game: 0, endsAt: 0, revealEndsAt: 0, countEndsAt: 0 };
   let room = null, qTimer = null, rTimer = null;
 
   // ---------- sound
@@ -226,11 +268,50 @@
     },
     join() { this.tone(660, .08); this.tone(990, .12, "square", .04, .08); },
     tick() { this.tone(1200, .04, "square", .025); },
-    lock() { this.tone(520, .06, "triangle", .06); },
+    lock() { this.tone(520, .06, "triangle", .07); },
     reveal() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, .22, "triangle", .07, i * .08)); },
-    start() { [392, 523, 659].forEach((f, i) => this.tone(f, .18, "square", .04, i * .12)); },
+    win() { [392, 523, 659, 784, 1047].forEach((f, i) => this.tone(f, .3, "square", .04, i * .11)); },
+    countIn() {
+      [0, .6, 1.2].forEach(d => this.tone(220, .14, "sawtooth", .06, d));
+      this.tone(440, .5, "sawtooth", .07, 1.8);
+      // Bono's count-in, if the browser can speak it
+      try {
+        if (!this.on || !window.speechSynthesis) return;
+        const u = new SpeechSynthesisUtterance("Uno, dos, tres, catorce!");
+        u.lang = "es-ES"; u.rate = 1.2; u.pitch = .9;
+        speechSynthesis.cancel(); speechSynthesis.speak(u);
+      } catch {}
+    },
   };
   ["pointerdown", "keydown"].forEach(ev => addEventListener(ev, () => Sound.init(), { once: true }));
+
+  // ---------- red and white ticker tape for the winner
+  const Confetti = (() => {
+    const cv = $("confetti"), cx = cv.getContext("2d");
+    let W = 0, H = 0, bits = [];
+    function size() { W = cv.width = innerWidth; H = cv.height = innerHeight; }
+    addEventListener("resize", size); size();
+    function burst(n = 160) {
+      if (REDUCE) return;
+      for (let i = 0; i < n; i++) bits.push({
+        x: Math.random() * W, y: -Math.random() * H * .6 - 20, vx: (Math.random() - .5) * 80, vy: 90 + Math.random() * 180,
+        w: 5 + Math.random() * 6, h: 14 + Math.random() * 22, a: Math.random() * 6, va: (Math.random() - .5) * 7, f: Math.random() * 6,
+        c: ["#d9301e", "#f4f0e8", "#d9301e", "#000000"][i % 4],
+      });
+    }
+    function draw(dt) {
+      if (!bits.length) return;
+      cx.clearRect(0, 0, W, H);
+      bits = bits.filter(b => b.y < H + 40);
+      for (const b of bits) {
+        b.x += b.vx * dt; b.y += b.vy * dt; b.a += b.va * dt; b.f += dt * 6;
+        cx.save(); cx.translate(b.x, b.y); cx.rotate(b.a); cx.scale(1, Math.cos(b.f));
+        cx.fillStyle = b.c; cx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h); cx.restore();
+      }
+      if (!bits.length) cx.clearRect(0, 0, W, H);
+    }
+    return { burst, draw };
+  })();
 
   // ---------- players
   const active = () => S.players.filter(p => p.local || p.connected);
@@ -239,6 +320,7 @@
   const placeOf = p => 1 + S.players.filter(x => x.score > p.score).length;
   const rankFor = p => RANKS.find(r => Math.round((p.correct / Math.max(1, S.deck.length)) * 10) >= r.min).name;
   const displayName = p => p.name || (byId(p.member)?.name ?? "Choosing…");
+  const shownName = p => p.local ? byId(p.member).name : (p.name || byId(p.member).name);
 
   function newPlayer(pid, name, local = false) {
     return { pid, name, local, member: null, conn: null, connected: local, seen: Date.now(), lostAt: 0,
@@ -246,6 +328,7 @@
   }
   function resetScores() {
     S.players.forEach(p => Object.assign(p, { score: 0, streak: 0, best: 0, correct: 0, answer: null, gain: 0, ok: false }));
+    shownScore.clear();
   }
 
   // ---------- room
@@ -326,14 +409,19 @@
   function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
   function startGame() {
-    // Drop anyone who left; everyone still here must have a member.
+    // Drop anyone who left; everyone still here must have a character.
     S.players = S.players.filter(p => p.local || p.connected);
     if (!canStart()) return sync();
     S.deck = shuffle(Q.filter(q => q.m === S.mode)).slice(0, ROUND).map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) }));
     resetScores();
-    S.i = 0;
-    Sound.start();
-    beginQuestion();
+    S.i = 0; S.game++;
+    // "Uno, dos, tres, catorce!" before the first question
+    S.phase = "countin";
+    S.countEndsAt = Date.now() + COUNT_MS;
+    clearTimeout(qTimer);
+    qTimer = setTimeout(beginQuestion, COUNT_MS);
+    Sound.countIn();
+    sync();
   }
 
   function beginQuestion() {
@@ -385,7 +473,7 @@
     clearTimeout(rTimer);
     S.i++;
     if (S.i < S.deck.length) beginQuestion();
-    else { S.phase = "final"; Sound.start(); sync(); }
+    else { S.phase = "final"; Sound.win(); sync(); }
   }
 
   function toLobby() {
@@ -421,6 +509,7 @@
       canStart: canStart(),
       waiting: active().filter(x => !x.member).length,
     };
+    if (S.phase === "countin") v.countLeft = Math.max(0, S.countEndsAt - now);
     if (S.phase === "question" || S.phase === "reveal") {
       v.q = { n: S.i + 1, total: S.deck.length, opts: q.opts, left: Math.max(0, S.endsAt - now) };
       v.my = p.answer ? p.answer.k : null;
@@ -436,6 +525,11 @@
   }
 
   // ---------- rendering
+  // Screens with entrance animations are built once per key and then updated in place,
+  // so a player locking in doesn't replay the question's entrance.
+  let builtKey = "", seated = new Set(), lockSeen = new Set();
+  const shownScore = new Map();
+
   function joinUrl() {
     const u = new URL("play.html", location.href);
     u.search = "";
@@ -445,47 +539,65 @@
   }
 
   function render() {
-    const focusId = document.activeElement?.id;
     const st = $("stage");
-    st.className = "stage" + (S.players.some(p => p.local) ? " couch-on" : "");
-    st.innerHTML = S.phase === "lobby" ? lobbyHtml() : S.phase === "final" ? finalHtml() : playHtml();
-    if (S.phase === "lobby") drawQr();
-    if (focusId && $(focusId)) $(focusId).focus({ preventScroll: true });
+    st.classList.toggle("couch-on", S.players.some(p => p.local));
+    const key = S.phase === "lobby" ? "lobby"
+      : S.phase === "countin" ? `count:${S.game}`
+      : S.phase === "final" ? `final:${S.game}`
+      : `q:${S.game}:${S.i}`;
+    if (S.phase === "lobby") {
+      const focusId = document.activeElement?.id;
+      st.innerHTML = lobbyHtml();
+      drawQr();
+      if (focusId && $(focusId)) $(focusId).focus({ preventScroll: true });
+    } else if (key !== builtKey) {
+      if (S.phase === "countin") st.innerHTML = countinHtml();
+      else if (S.phase === "final") { st.innerHTML = finalHtml(); Confetti.burst(220); }
+      else { st.innerHTML = playShell(); lockSeen = new Set(); }
+    }
+    if (S.phase === "question" || S.phase === "reveal") updatePlay();
+    builtKey = key;
+    document.body.dataset.phase = S.phase;
+    if (S.phase !== "question") document.body.classList.remove("hurry");
   }
 
   function lobbyHtml() {
     const modes = MODES.map(m =>
       `<button type="button" class="mode" id="mode-${m.id}" data-mode="${m.id}" aria-pressed="${S.mode === m.id}"><b>${m.name}</b><span>${m.blurb}</span></button>`).join("");
     const v = vip();
+    const now = new Set();
     const slots = MEMBERS.map(m => {
       const p = S.players.find(x => x.member === m.id);
-      const cls = ["slot", p && "taken", p && p.local && "couch", p && !p.local && !p.connected && "away"].filter(Boolean).join(" ");
-      const who = p ? (p.local ? "On this screen" : esc(p.name || "Phone player") + (p.connected ? "" : " · reconnecting")) : m.role.toUpperCase() + " · OPEN";
+      if (p) now.add(m.id);
+      const isNew = p && !seated.has(m.id);
+      const cls = ["slot", p && "taken", isNew && "pop", p && p.local && "couch", p && !p.local && !p.connected && "away"].filter(Boolean).join(" ");
+      const who = p ? (p.local ? "On this screen" : esc(p.name || "Phone player") + (p.connected ? "" : " · reconnecting")) : m.role + " · open";
       return `<button type="button" class="${cls}" id="slot-${m.id}" data-member="${m.id}" style="--mc:${m.color}"
         title="${p ? (p.local ? "Click to free this seat" : "") : "Click to play as " + m.name + " on this screen"}">
         ${p && p === v ? '<span class="vip">VIP</span>' : ""}
-        ${avatar(m.id)}<span class="who">${m.name}</span><span class="role">${m.role.toUpperCase()}</span><span class="pname">${who}</span></button>`;
+        ${avatar(m.id)}<span class="who">${m.name}</span><span class="pname">${who}</span></button>`;
     }).join("");
+    seated = now;
     const unpicked = active().filter(p => !p.member).length;
-    const hint = !active().length ? "Scan the code to join on your phone, or click a member to play on this screen."
+    const hint = !active().length ? "Scan the code to join on your phone, or click a character to play on this screen."
       : unpicked ? `Waiting for ${unpicked} player${unpicked > 1 ? "s" : ""} to pick a character.`
-      : `${active().length} of 4 in the band. ${v ? esc(displayName(v)) + " (VIP) can start from their phone." : "Press Enter to start."}`;
+      : `${active().length} of 4 on stage. ${v ? esc(displayName(v)) + " (VIP) can start from their phone." : "Press Enter to start."}`;
     const u = joinUrl();
-    const net = S.net === "open" ? `<div class="netmsg">Open the link or scan the code, then enter the room code.</div>`
+    const net = S.net === "open" ? `<div class="netmsg">Scan the code, or open the link and type the room code.</div>`
       : S.net === "connecting" ? `<div class="netmsg">Opening the room…</div>`
       : `<div class="netmsg bad">Phones can't connect right now (${esc(S.netErr)}). You can still play on this screen. <button type="button" class="btn ghost" id="btn-retry">Try again</button></div>`;
-    return `<section class="lobby">
+    return `<section class="lobby${builtKey !== "lobby" ? " intro" : ""}">
       <div class="lobby-main">
-        <h1>Where the Streets Have No <span>Game</span></h1>
-        <div><p class="label">MODE</p><div class="modes">${modes}</div></div>
-        <div><p class="label">PICK A CHARACTER · UP TO 4 PLAYERS</p><div class="slots">${slots}</div></div>
+        <h1>Where the Streets Have No <em>Game</em></h1>
+        <div><p class="label">Mode</p><div class="modes">${modes}</div></div>
+        <div><p class="label">Pick a character · up to 4 players</p><div class="slots">${slots}</div></div>
         <div class="lobby-foot"><button type="button" class="btn" id="btn-start" ${canStart() ? "" : "disabled"}>Start the show</button><span class="hint">${hint}</span></div>
       </div>
-      <aside class="joinbox">
-        <p class="label" style="margin:0">JOIN ON YOUR PHONE</p>
+      <aside class="joinbox framed moving">
+        <p class="label" style="margin:0">Join on your phone</p>
         <div class="qr" id="qr" aria-label="QR code to join"></div>
         <div class="url">${esc(u.host + u.pathname.replace(/\/[^/]*$/, "/play"))}</div>
-        <div><p class="label" style="margin:0">ROOM CODE</p><div class="code">${S.code || "····"}</div></div>
+        <div><p class="label" style="margin:0">Room code</p><div class="code">${S.code || "····"}</div></div>
         ${net}
       </aside>
     </section>`;
@@ -500,58 +612,82 @@
     } catch {}
   }
 
-  function playerCard(p, mode) {
+  function countinHtml() {
+    return `<section class="countin stripes moving" aria-label="Uno, dos, tres, catorce">${COUNT_WORDS.map((w, i) =>
+      `<span class="w" style="animation-delay:${i * .6}s">${w}</span>`).join("")}</section>`;
+  }
+
+  function playShell() {
+    const q = S.deck[S.i];
+    const mode = MODES.find(m => m.id === S.mode).name;
+    const answers = q.opts.map((o, k) =>
+      `<button type="button" class="ans ch${k + 1}" id="ans-${k}" data-k="${k}"><span class="ch">${k + 1}</span><span>${esc(o)}</span><span class="pickers"></span></button>`).join("");
+    return `<section class="play">
+      <div class="hud mono"><span class="tag">${mode}</span><span>Question <b>${S.i + 1}</b> of ${S.deck.length}</span><span class="grow"></span><span id="hud-right"></span></div>
+      <p class="question">${esc(q.q)}</p>
+      <div class="answers">${answers}</div>
+      <div class="strip" id="strip"></div>
+      <div class="fact" id="fact" hidden><p>${esc(q.f)}</p><div class="next"><button type="button" class="btn" id="btn-next">${S.i + 1 < S.deck.length ? "Next question" : "Final scores"}</button><div class="meter"><i id="rv-bar"></i></div></div></div>
+    </section>`;
+  }
+
+  function updatePlay() {
+    const q = S.deck[S.i], rev = S.phase === "reveal", right = q.opts.indexOf(q.a);
+    const couch = S.players.find(p => p.local);
+    const hr = $("hud-right");
+    if (hr.dataset.phase !== S.phase) {
+      hr.dataset.phase = S.phase;
+      hr.innerHTML = rev ? `<span class="answer-is">ANSWER ${right + 1}</span>`
+        : `<span class="timer" id="timer"><span class="meter"><i id="bar"></i></span><span class="num" id="num">${SECS}</span></span>`;
+    }
+    q.opts.forEach((o, k) => {
+      const b = $("ans-" + k);
+      b.classList.toggle("done", rev || !couch || !!couch.answer);
+      b.classList.toggle("mine", !rev && couch?.answer?.k === k);
+      b.classList.toggle("right", rev && k === right);
+      b.classList.toggle("dim", rev && k !== right);
+      b.tabIndex = rev || !couch || couch.answer ? -1 : 0;
+      const pk = b.querySelector(".pickers");
+      const html = rev ? S.players.filter(p => p.answer?.k === k).map(p => avatar(p.member)).join("") : "";
+      if (pk.innerHTML !== html) pk.innerHTML = html;
+    });
+    $("strip").innerHTML = [0, 1, 2, 3].map(i => playerCard(S.players[i])).join("");
+    $("fact").hidden = !rev;
+  }
+
+  function playerCard(p) {
     if (!p) return `<div class="pl empty"></div>`;
     const m = byId(p.member);
     let st = "", cls = "pl";
-    if (mode === "question") { st = p.answer ? "LOCKED IN" : (p.local || p.connected) ? "THINKING…" : "AWAY"; if (p.answer) cls += " locked"; }
-    else if (mode === "reveal") { st = p.ok ? `+${p.gain}` : p.answer ? "MISSED" : "NO ANSWER"; cls += p.ok ? " gain" : " miss"; }
+    if (S.phase === "question") {
+      st = p.answer ? "Locked in" : (p.local || p.connected) ? "Thinking…" : "Away";
+      if (p.answer) { cls += " locked"; if (!lockSeen.has(p.pid)) { lockSeen.add(p.pid); cls += " just"; } }
+    } else {
+      st = p.ok ? `+${p.gain}` : p.answer ? "Missed" : "No answer";
+      cls += p.ok ? " gain" : " miss";
+    }
     if (!p.local && !p.connected) cls += " away";
+    if (!shownScore.has(p.pid)) shownScore.set(p.pid, p.score);
     return `<div class="${cls}" style="--mc:${m.color}">${avatar(p.member)}
-      <div class="nm"><b>${esc(p.local ? m.name : (p.name || m.name))}</b><span>${p.local ? "ON THE TV" : m.name.toUpperCase()}</span></div>
-      <div><span class="sc">${p.score}</span><span class="st">${st}</span></div></div>`;
-  }
-
-  function playHtml() {
-    const q = S.deck[S.i], rev = S.phase === "reveal", right = q.opts.indexOf(q.a);
-    const couch = S.players.find(p => p.local);
-    const answers = q.opts.map((o, k) => {
-      let cls = "ans";
-      if (rev) cls += k === right ? " right" : " dim";
-      else if (couch?.answer?.k === k) cls += " mine";
-      const pickers = rev ? S.players.filter(p => p.answer?.k === k).map(p => avatar(p.member)).join("") : "";
-      return `<button type="button" class="${cls}" id="ans-${k}" data-k="${k}" ${rev || !couch || couch.answer ? "tabindex=\"-1\"" : ""}>
-        <span class="ch">${k + 1}</span><span>${esc(o)}</span><span class="pickers">${pickers}</span></button>`;
-    }).join("");
-    const strip = [0, 1, 2, 3].map(i => playerCard(S.players[i], S.phase)).join("");
-    const mode = MODES.find(m => m.id === S.mode).name.toUpperCase();
-    const bottom = rev
-      ? `<div class="fact"><p>${esc(q.f)}</p><div class="next"><button type="button" class="btn" id="btn-next">${S.i + 1 < S.deck.length ? "Next question" : "Final scores"}</button><div class="meter"><i id="rv-bar"></i></div></div></div>`
-      : `<div class="strip">${strip}</div>`;
-    return `<section class="play">
-      <div class="hud crt"><span>${mode}</span><span>Q <b>${S.i + 1}</b>/${S.deck.length}</span><span class="grow"></span>
-        ${rev ? `<span>ANSWER: <b>${right + 1}</b></span>` : `<span class="timer"><span class="meter" id="meter"><i id="bar"></i></span><span class="num" id="num">${SECS}</span></span>`}</div>
-      <p class="question">${esc(q.q)}</p>
-      <div class="answers">${answers}</div>
-      ${rev ? `<div class="strip">${strip}</div>${bottom}` : bottom}
-    </section>`;
+      <div class="nm"><b>${esc(shownName(p))}</b><span>${p.local ? "On the TV" : m.name}</span></div>
+      <div><span class="sc" data-pid="${esc(p.pid)}">${Math.round(shownScore.get(p.pid))}</span><span class="st mono">${st}</span></div></div>`;
   }
 
   function finalHtml() {
     const order = S.players.slice().sort((a, b) => b.score - a.score);
-    const w = order[0], wm = byId(w.member);
+    const w = order[0];
     const tie = order.length > 1 && order[1].score === w.score;
     const board = order.map(p => {
       const m = byId(p.member);
-      return `<li>${`<span class="pos">${placeOf(p)}</span>`}${avatar(p.member)}
-        <span class="who"><b>${esc(p.local ? m.name : (p.name || m.name))}</b><span>${m.name.toUpperCase()} · ${p.correct}/${S.deck.length} RIGHT · BEST STREAK ${p.best}</span></span>
+      return `<li><span class="pos">${placeOf(p)}</span>${avatar(p.member)}
+        <span class="who"><b>${esc(shownName(p))}</b><span>${m.name} · ${p.correct}/${S.deck.length} right · best streak ${p.best}</span></span>
         <span class="pts">${p.score}</span></li>`;
     }).join("");
     return `<section class="final">
       <div class="winner">
-        ${avatar(w.member)}
-        <span class="tag">${tie ? "IT'S A TIE AT THE TOP" : order.length > 1 ? "TONIGHT'S HEADLINER" : "FINAL BROADCAST"}</span>
-        <h2>${esc(w.local ? wm.name : (w.name || wm.name))}</h2>
+        <span class="ring">${avatar(w.member)}</span>
+        <span class="tag">${tie ? "Tie at the top" : order.length > 1 ? "Tonight's headliner" : "Final score"}</span>
+        <h2>${esc(shownName(w))}</h2>
         <p class="rank">Rank: <b>${rankFor(w)}</b></p>
       </div>
       <ol class="board">${board}</ol>
@@ -562,19 +698,32 @@
     </section>`;
   }
 
-  // ---------- animation: timers
-  let lastTickSec = null;
-  function frame() {
+  // ---------- animation loop: spiral, confetti, timers, score count-up
+  let last = performance.now(), lastTickSec = null;
+  function frame(t) {
+    const dt = Math.min(.1, Math.max(0, (t - last) / 1000)); last = t;
     const now = Date.now();
     if (S.phase === "question" && $("bar")) {
-      const left = Math.max(0, S.endsAt - now), sec = Math.ceil(left / 1000);
+      const left = Math.max(0, S.endsAt - now), sec = Math.ceil(left / 1000), low = left < 5000;
       $("bar").style.transform = `scaleX(${left / (SECS * 1000)})`;
       $("num").textContent = sec;
-      $("meter").classList.toggle("low", left < 5000);
+      $("timer").classList.toggle("low", low);
+      document.body.classList.toggle("hurry", low);
       if (sec !== lastTickSec && sec <= 5 && sec > 0) Sound.tick();
       lastTickSec = sec;
     }
     if (S.phase === "reveal" && $("rv-bar")) $("rv-bar").style.transform = `scaleX(${Math.max(0, S.revealEndsAt - now) / REVEAL_MS})`;
+    document.querySelectorAll(".sc[data-pid]").forEach(el => {
+      const p = S.players.find(x => x.pid === el.dataset.pid);
+      if (!p) return;
+      let v = shownScore.get(p.pid) ?? p.score;
+      if (v !== p.score) {
+        v = p.score - v < 1 ? p.score : v + Math.max(1, (p.score - v) * Math.min(1, dt * 4));
+        shownScore.set(p.pid, v);
+        el.textContent = Math.round(v);
+      }
+    });
+    Confetti.draw(dt);
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
@@ -614,16 +763,16 @@
   $("btn-full").onclick = toggleFull;
   $("btn-sound").onclick = toggleSound;
 
-  // ZOO TV slogan flicker
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    let s = 0; setInterval(() => { s = (s + 1) % SLOGANS.length; $("slogan").textContent = SLOGANS[s]; }, 3500);
+  // Header slogans
+  if (!REDUCE) {
+    let s = 0; setInterval(() => { s = (s + 1) % SLOGANS.length; $("slogan").innerHTML = `<span>${SLOGANS[s]}</span>`; }, 3500);
   }
 
   // Keep the TV awake while hosting (not all browsers allow it).
   try { navigator.wakeLock?.request("screen").catch(() => {}); } catch {}
 
   window.__game = S; // handy for debugging from the console
-  loadPhotos(() => render());
+  loadPhotos(() => { builtKey = ""; render(); });
   openRoom();
 })();
 </script>

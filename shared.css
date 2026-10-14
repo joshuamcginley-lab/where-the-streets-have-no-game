@@ -1,53 +1,99 @@
-/* ZOO TV broadcast look, shared by the TV screen and the phone controller.
-   Deliberately a single dark theme: it is a television picture. */
+/* How to Dismantle an Atomic Bomb / Vertigo look, shared by the TV and the phones.
+   The signature is the red-and-black slanted hazard stripe; everything else is
+   black, bomb red and bone white. Deliberately a single dark theme: it is a stage. */
 :root {
   color-scheme: dark;
-  --bg: #0b0c0f;
-  --screen: #14161b;
-  --raise: #1b1e25;
-  --line: #2a2e37;
-  --fg: #ecebe6;
-  --muted: #9a9ca5;
-  --signal: #f2d14b;            /* broadcast yellow */
-  --ink-on-signal: #16140a;
-  /* answer channels: Trabant red, yellow, blue, green */
-  --ch1: #e0533d;
-  --ch2: #e8b931;
-  --ch3: #3f86d6;
-  --ch4: #46a86c;
-  --ink-on-ch: #0b0c0f;
-  --good: #6fd08c;
-  --bad: #ff6b5a;
+  --bg: #0a0909;
+  --screen: #151313;
+  --raise: #1e1b1b;
+  --line: #322b2a;
+  --fg: #f4f0e8;              /* bone white */
+  --muted: #a39b97;
+  --red: #d9301e;             /* bomb red */
+  --red-deep: #7d110c;
+  --signal: var(--red);
+  --ink-on-signal: #fff8f0;
+  /* answer channels: red, white, silver, and a hollow fourth */
+  --ch1: #d9301e;
+  --ch2: #f4f0e8;
+  --ch3: #9aa1a8;
+  --ch4: transparent;
+  --ink-on-ch: #0a0909;
+  --good: #5fd38a;
+  --bad: #ff5a4f;
   --font-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --font-stencil: "Big Shoulders Stencil Display", "Big Shoulders Display", Impact, sans-serif;
   --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
-  --font-crt: "VT323", ui-monospace, "Courier New", monospace;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Courier New", monospace;
+  /* the slanted stripes; --sw is one stripe's width */
+  --sw: 11px;
+  --stripes: repeating-linear-gradient(-45deg, var(--red) 0 var(--sw), #000 var(--sw) calc(var(--sw) * 2));
+  --stripe-shift: calc(var(--sw) * 2.8284);   /* one full repeat along the x axis at 45° */
+  --stripe-speed: 1.6s;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
 body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
 [hidden] { display: none !important; }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
 
-.crt { font-family: var(--font-crt); letter-spacing: .05em; font-variant-numeric: tabular-nums; }
-.display { font-family: var(--font-display); text-transform: uppercase; }
+.mono { font-family: var(--font-mono); font-weight: 500; letter-spacing: .08em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.stencil { font-family: var(--font-stencil); font-weight: 900; font-variant-numeric: tabular-nums; }
+
+/* Anything striped can scroll: add .moving */
+.stripes { background: var(--stripes); }
+.moving { animation: stripe-run var(--stripe-speed) linear infinite; }
+@keyframes stripe-run { from { background-position: 0 0; } to { background-position: var(--stripe-shift) 0; } }
+
+/* A stripe frame: the element gets a striped border of --fw around its own background */
+.framed {
+  --fw: 10px;
+  border: var(--fw) solid transparent;
+  background: linear-gradient(var(--frame-fill, var(--screen)), var(--frame-fill, var(--screen))) padding-box, var(--stripes) border-box;
+}
+.framed.moving { animation-name: stripe-run-border; }
+@keyframes stripe-run-border { from { background-position: 0 0, 0 0; } to { background-position: 0 0, var(--stripe-shift) 0; } }
 
 .btn {
-  font: 600 1em/1 var(--font-body); cursor: pointer;
-  background: var(--signal); color: var(--ink-on-signal); border: 0; border-radius: 999px;
-  padding: .85em 1.6em;
+  font: 700 1em/1 var(--font-body); cursor: pointer; letter-spacing: .04em; text-transform: uppercase;
+  background: var(--red); color: var(--ink-on-signal); border: 0; border-radius: .2em;
+  padding: .9em 1.6em; transition: transform .12s, filter .15s, box-shadow .2s;
 }
-.btn:hover { filter: brightness(1.08); }
-.btn:disabled { opacity: .4; cursor: default; filter: none; }
-.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.btn:hover:not(:disabled) {
+  --sw: 7px;
+  background: repeating-linear-gradient(-45deg, var(--red) 0 var(--sw), var(--red-deep) var(--sw) calc(var(--sw) * 2));
+  animation: stripe-run .6s linear infinite;
+}
+.btn:active:not(:disabled) { transform: scale(.97); }
+.btn:disabled { opacity: .35; cursor: default; }
+.btn.ghost { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 2px var(--line); }
+.btn.ghost:hover { background: transparent; box-shadow: inset 0 0 0 2px var(--fg); animation: none; }
 
-/* Scanlines for anything that should look like it's on the monitor */
-.scan { position: relative; isolation: isolate; }
-.scan::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2; border-radius: inherit;
-  background: repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0,0,0,.26) 2px 3px);
+/* answer channel badges: the fourth is hollow so all four read apart */
+.ch {
+  font-family: var(--font-stencil); font-weight: 900; line-height: 1; text-align: center;
+  background: var(--c); color: var(--ink-on-ch); border-radius: .15em; padding: .12em .3em .08em; min-width: 1.5em;
 }
+.ch4 .ch, .ch.ch4 { box-shadow: inset 0 0 0 .12em var(--fg); color: var(--fg); }
+
+/* character avatars: black silhouette on the character's colour */
+.av {
+  --mc: var(--muted);
+  display: inline-grid; place-items: center; aspect-ratio: 1; max-width: 100%;
+  border-radius: 50%; background: var(--mc); color: #0a0909; overflow: hidden; flex: none;
+}
+.av svg { width: 64%; height: 64%; }
+.av img { width: 100%; height: 100%; object-fit: cover; }
+
+@keyframes slam { from { transform: scale(1.15); opacity: 0; filter: blur(6px); } to { transform: none; opacity: 1; filter: none; } }
+@keyframes rise { from { transform: translateY(1.2em); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pop { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } 100% { transform: none; } }
+@keyframes thump { 0%, 100% { transform: none; } 40% { transform: scale(1.06); } }
+@keyframes flash { 0% { box-shadow: 0 0 0 0 var(--fx, var(--good)); } 100% { box-shadow: 0 0 0 1.2em transparent; } }
+@keyframes word { 0% { transform: scale(2.2) skewX(-8deg); opacity: 0; } 18% { transform: skewX(-8deg); opacity: 1; } 80% { opacity: 1; } 100% { transform: scale(.92) skewX(-8deg); opacity: 0; } }
+@keyframes wipe { from { clip-path: polygon(0 0, 0 0, -20% 100%, -20% 100%); } to { clip-path: polygon(0 0, 120% 0, 100% 100%, -20% 100%); } }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none !important; animation: none !important; }
+  *, *::before, *::after { transition: none !important; animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
 }

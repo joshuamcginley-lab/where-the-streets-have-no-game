@@ -7,10 +7,11 @@
 <title>Where the Streets Have No Game · Controller</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=IBM+Plex+Sans:wght@400;500;600&family=VT323&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Big+Shoulders+Stencil+Display:wght@800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="shared.css">
 <style>
-  /* Phone controller: one column, thumb-sized targets, the TV does the talking. */
+  /* Phone controller: one column, thumb-sized targets, the TV does the talking.
+     A red LED band across the top echoes the TV's header. */
   body {
     font-size: 16px; line-height: 1.45; -webkit-tap-highlight-color: transparent;
     padding-block: max(14px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-bottom, 0px));
@@ -18,18 +19,18 @@
     padding-right: max(16px, env(safe-area-inset-right, 0px));
   }
   .app { max-width: 480px; margin: 0 auto; min-height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 18px; }
-  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 20px; color: var(--muted); }
-  .top b { color: var(--signal); font-weight: 400; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); padding-bottom: 14px; position: relative; }
+  .top::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; --sw: 5px; background: var(--stripes); animation: stripe-run var(--stripe-speed) linear infinite; }
+  .top b { color: var(--red); font-family: var(--font-stencil); font-weight: 900; font-size: 22px; letter-spacing: .06em; }
   .me { display: flex; align-items: center; gap: 8px; min-width: 0; }
   .me span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .screen { display: grid; gap: 16px; align-content: start; }
 
   h1 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 44px; line-height: .9; margin: 0; text-wrap: balance; }
-  h1 span { color: var(--signal); }
   h2 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 34px; line-height: .95; margin: 0; text-wrap: balance; }
   p { margin: 0; }
   .muted { color: var(--muted); }
-  .label { font-family: var(--font-crt); font-size: 19px; letter-spacing: .08em; color: var(--muted); }
+  .label { font: 600 12px var(--font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
 
   form { display: grid; gap: 14px; }
   label { display: grid; gap: 6px; }
@@ -38,7 +39,7 @@
     border: 1px solid var(--line); border-radius: 10px; padding: 14px; width: 100%;
   }
   input:focus { outline: 2px solid var(--signal); outline-offset: 1px; }
-  #room { font-family: var(--font-crt); font-size: 34px; letter-spacing: .3em; text-transform: uppercase; padding: 8px 14px; }
+  #room { font-family: var(--font-stencil); font-weight: 900; font-size: 40px; letter-spacing: .3em; text-transform: uppercase; padding: 6px 14px; color: var(--red); }
   .btn { font-size: 18px; padding: 16px 24px; width: 100%; }
   .err { color: var(--bad); }
 
@@ -55,22 +56,24 @@
   }
   .char .av { width: 60px; }
   .char b { font-family: var(--font-display); font-size: 22px; text-transform: uppercase; line-height: 1; }
-  .char small { font-family: var(--font-crt); font-size: 16px; color: var(--muted); }
+  .char small { font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .char[aria-pressed="true"] .av { animation: pop .45s cubic-bezier(.2,.9,.3,1.4); }
   .char[aria-pressed="true"] { border-color: var(--mc); background: color-mix(in srgb, var(--mc) 14%, var(--screen)); }
   .char:disabled { opacity: .3; cursor: default; }
 
   .hero { display: grid; justify-items: center; text-align: center; gap: 12px; padding-block: 10px; }
   .hero .av { width: 120px; }
 
-  .vipbox { border: 1px solid var(--signal); border-radius: 12px; padding: 14px; display: grid; gap: 12px; }
-  .vipbox .label { color: var(--signal); }
+  .vipbox { --fw: 7px; --sw: 6px; border: var(--fw) solid transparent; background: linear-gradient(var(--bg), var(--bg)) padding-box, var(--stripes) border-box; animation: stripe-run-border var(--stripe-speed) linear infinite; padding: 12px; display: grid; gap: 12px; }
+  .vipbox .label { color: var(--fg); }
   .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .seg button { background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 12px; cursor: pointer; font-weight: 600; }
-  .seg button[aria-pressed="true"] { border-color: var(--signal); color: var(--signal); }
+  .seg button[aria-pressed="true"] { border-color: var(--red); background: color-mix(in srgb, var(--red) 18%, transparent); }
 
-  .qhead { display: flex; justify-content: space-between; font-size: 22px; color: var(--muted); }
-  .meter { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
-  .meter i { display: block; height: 100%; width: 100%; background: var(--signal); transform-origin: left; }
+  .qhead { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); }
+  .meter { height: 12px; background: var(--line); overflow: hidden; transform: skewX(-20deg); }
+  .meter i { --sw: 5px; display: block; height: 100%; width: 100%; background: var(--stripes); transform-origin: left; animation: stripe-run var(--stripe-speed) linear infinite; }
+  .meter.low i { --stripe-speed: .35s; }
   .pad { display: grid; gap: 10px; }
   .key {
     --c: var(--ch1);
@@ -79,28 +82,38 @@
     padding: 16px; min-height: 76px; font-size: 18px; font-weight: 500; line-height: 1.25;
     transition: opacity .2s, border-color .2s, background .2s, transform .08s;
   }
-  .key:nth-child(2) { --c: var(--ch2); }
-  .key:nth-child(3) { --c: var(--ch3); }
-  .key:nth-child(4) { --c: var(--ch4); }
-  .key .ch { font-family: var(--font-crt); font-size: 28px; line-height: 1; background: var(--c); color: var(--ink-on-ch); border-radius: 6px; padding: 6px 10px 3px; }
+  .key.ch2 { --c: var(--ch2); }
+  .key.ch3 { --c: var(--ch3); }
+  .key.ch4 { --c: var(--ch4); }
+  .key .ch { font-size: 32px; }
+  .enter .key { animation: rise .4s cubic-bezier(.2,.9,.3,1.1) both; }
+  .enter .key.ch2 { animation-delay: .06s; }
+  .enter .key.ch3 { animation-delay: .12s; }
+  .enter .key.ch4 { animation-delay: .18s; }
   .key:active:not(:disabled) { transform: scale(.98); }
-  .key.picked { border-color: var(--c); background: color-mix(in srgb, var(--c) 18%, var(--screen)); }
+  .key.picked { border-color: var(--fg); background: color-mix(in srgb, var(--fg) 12%, var(--screen)); animation: thump .35s ease-out; }
   .key.right { border-color: var(--good); background: color-mix(in srgb, var(--good) 16%, var(--screen)); }
   .key.off { opacity: .3; }
   .key:disabled { cursor: default; }
 
-  .verdict { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 64px; line-height: .9; }
+  .verdict { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 64px; line-height: .9; animation: slam .5s cubic-bezier(.2,.9,.3,1.1) both; }
   .verdict.ok { color: var(--good); }
   .verdict.no { color: var(--bad); }
-  .big { font-family: var(--font-crt); font-size: 56px; line-height: 1; color: var(--signal); }
-  .stats { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; font-family: var(--font-crt); font-size: 20px; color: var(--muted); }
-  .stats b { color: var(--fg); font-weight: 400; }
+  .big { font-family: var(--font-stencil); font-weight: 900; font-size: 64px; line-height: 1; color: var(--fg); animation: pop .5s .15s cubic-bezier(.2,.9,.3,1.4) both; }
+  .stats { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; font: 500 13px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .stats b { color: var(--fg); }
+  .hero .av { animation: pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
+  .calm .hero .av, .calm .char .av { animation: none; }
+  h1 em { font-style: normal; font-family: var(--font-stencil); color: var(--ink-on-signal); background: var(--red); padding: 0 .14em; display: inline-block; transform: skewX(-10deg); }
+  .countin { position: fixed; inset: 0; z-index: 3; display: grid; place-items: center; --sw: 22px; --stripe-speed: .45s; background: var(--stripes); animation: stripe-run var(--stripe-speed) linear infinite; }
+  .countin .w { grid-area: 1 / 1; font-family: var(--font-stencil); font-weight: 900; font-size: 96px; line-height: .9; background: var(--bg); padding: 4px 18px 0; opacity: 0; animation: word .62s cubic-bezier(.2,.9,.3,1.1) both; }
+  .countin .w:last-child { background: var(--fg); color: var(--red); font-size: 64px; animation: pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
   .row { display: grid; gap: 10px; }
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="top crt" id="top"></div>
+  <div class="top mono" id="top"></div>
   <main class="screen" id="screen"></main>
 </div>
 
@@ -198,10 +211,19 @@
       : `<span>U2 TRIVIA</span><span>${C.code ? `ROOM <b>${esc(C.code)}</b>` : ""}</span>`;
     const s = $("screen");
     const focusId = document.activeElement?.id;
+    // Screens with entrance animations are only rebuilt when they change, so another
+    // player's update doesn't replay them.
+    const key = C.status !== "live" ? C.status : v.phase === "question" || v.phase === "reveal" ? `${v.phase}:${v.q.n}` : v.phase;
+    const fresh = key !== C.shownKey;
+    C.shownKey = key;
+    if (!fresh && (key.startsWith("reveal") || key === "final" || key === "countin")) return;
+    s.classList.toggle("enter", fresh);
+    s.classList.remove("calm");
     if (C.status === "form" || C.status === "error") s.innerHTML = formView();
     else if (C.status === "connecting") s.innerHTML = msgView("Connecting", `Finding room ${esc(C.code)}…`);
     else if (C.status === "lost") s.innerHTML = msgView("Reconnecting", "Lost the TV for a moment. Hang on, your seat is saved.");
     else if (v.phase === "lobby") s.innerHTML = lobbyView(v);
+    else if (v.phase === "countin") s.innerHTML = countinView(v);
     else if (v.phase === "question") s.innerHTML = questionView(v);
     else if (v.phase === "reveal") s.innerHTML = revealView(v);
     else if (v.phase === "final") s.innerHTML = finalView(v);
@@ -209,7 +231,7 @@
   }
 
   function formView() {
-    return `<h1>Where the Streets Have No <span>Game</span></h1>
+    return `<h1>Where the Streets Have No <em>Game</em></h1>
       <p class="muted">Enter the room code shown on the TV.</p>
       <form id="join-form" autocomplete="off">
         <label><span class="label">ROOM CODE</span><input id="room" name="room" maxlength="4" inputmode="text" autocapitalize="characters" spellcheck="false" value="${esc(C.code)}" required></label>
@@ -223,6 +245,9 @@
 
   function lobbyView(v) {
     const mine = v.me.member;
+    const justPicked = mine && mine !== C.lastMine;
+    C.lastMine = mine;
+    $("screen").classList.toggle("calm", !justPicked);
     const chars = MEMBERS.map(m => {
       const taken = v.taken[m.id];
       return `<button type="button" class="char" id="char-${m.id}" data-member="${m.id}" style="--mc:${m.color}" aria-pressed="${mine === m.id}" ${taken ? "disabled" : ""}>
@@ -240,11 +265,17 @@
     return `${head}${mine ? vip : ""}<div class="chars">${chars}</div>${mine ? "" : vip}`;
   }
 
+  function countinView(v) {
+    const elapsed = (2900 - (v.countLeft ?? 2900)) / 1000;
+    return `<div class="countin" aria-label="Uno, dos, tres, catorce">${["UNO", "DOS", "TRES", "¡CATORCE!"].map((w, i) =>
+      `<span class="w" style="animation-delay:${(i * .6 - elapsed).toFixed(2)}s">${w}</span>`).join("")}</div>`;
+  }
+
   function questionView(v) {
     const picked = v.my;
     const keys = v.q.opts.map((o, k) =>
-      `<button type="button" class="key ${picked === k ? "picked" : picked !== null ? "off" : ""}" data-k="${k}" ${picked !== null ? "disabled" : ""}><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
-    return `<div class="qhead crt"><span>Q ${v.q.n}/${v.q.total}</span><span id="secs"></span></div>
+      `<button type="button" class="key ch${k + 1} ${picked === k ? "picked" : picked !== null ? "off" : ""}" data-k="${k}" ${picked !== null ? "disabled" : ""}><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
+    return `<div class="qhead mono"><span>Q ${v.q.n}/${v.q.total}</span><span id="secs"></span></div>
       <div class="meter"><i id="bar"></i></div>
       <p class="muted">${picked === null ? "The question is on the TV. Pick your answer." : "Locked in. Waiting for the others."}</p>
       <div class="pad">${keys}</div>`;
@@ -253,7 +284,7 @@
   function revealView(v) {
     const r = v.rv;
     const keys = v.q.opts.map((o, k) =>
-      `<button type="button" class="key ${k === r.right ? "right" : v.my === k ? "picked" : "off"}" disabled><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
+      `<button type="button" class="key ch${k + 1} ${k === r.right ? "right" : v.my === k ? "picked" : "off"}" disabled><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
     const head = r.ok ? `<div class="verdict ok">Correct</div><div class="big">+${r.gain}</div>`
       : `<div class="verdict no">${v.my === null ? "Too slow" : "Not quite"}</div>`;
     return `<div class="hero">${head}
@@ -278,6 +309,7 @@
     if (C.v?.phase === "question" && $("bar")) {
       const left = Math.max(0, C.deadline - Date.now());
       $("bar").style.transform = `scaleX(${left / 20000})`;
+      $("bar").parentElement.classList.toggle("low", left < 5000);
       $("secs").textContent = Math.ceil(left / 1000) + "s";
     }
     requestAnimationFrame(frame);
