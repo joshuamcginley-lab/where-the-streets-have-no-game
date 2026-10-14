@@ -7,7 +7,7 @@
 <meta name="description" content="A U2 trivia party game. Put it on the TV, join on your phones, play as Bono, Edge, Adam, Larry, MacPhisto or Mirror Ball Man.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Big+Shoulders+Stencil+Display:wght@800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Big+Shoulders+Stencil+Display:wght@800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Tinos:wght@400;700&display=swap">
 <link rel="stylesheet" href="shared.css">
 <style>
   /* TV layout: one 16:9 screen under a thin hazard-stripe band. Everything is
@@ -18,24 +18,26 @@
   body[data-phase="countin"] { --stripe-speed: .45s; }
   body.hurry { --stripe-speed: .35s; }
   #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
-  .band { position: fixed; left: 0; right: 0; top: 0; height: .8rem; z-index: 2; }
+  body { display: flex; flex-direction: column; }
+  header.cover { flex: none; height: 6.2rem; font-size: 1rem; padding-top: env(safe-area-inset-top, 0px); }
+  header.cover .title { font-size: 2.5rem; }
+  .controls {
+    position: fixed; z-index: 4; display: flex; gap: .4rem;
+    right: max(1rem, env(safe-area-inset-right, 0px)); bottom: max(.5rem, env(safe-area-inset-bottom, 0px));
+  }
+  .controls button {
+    background: transparent; border: 0; cursor: pointer; padding: .3rem .5rem;
+    font: 500 .7rem var(--font-mono); letter-spacing: .1em; color: var(--muted); opacity: .7;
+  }
+  .controls button:hover { color: var(--fg); opacity: 1; }
   .tv {
-    position: relative; z-index: 1;
-    height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 1.1rem;
-    padding-block: max(1.8rem, env(safe-area-inset-top, 0px)) max(1.9rem, env(safe-area-inset-bottom, 0px));
+    position: relative; z-index: 1; flex: 1; min-height: 0;
+    display: grid; grid-template-rows: 1fr;
+    padding-block: 1.2rem max(1.9rem, env(safe-area-inset-bottom, 0px));
     padding-left: max(1.6rem, env(safe-area-inset-left, 0px));
     padding-right: max(1.6rem, env(safe-area-inset-right, 0px));
   }
 
-  /* ---------- header bar ---------- */
-  .bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1.2rem; font-size: .95rem; }
-  .bar .motto { grid-column: 2; font-weight: 600; letter-spacing: .32em; color: var(--fg); white-space: nowrap; }
-  .bar .controls { grid-column: 3; justify-self: end; display: flex; gap: .4rem; }
-  .bar button {
-    background: transparent; border: 0; border-radius: .25rem; cursor: pointer;
-    font: 500 .8rem var(--font-mono); letter-spacing: .1em; color: var(--muted); padding: .3rem .6rem;
-  }
-  .bar button:hover { color: var(--fg); border-color: var(--fg); }
   .stage { min-height: 0; display: grid; }
   .stage > section { min-height: 0; }
   .label { font: 600 .9rem var(--font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 0 0 .55rem; }
@@ -214,16 +216,13 @@
 </style>
 </head>
 <body>
-<div class="band stripes" aria-hidden="true"></div>
+<header class="cover"><span class="title">Everything You Know Is Wrong</span></header>
 <canvas id="confetti" aria-hidden="true"></canvas>
+<div class="controls">
+  <button type="button" id="btn-sound" title="Sound (M)">SOUND ON</button>
+  <button type="button" id="btn-full" title="Full screen (F)">FULL SCREEN</button>
+</div>
 <div class="tv">
-  <div class="bar mono">
-    <span class="motto">EVERYTHING YOU KNOW IS WRONG</span>
-    <span class="controls">
-      <button type="button" id="btn-sound" title="Sound (M)">SOUND ON</button>
-      <button type="button" id="btn-full" title="Full screen (F)">FULL SCREEN</button>
-    </span>
-  </div>
   <main class="stage" id="stage"></main>
 </div>
 
@@ -289,7 +288,7 @@
       for (let i = 0; i < n; i++) bits.push({
         x: Math.random() * W, y: -Math.random() * H * .6 - 20, vx: (Math.random() - .5) * 80, vy: 90 + Math.random() * 180,
         w: 5 + Math.random() * 6, h: 14 + Math.random() * 22, a: Math.random() * 6, va: (Math.random() - .5) * 7, f: Math.random() * 6,
-        c: ["#d9301e", "#f4f0e8", "#d9301e", "#000000"][i % 4],
+        c: ["#c8452c", "#f4f0e8", "#c8452c", "#000000"][i % 4],
       });
     }
     function draw(dt) {

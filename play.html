@@ -7,7 +7,7 @@
 <title>Where the Streets Have No Game · Controller</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Big+Shoulders+Stencil+Display:wght@800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Big+Shoulders+Stencil+Display:wght@800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Tinos:wght@400;700&display=swap">
 <link rel="stylesheet" href="shared.css">
 <style>
   /* Phone controller: one column, thumb-sized targets, the TV does the talking.
@@ -18,9 +18,10 @@
     padding-left: max(16px, env(safe-area-inset-left, 0px));
     padding-right: max(16px, env(safe-area-inset-right, 0px));
   }
+  header.cover { height: 64px; font-size: 9px; margin: calc(-1 * max(14px, env(safe-area-inset-top, 0px))) calc(-1 * max(16px, env(safe-area-inset-right, 0px))) 16px calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-top: env(safe-area-inset-top, 0px); }
+  header.cover .title { font-size: 17px; }
   .app { max-width: 480px; margin: 0 auto; min-height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 18px; }
   .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); padding-bottom: 14px; position: relative; }
-  .top::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; --sw: 4px; background: var(--stripes); }
   .top b { color: var(--red); font-family: var(--font-stencil); font-weight: 900; font-size: 22px; letter-spacing: .06em; }
   .me { display: flex; align-items: center; gap: 8px; min-width: 0; }
   .me span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -113,6 +114,7 @@
 </style>
 </head>
 <body>
+<header class="cover"><span class="title">Everything You Know Is Wrong</span></header>
 <div class="app">
   <div class="top mono" id="top"></div>
   <main class="screen" id="screen"></main>

@@ -9,12 +9,12 @@
   --line: #322b2a;
   --fg: #f4f0e8;              /* bone white */
   --muted: #a39b97;
-  --red: #d9301e;             /* bomb red */
-  --red-deep: #7d110c;
+  --red: #c8452c;             /* the album cover's brick red */
+  --red-deep: #6e1d10;
   --signal: var(--red);
   --ink-on-signal: #fff8f0;
   /* answer channels: red, white, silver, and a hollow fourth */
-  --ch1: #d9301e;
+  --ch1: #c8452c;
   --ch2: #f4f0e8;
   --ch3: #9aa1a8;
   --ch4: transparent;
@@ -25,6 +25,7 @@
   --font-stencil: "Big Shoulders Stencil Display", "Big Shoulders Display", Impact, sans-serif;
   --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "Courier New", monospace;
+  --font-serif: "Tinos", "Times New Roman", Times, serif;   /* the album title face */
   /* the slanted stripes; --sw is one stripe's width */
   --sw: 11px;
   --stripes: repeating-linear-gradient(-45deg, var(--red) 0 var(--sw), #000 var(--sw) calc(var(--sw) * 2));
@@ -40,6 +41,17 @@ button { font: inherit; color: inherit; }
 
 .mono { font-family: var(--font-mono); font-weight: 500; letter-spacing: .08em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
 .stencil { font-family: var(--font-stencil); font-weight: 900; font-variant-numeric: tabular-nums; }
+
+/* The album cover: a band of wide brick-red slashes on black with the title set over them in white serif capitals */
+.cover {
+  --cw: 2.6em;   /* one red slash */
+  position: relative; display: grid; place-items: center; overflow: hidden;
+  background: repeating-linear-gradient(-58deg, #000 0 calc(var(--cw) * 1.25), var(--red) calc(var(--cw) * 1.25) calc(var(--cw) * 2.25));
+}
+.cover .title {
+  font-family: var(--font-serif); font-weight: 400; color: #fff; text-transform: uppercase;
+  letter-spacing: .03em; white-space: nowrap; text-shadow: 0 0 .5em rgba(0,0,0,.35);
+}
 
 /* Anything striped can scroll: add .moving */
 .stripes { background: var(--stripes); }
