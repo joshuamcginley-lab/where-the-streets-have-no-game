@@ -3,7 +3,7 @@
    black, bomb red and bone white. Deliberately a single dark theme: it is a stage. */
 :root {
   color-scheme: dark;
-  --bg: #0a0909;
+  --bg: #000000;             /* the black between the cover stripes */
   --screen: #151313;
   --raise: #1e1b1b;
   --line: #322b2a;
