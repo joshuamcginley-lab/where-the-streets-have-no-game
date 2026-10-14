@@ -60,7 +60,19 @@
     font-style: normal; font-family: var(--font-stencil); color: var(--ink-on-signal);
     background: var(--red); padding: 0 .16em; margin-left: .04em; display: inline-block; transform: skewX(-10deg);
   }
-  .modes { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+  .soundhint { color: var(--red); font-weight: 600; margin: 0; }
+
+  /* name-that-song: bars that bounce while the clip plays */
+  .listening { display: inline-flex; align-items: flex-end; gap: .25rem; height: 2.6rem; margin-left: 1.2rem; vertical-align: -.1em; }
+  .listening i { width: .45rem; height: 100%; background: var(--red); transform-origin: bottom; animation: eq .9s ease-in-out infinite alternate; }
+  .listening i:nth-child(2) { animation-delay: -.3s; } .listening i:nth-child(3) { animation-delay: -.6s; }
+  .listening i:nth-child(4) { animation-delay: -.15s; } .listening i:nth-child(5) { animation-delay: -.45s; }
+  .reveal-on .listening i { animation-play-state: paused; opacity: .4; }
+  @keyframes eq { from { transform: scaleY(.15); } to { transform: scaleY(1); } }
+  .fact .art { width: 6.5rem; height: 6.5rem; object-fit: cover; flex: none; }
+  .fact .song { display: flex; gap: 1.2rem; align-items: center; }
+  .fact .credit { display: block; font: 500 .8rem var(--font-mono); letter-spacing: .08em; color: var(--muted); margin-top: .35rem; text-transform: uppercase; }
   .mode {
     text-align: left; cursor: pointer; background: color-mix(in srgb, var(--screen) 88%, transparent); border: 2px solid var(--line);
     border-radius: .4rem; padding: .85rem 1.1rem; display: grid; gap: .25rem; transition: border-color .2s, background .2s, transform .15s;
@@ -240,6 +252,7 @@
 <script src="vendor/qrcode.js"></script>
 <script src="questions.js"></script>
 <script src="members.js"></script>
+<script src="songs.js"></script>
 <script src="net.js"></script>
 <script>
 (() => {
@@ -294,7 +307,10 @@
     },
   };
   Sound.init();   // starts suspended; any click or key on the TV lets it play
-  ["pointerdown", "keydown"].forEach(ev => addEventListener(ev, () => Sound.init()));
+  ["pointerdown", "keydown"].forEach(ev => addEventListener(ev, () => {
+    Sound.init();
+    if (S.phase === "lobby" && document.querySelector(".soundhint")) setTimeout(render, 0);
+  }));
 
   // ---------- the host's own copy of "Vertigo" for the count-in
   // The file never leaves this device: it is read here and kept in this browser's storage.
@@ -500,11 +516,69 @@
   // ---------- game flow
   function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
+  // ---------- name that song
+  // Previews and artwork stream from Apple; nothing is hosted here.
+  const SONGS = window.U2S?.SONGS || [];
+
+  function songQuestion(song) {
+    // Wrong answers: songs from around the same time, so the year alone doesn't give it away.
+    const near = SONGS.filter(x => x.title !== song.title)
+      .map(x => ({ x, d: Math.abs(x.year - song.year) + Math.random() * 3 }))
+      .sort((a, b) => a.d - b.d).slice(0, 8).map(o => o.x);
+    return { q: "Name that song", a: song.title, w: shuffle(near).slice(0, 3).map(x => x.title), song };
+  }
+
+  // Ten questions. Name That Song is all clips (mostly hits, some deep cuts);
+  // the other modes are trivia with one clip slipped in somewhere in the middle.
+  function buildDeck(mode) {
+    if (mode === "songs" && !SONGS.length) mode = "casual";   // song list didn't load
+    if (mode === "songs") {
+      const hits = shuffle(SONGS.filter(x => x.tier === "hit")), deep = shuffle(SONGS.filter(x => x.tier === "deep"));
+      return shuffle([...hits.slice(0, 6), ...deep.slice(0, 4)]).slice(0, ROUND).map(songQuestion);
+    }
+    const deck = shuffle(Q.filter(q => q.m === mode)).slice(0, ROUND);
+    const pool = SONGS.filter(x => x.tier === (mode === "deep" ? "deep" : "hit"));
+    if (pool.length) deck[2 + Math.floor(Math.random() * 6)] = songQuestion(pool[Math.floor(Math.random() * pool.length)]);
+    return deck;
+  }
+
+  const Player = {
+    el: new Audio(), fader: null,
+    play(url) {
+      this.stop();
+      if (!Sound.on || !url) return;
+      this.el.src = url; this.el.volume = 1;
+      this.el.play().catch(() => toast("The TV couldn't play the clip. Click anywhere on the TV screen once so it can play sound."));
+    },
+    fade(to, ms = 800) {
+      clearInterval(this.fader);
+      const from = this.el.volume, t0 = performance.now();
+      this.fader = setInterval(() => {
+        const k = Math.min(1, (performance.now() - t0) / ms);
+        this.el.volume = from + (to - from) * k;
+        if (k === 1) clearInterval(this.fader);
+      }, 30);
+    },
+    stop() { clearInterval(this.fader); this.el.pause(); this.el.removeAttribute("src"); this.el.load(); },
+  };
+
+  // Preview links can change, so refresh them from Apple when the TV loads.
+  (async () => {
+    try {
+      for (let i = 0; i < SONGS.length; i += 150) {
+        const ids = SONGS.slice(i, i + 150).map(x => x.id).join(",");
+        const r = await fetch(`https://itunes.apple.com/lookup?id=${ids}&country=us`);
+        const fresh = new Map((await r.json()).results.map(x => [x.trackId, x.previewUrl]));
+        SONGS.forEach(x => { if (fresh.get(x.id)) x.preview = fresh.get(x.id); });
+      }
+    } catch {}
+  })();
+
   function startGame() {
     // Drop anyone who left; everyone still here must have a character.
     S.players = S.players.filter(p => p.local || p.connected);
     if (!canStart()) return sync();
-    S.deck = shuffle(Q.filter(q => q.m === S.mode)).slice(0, ROUND).map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) }));
+    S.deck = buildDeck(S.mode).map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) }));
     resetScores();
     S.i = 0; S.game++;
     // "Unos, dos, tres, catorce!" before the first question
@@ -520,6 +594,8 @@
   function beginQuestion() {
     clearTimeout(rTimer);
     S.phase = "question";
+    const q = S.deck[S.i];
+    if (q.song) Player.play(q.song.preview); else Player.stop();
     S.players.forEach(p => { p.answer = null; p.gain = 0; p.ok = false; });
     S.endsAt = Date.now() + SECS * 1000;
     clearTimeout(qTimer);
@@ -558,6 +634,7 @@
     S.revealEndsAt = Date.now() + REVEAL_MS;
     rTimer = setTimeout(nextQuestion, REVEAL_MS);
     Sound.reveal();
+    Player.fade(.3);   // the song keeps going quietly under the reveal
     sync();
   }
 
@@ -566,11 +643,12 @@
     clearTimeout(rTimer);
     S.i++;
     if (S.i < S.deck.length) beginQuestion();
-    else { S.phase = "final"; Sound.win(); sync(); }
+    else { S.phase = "final"; Player.stop(); Sound.win(); sync(); }
   }
 
   function toLobby() {
     clearTimeout(qTimer); clearTimeout(rTimer);
+    Player.stop();
     S.phase = "lobby";
     S.players = S.players.filter(p => p.local || p.connected);
     resetScores();
@@ -604,7 +682,7 @@
     };
     if (S.phase === "countin") Object.assign(v, { countLeft: Math.max(0, S.countEndsAt - now), countMs: S.countMs, countAt });
     if (S.phase === "question" || S.phase === "reveal") {
-      v.q = { n: S.i + 1, total: S.deck.length, opts: q.opts, left: Math.max(0, S.endsAt - now) };
+      v.q = { n: S.i + 1, total: S.deck.length, opts: q.opts, left: Math.max(0, S.endsAt - now), song: !!q.song };
       v.my = p.answer ? p.answer.k : null;
     }
     if (S.phase === "reveal") v.rv = { right: q.opts.indexOf(q.a), ok: p.ok, gain: p.gain, streak: p.streak, place: placeOf(p), of: S.players.length, left: Math.max(0, S.revealEndsAt - now) };
@@ -689,6 +767,7 @@
         <div><p class="label">Mode</p><div class="modes">${modes}</div></div>
         <div><p class="label">Pick a character · up to 4 players</p><div class="slots">${slots}</div></div>
         <div class="lobby-foot"><button type="button" class="btn" id="btn-start" ${canStart() ? "" : "disabled"}>Start the show</button><span class="hint">${hint}</span></div>
+        ${navigator.userActivation && !navigator.userActivation.hasBeenActive ? `<p class="soundhint">Click anywhere on this screen once to switch the sound on.</p>` : ""}
       </div>
       <aside class="joinbox framed">
         <p class="label" style="margin:0">Join on your phone</p>
@@ -719,12 +798,16 @@
     const mode = MODES.find(m => m.id === S.mode).name;
     const answers = q.opts.map((o, k) =>
       `<button type="button" class="ans ch${k + 1}" id="ans-${k}" data-k="${k}"><span class="ch">${k + 1}</span><span>${esc(o)}</span><span class="pickers"></span></button>`).join("");
+    const s = q.song;
+    const fact = s
+      ? `<div class="song"><img class="art" src="${esc(s.art)}" alt=""><p>From <b>${esc(s.album)}</b> (${s.year}).<span class="credit">Preview courtesy of Apple Music</span></p></div>`
+      : `<p>${esc(q.f)}</p>`;
     return `<section class="play">
       <div class="hud mono"><span class="tag">${mode}</span><span>Question <b>${S.i + 1}</b> of ${S.deck.length}</span><span class="grow"></span><span id="hud-right"></span></div>
-      <p class="question">${esc(q.q)}</p>
+      <p class="question">${esc(q.q)}${s ? `<span class="listening" aria-label="Playing on the TV"><i></i><i></i><i></i><i></i><i></i></span>` : ""}</p>
       <div class="answers">${answers}</div>
       <div class="strip" id="strip"></div>
-      <div class="fact" id="fact" hidden><p>${esc(q.f)}</p><div class="next"><button type="button" class="btn" id="btn-next">${S.i + 1 < S.deck.length ? "Next question" : "Final scores"}</button><div class="meter"><i id="rv-bar"></i></div></div></div>
+      <div class="fact" id="fact" hidden>${fact}<div class="next"><button type="button" class="btn" id="btn-next">${S.i + 1 < S.deck.length ? "Next question" : "Final scores"}</button><div class="meter"><i id="rv-bar"></i></div></div></div>
     </section>`;
   }
 
@@ -750,6 +833,7 @@
     });
     $("strip").innerHTML = [0, 1, 2, 3].map(i => playerCard(S.players[i])).join("");
     $("fact").hidden = !rev;
+    $("stage").classList.toggle("reveal-on", rev);
   }
 
   function playerCard(p) {

@@ -67,8 +67,8 @@
 
   .vipbox { --fw: 5px; --sw: 6px; border: var(--fw) solid transparent; background: linear-gradient(var(--bg), var(--bg)) padding-box, var(--stripes) border-box; padding: 12px; display: grid; gap: 12px; }
   .vipbox .label { color: var(--fg); }
-  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .seg button { background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 12px; cursor: pointer; font-weight: 600; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .seg button { background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 10px 6px; cursor: pointer; font-weight: 600; font-size: 14px; line-height: 1.2; }
   .seg button[aria-pressed="true"] { border-color: var(--red); background: color-mix(in srgb, var(--red) 18%, transparent); }
 
   .qhead { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); }
@@ -282,7 +282,7 @@
       `<button type="button" class="key ch${k + 1} ${picked === k ? "picked" : picked !== null ? "off" : ""}" data-k="${k}" ${picked !== null ? "disabled" : ""}><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
     return `<div class="qhead mono"><span>Q ${v.q.n}/${v.q.total}</span><span id="secs"></span></div>
       <div class="meter"><i id="bar"></i></div>
-      <p class="muted">${picked === null ? "The question is on the TV. Pick your answer." : "Locked in. Waiting for the others."}</p>
+      <p class="muted">${picked !== null ? "Locked in. Waiting for the others." : v.q.song ? "Listen to the TV. Which song is it?" : "The question is on the TV. Pick your answer."}</p>
       <div class="pad">${keys}</div>`;
   }
 

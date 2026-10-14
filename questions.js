@@ -5,6 +5,7 @@ window.U2 = (() => {
   const MODES = [
     { id: "casual", name: "Casual Fan", blurb: "The hits, the albums, the big moments. For anyone with a U2 song on a playlist." },
     { id: "deep",   name: "Deep Cuts",  blurb: "B-sides, studios, producers and tour lore. For people who own the box sets." },
+    { id: "songs",  name: "Name That Song", blurb: "A clip plays on the TV. Name the song before everyone else does." },
   ];
 
   const CASUAL = [
