@@ -15,7 +15,7 @@ A U2 trivia party game in the style of Jackbox. The TV shows the questions; ever
 3. Each player picks a character. The first phone to join is the **VIP**: they choose the mode and start the game from their phone. The TV can also start it with the button or Enter.
 4. The question appears on the TV, and the four answers appear on every phone. After everyone answers (or time runs out), the TV reveals the answer, who picked what, and a fact about it.
 
-**Bono's count-in.** Before the first question the TV plays the opening of "Vertigo" (`audio/vertigo-intro.m4a`), with "UNOS · DOS · TRES · ¡CATORCE!" timed to Bono's voice and the band crashing in on the last word. If the clip can't play, a computer voice does the count-in instead.
+**Bono's count-in.** Before the first question the TV plays the opening of "Vertigo" (`audio/vertigo-intro.m4a`), with "UNOS · DOS · TRES · ¡CATORCE!" timed to Bono's voice and the band crashing in on the last word. If the clip can't play, a computer voice does the count-in instead. If you swap in a different clip, open `/sync` on the TV computer to tap along and re-time the words, then put the new numbers in `CLIP_AT` in `index.html`.
 
 TV keyboard shortcuts: **Enter** start or next, **1–4** answer for the on-screen player, **F** full screen. Sound is always on.
 

@@ -310,12 +310,12 @@
   }));
 
   // ---------- Bono's count-in, from the top of "Vertigo"
-  // Word times measured from audio/vertigo-intro.m4a; the band crashes in at 1.6 s, on "-ce!".
+  // Word times for audio/vertigo-intro.m4a, tapped along by ear on sync.html. Re-run that page if the clip changes.
   // If the clip can't load or play, the robot voice takes over with the default timing.
   // Timings set by ear on sync.html are saved in this browser and win over the built-in ones.
   const CLIP_AT = (() => {
     try { const t = JSON.parse(localStorage.getItem("wtshng-countin-at")); if (Array.isArray(t) && t.length === 4 && t.every(n => typeof n === "number" && n >= 0 && n < 7)) return t; } catch {}
-    return [.08, .4, .7, 1.04];
+    return [1.95, 2.97, 3.84, 4.69];   // set by ear on sync.html
   })();
   const Clip = {
     buffer: null,
@@ -335,9 +335,11 @@
         const at = (performance.now() - started) / 1000;
         if (at > end) return;
         const src = c.createBufferSource(), g = c.createGain(), t = c.currentTime;
+        // Fade out by the end of the question's arrival, or by the end of the clip if that's sooner.
+        const dur = this.buffer.duration, fadeEnd = Math.min(end + 1, dur), fadeStart = Math.max(at, Math.min(end - .3, fadeEnd - .8));
         src.buffer = this.buffer; src.connect(g).connect(c.destination);
-        g.gain.setValueAtTime(1, t); g.gain.setValueAtTime(1, t + Math.max(0, end - at - .3)); g.gain.linearRampToValueAtTime(0, t + end - at + 1);
-        src.start(t, at, end - at + 1.1);
+        g.gain.setValueAtTime(1, t); g.gain.setValueAtTime(1, t + fadeStart - at); g.gain.linearRampToValueAtTime(0, t + fadeEnd - at);
+        src.start(t, at, fadeEnd - at + .05);
       };
       if (c.state === "running") go();
       else c.resume().then(go).catch(() => {});
