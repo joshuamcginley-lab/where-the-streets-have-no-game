@@ -20,7 +20,7 @@
   }
   .app { max-width: 480px; margin: 0 auto; min-height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 18px; }
   .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); padding-bottom: 14px; position: relative; }
-  .top::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; --sw: 5px; background: var(--stripes); animation: stripe-run var(--stripe-speed) linear infinite; }
+  .top::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; --sw: 4px; background: var(--stripes); }
   .top b { color: var(--red); font-family: var(--font-stencil); font-weight: 900; font-size: 22px; letter-spacing: .06em; }
   .me { display: flex; align-items: center; gap: 8px; min-width: 0; }
   .me span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -64,7 +64,7 @@
   .hero { display: grid; justify-items: center; text-align: center; gap: 12px; padding-block: 10px; }
   .hero .av { width: 120px; }
 
-  .vipbox { --fw: 7px; --sw: 6px; border: var(--fw) solid transparent; background: linear-gradient(var(--bg), var(--bg)) padding-box, var(--stripes) border-box; animation: stripe-run-border var(--stripe-speed) linear infinite; padding: 12px; display: grid; gap: 12px; }
+  .vipbox { --fw: 5px; --sw: 6px; border: var(--fw) solid transparent; background: linear-gradient(var(--bg), var(--bg)) padding-box, var(--stripes) border-box; padding: 12px; display: grid; gap: 12px; }
   .vipbox .label { color: var(--fg); }
   .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .seg button { background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 12px; cursor: pointer; font-weight: 600; }
@@ -72,8 +72,8 @@
 
   .qhead { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); }
   .meter { height: 12px; background: var(--line); overflow: hidden; transform: skewX(-20deg); }
-  .meter i { --sw: 5px; display: block; height: 100%; width: 100%; background: var(--stripes); transform-origin: left; animation: stripe-run var(--stripe-speed) linear infinite; }
-  .meter.low i { --stripe-speed: .35s; }
+  .meter i { --sw: 5px; display: block; height: 100%; width: 100%; background: var(--stripes); transform-origin: left; }
+  .meter.low i { animation: stripe-run .35s linear infinite; }
   .pad { display: grid; gap: 10px; }
   .key {
     --c: var(--ch1);
@@ -107,7 +107,8 @@
   h1 em { font-style: normal; font-family: var(--font-stencil); color: var(--ink-on-signal); background: var(--red); padding: 0 .14em; display: inline-block; transform: skewX(-10deg); }
   .countin { position: fixed; inset: 0; z-index: 3; display: grid; place-items: center; --sw: 22px; --stripe-speed: .45s; background: var(--stripes); animation: stripe-run var(--stripe-speed) linear infinite; }
   .countin .w { grid-area: 1 / 1; font-family: var(--font-stencil); font-weight: 900; font-size: 96px; line-height: .9; background: var(--bg); padding: 4px 18px 0; opacity: 0; animation: word .62s cubic-bezier(.2,.9,.3,1.1) both; }
-  .countin .w:last-child { background: var(--fg); color: var(--red); font-size: 64px; animation: pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
+  .countin .w:last-child { background: var(--fg); color: var(--red); font-size: 64px; opacity: 1; animation: pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
+  .countin.hold { animation-play-state: paused; }
   .row { display: grid; gap: 10px; }
 </style>
 </head>
@@ -266,9 +267,11 @@
   }
 
   function countinView(v) {
-    const elapsed = (2900 - (v.countLeft ?? 2900)) / 1000;
+    // Same timing as the TV: quick UNOS-DOS-TRES, a beat, then CATORCE holds.
+    const at = [0, .5, 1, 1.85], elapsed = (4400 - (v.countLeft ?? 4400)) / 1000;
+    setTimeout(() => document.querySelector(".countin")?.classList.add("hold"), Math.max(0, at[3] - elapsed) * 1000);
     return `<div class="countin" aria-label="Unos, dos, tres, catorce">${["UNOS", "DOS", "TRES", "¡CATORCE!"].map((w, i) =>
-      `<span class="w" style="animation-delay:${(i * .6 - elapsed).toFixed(2)}s">${w}</span>`).join("")}</div>`;
+      `<span class="w" style="animation-delay:${(at[i] - elapsed).toFixed(2)}s">${w}</span>`).join("")}</div>`;
   }
 
   function questionView(v) {

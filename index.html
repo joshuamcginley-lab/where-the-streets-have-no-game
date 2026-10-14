@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Big+Shoulders+Stencil+Display:wght@800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="shared.css">
 <style>
-  /* TV layout: one 16:9 screen between two scrolling hazard-stripe bands. Everything is
+  /* TV layout: one 16:9 screen under a thin hazard-stripe band. Everything is
      sized in rem off the viewport width so it reads from the sofa. */
   html { font-size: clamp(13px, 1.2vw, 30px); }
   body { overflow: hidden; --sw: .5rem; }
@@ -18,9 +18,7 @@
   body[data-phase="countin"] { --stripe-speed: .45s; }
   body.hurry { --stripe-speed: .35s; }
   #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
-  .band { position: fixed; left: 0; right: 0; height: .75rem; z-index: 2; }
-  .band.top { top: 0; }
-  .band.bottom { bottom: 0; }
+  .band { position: fixed; left: 0; right: 0; top: 0; height: .45rem; z-index: 2; }
   .tv {
     position: relative; z-index: 1;
     height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 1.1rem;
@@ -35,12 +33,10 @@
     background: var(--red); color: var(--ink-on-signal); padding: .35rem .7rem; border-radius: .2rem; transform: skewX(-10deg);
     font-weight: 600; letter-spacing: .14em;
   }
-  .live::before { content: ""; display: inline-block; width: .55em; height: .55em; border-radius: 50%; background: var(--fg); margin-right: .55em; vertical-align: .05em; animation: blink 1.2s steps(2) infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
-  .bar .slogan { flex: 1; text-align: center; color: var(--muted); letter-spacing: .3em; }
-  .bar .slogan span { display: inline-block; animation: rise .5s backwards; }
+  .live::before { content: ""; display: inline-block; width: .55em; height: .55em; border-radius: 50%; background: var(--fg); margin-right: .55em; vertical-align: .05em; }
+  .bar .grow { flex: 1; }
   .bar button {
-    background: transparent; border: 1px solid var(--line); border-radius: .25rem; cursor: pointer;
+    background: transparent; border: 0; border-radius: .25rem; cursor: pointer;
     font: 500 .8rem var(--font-mono); letter-spacing: .1em; color: var(--muted); padding: .3rem .6rem;
   }
   .bar button:hover { color: var(--fg); border-color: var(--fg); }
@@ -68,14 +64,13 @@
   .mode b { font-family: var(--font-display); font-weight: 900; font-size: 2.1rem; text-transform: uppercase; line-height: 1; }
   .mode span { color: var(--muted); font-size: .95rem; line-height: 1.35; }
   .mode:hover { border-color: var(--muted); transform: translateY(-2px); }
-  .mode[aria-pressed="true"] { --fw: .4rem; border: var(--fw) solid transparent; padding: calc(.85rem - .4rem + 2px) calc(1.1rem - .4rem + 2px);
-    background: linear-gradient(var(--screen), var(--screen)) padding-box, var(--stripes) border-box; animation: stripe-run-border var(--stripe-speed) linear infinite; }
+  .mode[aria-pressed="true"] { border-color: var(--red); }
 
   .slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
   .slot {
     --mc: var(--muted);
     position: relative; text-align: left; cursor: pointer; background: color-mix(in srgb, var(--screen) 88%, transparent);
-    border: 2px dashed var(--line); border-radius: .4rem; padding: .65rem .8rem;
+    border: 2px solid transparent; border-radius: .4rem; padding: .65rem .8rem;
     display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: .8rem; align-items: center; min-width: 0;
     transition: border-color .2s, transform .15s;
   }
@@ -96,11 +91,10 @@
   }
   .lobby-foot { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; font-size: 1.05rem; }
   .lobby-foot .btn { font-size: 1.35rem; }
-  .lobby-foot .btn:not(:disabled) { animation: thump 1.6s ease-in-out infinite; }
   .lobby-foot .hint { color: var(--muted); }
 
   .joinbox {
-    --fw: 1rem; border-radius: 0; box-shadow: 0 0 3rem rgba(0,0,0,.6);
+    --fw: .6rem; border-radius: 0; box-shadow: 0 0 3rem rgba(0,0,0,.6);
     padding: 1.3rem; display: grid; gap: .9rem; justify-items: center; text-align: center; align-content: start;
   }
   .joinbox .qr { background: #fff; padding: .7rem; border-radius: .3rem; width: 12.5rem; max-width: 100%; aspect-ratio: 1; }
@@ -117,20 +111,22 @@
     background: var(--bg); padding: .04em .25em 0; opacity: 0;
     animation: word .62s cubic-bezier(.2,.9,.3,1.1) both;
   }
-  .countin .w:last-child { background: var(--fg); color: var(--red); font-size: 11rem; animation: pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
+  .countin .w:last-child { background: var(--fg); color: var(--red); font-size: 12rem; opacity: 1; animation: pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
+  .countin.hold { animation-play-state: paused; }   /* the stripes stop dead on CATORCE */
 
   /* ---------- question / reveal ---------- */
   .play { display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 1rem; }
   .hud { display: flex; align-items: center; gap: 1.2rem; font-size: 1.05rem; color: var(--muted); }
   .hud b { color: var(--fg); }
-  .hud .tag { background: var(--red); color: var(--ink-on-signal); padding: .25rem .6rem; border-radius: .2rem; }
+  .hud .tag { color: var(--fg); }
   .hud .grow { flex: 1; }
   .timer { display: flex; align-items: center; gap: .9rem; }
   .timer .num { font-family: var(--font-stencil); font-weight: 900; font-size: 3.4rem; line-height: .8; color: var(--fg); min-width: 2ch; text-align: right; }
   .timer.low .num { color: var(--red); animation: thump .5s ease-in-out infinite; }
   .meter { width: 18rem; height: .9rem; background: var(--line); overflow: hidden; transform: skewX(-20deg); }
   .meter i { display: block; height: 100%; width: 100%; background: var(--fg); transform-origin: left; }
-  .timer .meter i { --sw: .3rem; background: var(--stripes); animation: stripe-run var(--stripe-speed) linear infinite; }
+  .timer .meter i { --sw: .3rem; background: var(--stripes); }
+  .timer.low .meter i { animation: stripe-run .35s linear infinite; }
   .answer-is { font-family: var(--font-display); font-weight: 900; font-size: 1.8rem; color: var(--good); letter-spacing: .04em; animation: pop .45s both; }
   .question {
     font-family: var(--font-display); font-weight: 900; font-size: 3.7rem; line-height: 1; margin: 0;
@@ -191,7 +187,7 @@
   .final { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4rem; align-content: center; }
   .winner { display: grid; gap: .9rem; align-content: center; justify-items: start; }
   .winner .av { width: 11rem; animation: pop .8s cubic-bezier(.2,.9,.3,1.4) both; }
-  .winner .ring { --sw: .45rem; padding: .7rem; border-radius: 50%; background: var(--stripes); animation: stripe-run var(--stripe-speed) linear infinite; display: inline-grid; }
+  .winner .ring { --sw: .45rem; padding: .6rem; border-radius: 50%; background: var(--stripes); display: inline-grid; }
   .winner .tag { font: 600 1.05rem var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-on-signal); background: var(--red); padding: .3rem .7rem; border-radius: .2rem; animation: rise .5s .3s backwards; }
   .winner h2 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 6rem; line-height: .85; margin: 0; text-wrap: balance; animation: slam .7s .45s backwards; }
   .winner .rank { font-size: 1.5rem; color: var(--muted); margin: 0; animation: rise .5s .7s backwards; }
@@ -202,7 +198,7 @@
   .board li:nth-child(3) { animation-delay: .2s; }
   .board li:nth-child(4) { animation-delay: .3s; }
   .board .pos { font-family: var(--font-stencil); font-weight: 900; font-size: 2.6rem; color: var(--muted); line-height: 1; }
-  .board li:first-child { --fw: .35rem; border: var(--fw) solid transparent; padding: calc(.8rem - .35rem + 2px) calc(1.1rem - .35rem + 2px); background: linear-gradient(var(--screen), var(--screen)) padding-box, var(--stripes) border-box; }
+  .board li:first-child { border-color: var(--red); }
   .board li:first-child .pos { color: var(--red); }
   .board .av { width: 3.4rem; }
   .board .who b { display: block; font-size: 1.4rem; }
@@ -222,13 +218,12 @@
 </style>
 </head>
 <body>
-<div class="band top stripes moving" aria-hidden="true"></div>
-<div class="band bottom stripes moving" aria-hidden="true"></div>
+<div class="band stripes" aria-hidden="true"></div>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <div class="tv">
   <div class="bar mono">
     <span class="live">VERTIGO // LIVE</span>
-    <span class="slogan" id="slogan"><span>UNOS, DOS, TRES, CATORCE!</span></span>
+    <span class="grow"></span>
     <button type="button" id="btn-sound" title="Sound (M)">SOUND ON</button>
     <button type="button" id="btn-full" title="Full screen (F)">FULL SCREEN</button>
   </div>
@@ -244,10 +239,10 @@
 (() => {
   const { MODES, Q, RANKS } = U2;
   const { MEMBERS, byId, avatar, loadPhotos } = U2M;
-  const MAX = 4, ROUND = 10, SECS = 20, REVEAL_MS = 12000, COUNT_MS = 2900, LOBBY_GRACE_MS = 60000, STALE_MS = 12000;
+  const MAX = 4, ROUND = 10, SECS = 20, REVEAL_MS = 12000, COUNT_MS = 4400, LOBBY_GRACE_MS = 60000, STALE_MS = 12000;
   const CODE_CHARS = "BCDFGHJKLMNPQRSTVWXZ";
   const COUNT_WORDS = ["UNOS", "DOS", "TRES", "¡CATORCE!"];
-  const SLOGANS = ["UNOS, DOS, TRES, CATORCE!", "HELLO, HELLO", "¡HOLA!", "COEXIST", "A PLACE CALLED VERTIGO", "CITY OF BLINDING LIGHTS", "HOW TO DISMANTLE AN ATOMIC BOMB"];
+  const COUNT_AT = [0, .5, 1, 1.85];   // seconds; the gap before CATORCE is the joke
   const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -272,14 +267,15 @@
     reveal() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, .22, "triangle", .07, i * .08)); },
     win() { [392, 523, 659, 784, 1047].forEach((f, i) => this.tone(f, .3, "square", .04, i * .11)); },
     countIn() {
-      [0, .6, 1.2].forEach(d => this.tone(220, .14, "sawtooth", .06, d));
-      this.tone(440, .5, "sawtooth", .07, 1.8);
-      // Bono's count-in, if the browser can speak it
+      COUNT_AT.slice(0, 3).forEach(d => this.tone(220, .14, "sawtooth", .06, d));
+      this.tone(440, .9, "sawtooth", .07, COUNT_AT[3]);
+      // Bono's count-in, if the browser can speak it, with the same pause before "catorce"
       try {
         if (!this.on || !window.speechSynthesis) return;
-        const u = new SpeechSynthesisUtterance("Unos, dos, tres, catorce!");
-        u.lang = "es-ES"; u.rate = 1.2; u.pitch = .9;
-        speechSynthesis.cancel(); speechSynthesis.speak(u);
+        const say = (text, rate) => { const u = new SpeechSynthesisUtterance(text); u.lang = "es-ES"; u.rate = rate; u.pitch = .9; speechSynthesis.speak(u); };
+        speechSynthesis.cancel();
+        say("Unos, dos, tres", 1.3);
+        setTimeout(() => say("¡Catorce!", 1), COUNT_AT[3] * 1000);
       } catch {}
     },
   };
@@ -551,7 +547,11 @@
       drawQr();
       if (focusId && $(focusId)) $(focusId).focus({ preventScroll: true });
     } else if (key !== builtKey) {
-      if (S.phase === "countin") st.innerHTML = countinHtml();
+      if (S.phase === "countin") {
+        st.innerHTML = countinHtml();
+        const el = st.querySelector(".countin");
+        setTimeout(() => el.classList.add("hold"), COUNT_AT[3] * 1000);
+      }
       else if (S.phase === "final") { st.innerHTML = finalHtml(); Confetti.burst(220); }
       else { st.innerHTML = playShell(); lockSeen = new Set(); }
     }
@@ -571,7 +571,7 @@
       if (p) now.add(m.id);
       const isNew = p && !seated.has(m.id);
       const cls = ["slot", p && "taken", isNew && "pop", p && p.local && "couch", p && !p.local && !p.connected && "away"].filter(Boolean).join(" ");
-      const who = p ? (p.local ? "On this screen" : esc(p.name || "Phone player") + (p.connected ? "" : " · reconnecting")) : m.role + " · open";
+      const who = p ? (p.local ? "On this screen" : esc(p.name || "Phone player") + (p.connected ? "" : " · reconnecting")) : "Open";
       return `<button type="button" class="${cls}" id="slot-${m.id}" data-member="${m.id}" style="--mc:${m.color}"
         title="${p ? (p.local ? "Click to free this seat" : "") : "Click to play as " + m.name + " on this screen"}">
         ${p && p === v ? '<span class="vip">VIP</span>' : ""}
@@ -593,7 +593,7 @@
         <div><p class="label">Pick a character · up to 4 players</p><div class="slots">${slots}</div></div>
         <div class="lobby-foot"><button type="button" class="btn" id="btn-start" ${canStart() ? "" : "disabled"}>Start the show</button><span class="hint">${hint}</span></div>
       </div>
-      <aside class="joinbox framed moving">
+      <aside class="joinbox framed">
         <p class="label" style="margin:0">Join on your phone</p>
         <div class="qr" id="qr" aria-label="QR code to join"></div>
         <div class="url">${esc(u.host + u.pathname.replace(/\/[^/]*$/, "/play"))}</div>
@@ -614,7 +614,7 @@
 
   function countinHtml() {
     return `<section class="countin stripes moving" aria-label="Unos, dos, tres, catorce">${COUNT_WORDS.map((w, i) =>
-      `<span class="w" style="animation-delay:${i * .6}s">${w}</span>`).join("")}</section>`;
+      `<span class="w" style="animation-delay:${COUNT_AT[i]}s">${w}</span>`).join("")}</section>`;
   }
 
   function playShell() {
@@ -669,7 +669,7 @@
     if (!p.local && !p.connected) cls += " away";
     if (!shownScore.has(p.pid)) shownScore.set(p.pid, p.score);
     return `<div class="${cls}" style="--mc:${m.color}">${avatar(p.member)}
-      <div class="nm"><b>${esc(shownName(p))}</b><span>${p.local ? "On the TV" : m.name}</span></div>
+      <div class="nm"><b>${esc(shownName(p))}</b></div>
       <div><span class="sc" data-pid="${esc(p.pid)}">${Math.round(shownScore.get(p.pid))}</span><span class="st mono">${st}</span></div></div>`;
   }
 
@@ -762,11 +762,6 @@
   function toggleSound() { Sound.on = !Sound.on; $("btn-sound").textContent = Sound.on ? "SOUND ON" : "SOUND OFF"; }
   $("btn-full").onclick = toggleFull;
   $("btn-sound").onclick = toggleSound;
-
-  // Header slogans
-  if (!REDUCE) {
-    let s = 0; setInterval(() => { s = (s + 1) % SLOGANS.length; $("slogan").innerHTML = `<span>${SLOGANS[s]}</span>`; }, 3500);
-  }
 
   // Keep the TV awake while hosting (not all browsers allow it).
   try { navigator.wakeLock?.request("screen").catch(() => {}); } catch {}
