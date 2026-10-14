@@ -270,7 +270,7 @@
 
   function countinView(v) {
     // Same timing as the TV: quick UNOS-DOS-TRES, a beat, then CATORCE holds.
-    const at = [0, .5, 1, 1.85], elapsed = (4400 - (v.countLeft ?? 4400)) / 1000;
+    const at = v.countAt || [0, .5, 1, 1.85], total = v.countMs || 4400, elapsed = (total - (v.countLeft ?? total)) / 1000;
     setTimeout(() => document.querySelector(".countin")?.classList.add("hold"), Math.max(0, at[3] - elapsed) * 1000);
     return `<div class="countin" aria-label="Unos, dos, tres, catorce">${["UNOS", "DOS", "TRES", "¡CATORCE!"].map((w, i) =>
       `<span class="w" style="animation-delay:${(at[i] - elapsed).toFixed(2)}s">${w}</span>`).join("")}</div>`;
