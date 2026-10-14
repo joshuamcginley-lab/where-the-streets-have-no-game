@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Count-in Sync</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Big+Shoulders+Stencil+Display:wght@800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Tinos:wght@400;700&display=swap">
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* One column of steps; the big pad is where you tap along. */
+  body { font-size: 17px; line-height: 1.5; }
+  header.cover { height: 90px; font-size: 12px; }
+  header.cover .title { font-size: 24px; }
+  main {
+    max-width: 640px; margin: 0 auto; display: grid; gap: 22px;
+    padding-block: 28px 60px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  h1 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 44px; line-height: .95; margin: 0; }
+  p { margin: 0; }
+  .muted { color: var(--muted); }
+  ol.steps { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+  .pad {
+    height: 220px; display: grid; place-items: center; cursor: pointer; user-select: none;
+    background: var(--screen); border: 2px solid var(--line); border-radius: 8px;
+    font-family: var(--font-stencil); font-weight: 900; font-size: 64px; letter-spacing: .04em;
+  }
+  .pad.live { border-color: var(--red); }
+  .pad.flash { background: var(--red); color: var(--fg); }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .btn { font-size: 15px; }
+  .times { font-family: var(--font-mono); font-size: 15px; display: grid; gap: 4px; }
+  .times b { color: var(--fg); }
+  .result { border: 2px solid var(--red); border-radius: 8px; padding: 16px; display: grid; gap: 12px; }
+  .result code { font: 600 22px var(--font-mono); color: var(--fg); user-select: all; }
+  .note { font-size: 15px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="cover"><span class="title">Everything You Know Is Wrong</span></header>
+<main>
+  <h1>Count-in sync</h1>
+  <ol class="steps muted">
+    <li>Press <b>Play &amp; tap</b>. As Bono says each word, tap the space bar (or the big box): <b>Unos</b>, <b>dos</b>, <b>tres</b>, <b>catorce</b>.</li>
+    <li>Do it two or three times. The timings are averaged.</li>
+    <li>Press <b>Preview</b> to see the words flash with the clip. Nudge if needed.</li>
+    <li>Press <b>Use these timings</b>, then send the numbers to Claude.</li>
+  </ol>
+
+  <div class="pad" id="pad" role="button" tabindex="0" aria-live="polite">READY</div>
+
+  <div class="row">
+    <button class="btn" type="button" id="btn-play">Play &amp; tap</button>
+    <button class="btn ghost" type="button" id="btn-preview" disabled>Preview</button>
+    <button class="btn ghost" type="button" id="btn-earlier" disabled>Earlier 0.05s</button>
+    <button class="btn ghost" type="button" id="btn-later" disabled>Later 0.05s</button>
+    <button class="btn ghost" type="button" id="btn-reset">Start over</button>
+  </div>
+
+  <div class="times" id="times"></div>
+
+  <div class="result" id="result" hidden>
+    <p>Timings (seconds into the clip):</p>
+    <code id="code"></code>
+    <div class="row"><button class="btn" type="button" id="btn-save">Use these timings</button><span class="note" id="saved"></span></div>
+  </div>
+</main>
+
+<script>
+(() => {
+  const WORDS = ["UNOS", "DOS", "TRES", "¡CATORCE!"];
+  const $ = id => document.getElementById(id);
+  let ctx = null, buffer = null, src = null, t0 = 0, taps = [], runs = [], shift = 0, mode = "idle";
+
+  async function ensureAudio() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state !== "running") await ctx.resume();
+    if (!buffer) buffer = await ctx.decodeAudioData(await (await fetch("audio/vertigo-intro.m4a")).arrayBuffer());
+  }
+  function playClip(onEnd) {
+    if (src) try { src.stop(); } catch {}
+    src = ctx.createBufferSource(); src.buffer = buffer; src.connect(ctx.destination);
+    src.onended = onEnd;
+    t0 = ctx.currentTime + .05;
+    src.start(t0);
+  }
+  const avg = () => WORDS.map((_, i) => runs.reduce((s, r) => s + r[i], 0) / runs.length + shift);
+  const fmt = a => "[" + a.map(x => Math.max(0, x).toFixed(2)).join(", ") + "]";
+
+  function show() {
+    $("times").innerHTML = runs.map((r, i) => `<span>Run ${i + 1}: <b>${fmt(r)}</b></span>`).join("");
+    const ok = runs.length > 0;
+    $("result").hidden = !ok;
+    ["btn-preview", "btn-earlier", "btn-later"].forEach(id => $(id).disabled = !ok);
+    if (ok) $("code").textContent = fmt(avg());
+  }
+
+  function tap() {
+    if (mode !== "tap" || taps.length >= 4) return;
+    taps.push(ctx.currentTime - t0);
+    $("pad").textContent = WORDS[taps.length - 1];
+    flash();
+    if (taps.length === 4) { runs.push(taps.slice()); mode = "idle"; $("pad").classList.remove("live"); show(); }
+  }
+  function flash() { const p = $("pad"); p.classList.add("flash"); setTimeout(() => p.classList.remove("flash"), 140); }
+
+  $("btn-play").onclick = async () => {
+    await ensureAudio();
+    taps = []; mode = "tap";
+    $("pad").textContent = "TAP ON EACH WORD"; $("pad").classList.add("live");
+    $("pad").focus();
+    playClip(() => { if (mode === "tap") { mode = "idle"; $("pad").classList.remove("live"); $("pad").textContent = taps.length < 4 ? "MISSED SOME. TRY AGAIN" : "READY"; } });
+  };
+  $("btn-preview").onclick = async () => {
+    await ensureAudio();
+    mode = "preview"; const at = avg();
+    $("pad").textContent = "…";
+    playClip(() => { mode = "idle"; $("pad").textContent = "READY"; });
+    at.forEach((t, i) => setTimeout(() => { $("pad").textContent = WORDS[i]; flash(); }, (t + .05) * 1000));
+  };
+  $("btn-earlier").onclick = () => { shift -= .05; show(); };
+  $("btn-later").onclick = () => { shift += .05; show(); };
+  $("btn-reset").onclick = () => { runs = []; shift = 0; mode = "idle"; $("pad").textContent = "READY"; $("saved").textContent = ""; show(); };
+  $("btn-save").onclick = () => {
+    try { localStorage.setItem("wtshng-countin-at", JSON.stringify(avg().map(x => +Math.max(0, x).toFixed(2)))); $("saved").textContent = "Saved. The game on this browser uses these now. Send the numbers to Claude to make them permanent."; }
+    catch { $("saved").textContent = "Couldn't save in this browser. Send the numbers to Claude instead."; }
+  };
+  $("pad").onclick = tap;
+  addEventListener("keydown", e => { if (e.code === "Space") { e.preventDefault(); tap(); } });
+  show();
+})();
+</script>
+</body>
+</html>
