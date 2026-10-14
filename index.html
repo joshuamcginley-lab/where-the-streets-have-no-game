@@ -289,7 +289,7 @@
     reveal() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, .22, "triangle", .07, i * .08)); },
     win() { [392, 523, 659, 784, 1047].forEach((f, i) => this.tone(f, .3, "square", .04, i * .11)); },
     countIn() {
-      if (Clip.buffer && this.live) { countAt = CLIP_AT.slice(); return Clip.play(); }
+      if (Clip.buffer) { countAt = CLIP_AT.slice(); return Clip.play(); }
       countAt = DEFAULT_AT.slice();   // robot voice: use its own timing
       countAt.slice(0, 3).forEach(d => this.tone(220, .14, "sawtooth", .06, d));
       this.tone(440, .9, "sawtooth", .07, countAt[3]);
@@ -323,12 +323,23 @@
       } catch {}
     },
     // From the top: the count-in, the band kicking in, then a fade into the first question.
+    // The browser may still be switching sound on (it only allows it after a click), so wait
+    // for that and start the clip at the matching point to stay in step with the words.
     play() {
-      const c = Sound.ctx, src = c.createBufferSource(), g = c.createGain(), t = c.currentTime;
-      const end = countAt[3] + COUNT_HOLD;
-      src.buffer = this.buffer; src.connect(g).connect(c.destination);
-      g.gain.setValueAtTime(1, t); g.gain.setValueAtTime(1, t + end - .3); g.gain.linearRampToValueAtTime(0, t + end + 1);
-      src.start(t, 0, end + 1.1);
+      const c = Sound.ctx, started = performance.now(), end = countAt[3] + COUNT_HOLD;
+      const go = () => {
+        const at = (performance.now() - started) / 1000;
+        if (at > end) return;
+        const src = c.createBufferSource(), g = c.createGain(), t = c.currentTime;
+        src.buffer = this.buffer; src.connect(g).connect(c.destination);
+        g.gain.setValueAtTime(1, t); g.gain.setValueAtTime(1, t + Math.max(0, end - at - .3)); g.gain.linearRampToValueAtTime(0, t + end - at + 1);
+        src.start(t, at, end - at + 1.1);
+      };
+      if (c.state === "running") go();
+      else c.resume().then(go).catch(() => {});
+      setTimeout(() => {
+        if (c.state !== "running") toast("The browser is blocking sound on this screen. Click anywhere on the TV page, then start the next game.");
+      }, 600);
     },
   };
   Clip.load();
