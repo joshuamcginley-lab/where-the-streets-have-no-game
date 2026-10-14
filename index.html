@@ -228,7 +228,7 @@
 <div class="tv">
   <div class="bar mono">
     <span class="live">VERTIGO // LIVE</span>
-    <span class="slogan" id="slogan"><span>UNO, DOS, TRES, CATORCE!</span></span>
+    <span class="slogan" id="slogan"><span>UNOS, DOS, TRES, CATORCE!</span></span>
     <button type="button" id="btn-sound" title="Sound (M)">SOUND ON</button>
     <button type="button" id="btn-full" title="Full screen (F)">FULL SCREEN</button>
   </div>
@@ -246,8 +246,8 @@
   const { MEMBERS, byId, avatar, loadPhotos } = U2M;
   const MAX = 4, ROUND = 10, SECS = 20, REVEAL_MS = 12000, COUNT_MS = 2900, LOBBY_GRACE_MS = 60000, STALE_MS = 12000;
   const CODE_CHARS = "BCDFGHJKLMNPQRSTVWXZ";
-  const COUNT_WORDS = ["UNO", "DOS", "TRES", "¡CATORCE!"];
-  const SLOGANS = ["UNO, DOS, TRES, CATORCE!", "HELLO, HELLO", "¡HOLA!", "COEXIST", "A PLACE CALLED VERTIGO", "CITY OF BLINDING LIGHTS", "HOW TO DISMANTLE AN ATOMIC BOMB"];
+  const COUNT_WORDS = ["UNOS", "DOS", "TRES", "¡CATORCE!"];
+  const SLOGANS = ["UNOS, DOS, TRES, CATORCE!", "HELLO, HELLO", "¡HOLA!", "COEXIST", "A PLACE CALLED VERTIGO", "CITY OF BLINDING LIGHTS", "HOW TO DISMANTLE AN ATOMIC BOMB"];
   const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -277,7 +277,7 @@
       // Bono's count-in, if the browser can speak it
       try {
         if (!this.on || !window.speechSynthesis) return;
-        const u = new SpeechSynthesisUtterance("Uno, dos, tres, catorce!");
+        const u = new SpeechSynthesisUtterance("Unos, dos, tres, catorce!");
         u.lang = "es-ES"; u.rate = 1.2; u.pitch = .9;
         speechSynthesis.cancel(); speechSynthesis.speak(u);
       } catch {}
@@ -415,7 +415,7 @@
     S.deck = shuffle(Q.filter(q => q.m === S.mode)).slice(0, ROUND).map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) }));
     resetScores();
     S.i = 0; S.game++;
-    // "Uno, dos, tres, catorce!" before the first question
+    // "Unos, dos, tres, catorce!" before the first question
     S.phase = "countin";
     S.countEndsAt = Date.now() + COUNT_MS;
     clearTimeout(qTimer);
@@ -613,7 +613,7 @@
   }
 
   function countinHtml() {
-    return `<section class="countin stripes moving" aria-label="Uno, dos, tres, catorce">${COUNT_WORDS.map((w, i) =>
+    return `<section class="countin stripes moving" aria-label="Unos, dos, tres, catorce">${COUNT_WORDS.map((w, i) =>
       `<span class="w" style="animation-delay:${i * .6}s">${w}</span>`).join("")}</section>`;
   }
 

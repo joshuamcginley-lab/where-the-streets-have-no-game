@@ -267,7 +267,7 @@
 
   function countinView(v) {
     const elapsed = (2900 - (v.countLeft ?? 2900)) / 1000;
-    return `<div class="countin" aria-label="Uno, dos, tres, catorce">${["UNO", "DOS", "TRES", "¡CATORCE!"].map((w, i) =>
+    return `<div class="countin" aria-label="Unos, dos, tres, catorce">${["UNOS", "DOS", "TRES", "¡CATORCE!"].map((w, i) =>
       `<span class="w" style="animation-delay:${(i * .6 - elapsed).toFixed(2)}s">${w}</span>`).join("")}</div>`;
   }
 
