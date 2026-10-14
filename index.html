@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Where the Streets Have No Game</title>
+<meta name="robots" content="noindex, nofollow">
 <meta name="description" content="A U2 trivia party game. Put it on the TV, join on your phones, play as Bono, Edge, Adam, Larry, MacPhisto or Mirror Ball Man.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +31,6 @@
     font: 500 .7rem var(--font-mono); letter-spacing: .1em; color: var(--muted); opacity: .7;
   }
   .controls button:hover { color: var(--fg); opacity: 1; }
-  .controls #btn-clip.on { color: var(--red); opacity: 1; }
   .toast {
     position: fixed; z-index: 6; left: 50%; bottom: 2.4rem; transform: translateX(-50%); max-width: min(40rem, 90vw);
     background: var(--fg); color: #000; font-size: 1rem; line-height: 1.4; padding: .7rem 1.1rem; border-radius: .3rem;
@@ -237,9 +237,6 @@
 <header class="cover"><span class="title">Everything You Know Is Wrong</span></header>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <div class="controls">
-  <button type="button" id="btn-clip" title="Play the opening of your own copy of Vertigo during the count-in. The file stays on this device.">LOAD COUNT-IN CLIP</button>
-  <button type="button" id="btn-clip-clear" hidden>USE ROBOT VOICE</button>
-  <input type="file" id="clip-file" accept="audio/*" hidden>
   <button type="button" id="btn-full" title="Full screen (F)">FULL SCREEN</button>
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -292,7 +289,8 @@
     reveal() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, .22, "triangle", .07, i * .08)); },
     win() { [392, 523, 659, 784, 1047].forEach((f, i) => this.tone(f, .3, "square", .04, i * .11)); },
     countIn() {
-      if (Clip.buffer && this.live) return Clip.play();
+      if (Clip.buffer && this.live) { countAt = CLIP_AT.slice(); return Clip.play(); }
+      countAt = DEFAULT_AT.slice();   // robot voice: use its own timing
       countAt.slice(0, 3).forEach(d => this.tone(220, .14, "sawtooth", .06, d));
       this.tone(440, .9, "sawtooth", .07, countAt[3]);
       // Bono's count-in, if the browser can speak it, with the same pause before "catorce"
@@ -311,66 +309,20 @@
     if (S.phase === "lobby" && document.querySelector(".soundhint")) setTimeout(render, 0);
   }));
 
-  // ---------- the host's own copy of "Vertigo" for the count-in
-  // The file never leaves this device: it is read here and kept in this browser's storage.
-  const Store = {
-    db: null,
-    open() {
-      return this.db ||= new Promise((res, rej) => {
-        const r = indexedDB.open("wtshng", 1);
-        r.onupgradeneeded = () => r.result.createObjectStore("kv");
-        r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
-      });
-    },
-    async run(mode, fn) {
-      const db = await this.open();
-      return new Promise((res, rej) => { const q = fn(db.transaction("kv", mode).objectStore("kv")); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
-    },
-    get: k => Store.run("readonly", st => st.get(k)),
-    set: (k, v) => Store.run("readwrite", st => st.put(v, k)),
-    del: k => Store.run("readwrite", st => st.delete(k)),
-  };
-
-  // Find the four shouted words at the start of the track: bursts of loudness separated by dips.
-  function findWords(buf) {
-    const sr = buf.sampleRate, data = buf.getChannelData(0), hop = Math.round(sr * .01);
-    const frames = Math.floor(Math.min(data.length, sr * 5) / hop);
-    const env = [];
-    for (let f = 0; f < frames; f++) {
-      let sum = 0;
-      for (let j = f * hop; j < (f + 1) * hop; j++) sum += data[j] * data[j];
-      env.push(Math.sqrt(sum / hop));
-    }
-    const sm = env.map((_, i) => (env[i - 1] ?? env[i]) / 4 + env[i] / 2 + (env[i + 1] ?? env[i]) / 4);
-    const peak = Math.max(...sm.slice(0, 400));
-    if (!peak) return null;
-    const hi = peak * .35, lo = peak * .15, onsets = [];
-    let armed = true;
-    for (let i = 0; i < sm.length && onsets.length < 4; i++) {
-      if (armed && sm[i] > hi && (!onsets.length || i * .01 - onsets[onsets.length - 1] > .15)) { onsets.push(+(i * .01).toFixed(2)); armed = false; }
-      else if (!armed && sm[i] < lo) armed = true;
-    }
-    return onsets.length === 4 && onsets[3] < 4 ? onsets : null;
-  }
-
+  // ---------- Bono's count-in, from the top of "Vertigo"
+  // Word times measured from audio/vertigo-intro.m4a; the band crashes in at 1.6 s, on "-ce!".
+  // If the clip can't load or play, the robot voice takes over with the default timing.
+  const CLIP_AT = [.08, .4, .7, 1.04];
   const Clip = {
     buffer: null,
-    async use(blob, name, save) {
-      Sound.init();
-      const buf = await Sound.ctx.decodeAudioData(await blob.arrayBuffer());
-      const at = findWords(buf);
-      this.buffer = buf;
-      countAt = at || DEFAULT_AT.slice();
-      if (save) await Store.set("countin", { blob, name }).catch(() => {});
-      showClip();
-      return at;
+    async load() {
+      try {
+        const r = await fetch("audio/vertigo-intro.m4a");
+        this.buffer = await Sound.ctx.decodeAudioData(await r.arrayBuffer());
+        countAt = CLIP_AT.slice();
+      } catch {}
     },
-    clear() {
-      this.buffer = null; countAt = DEFAULT_AT.slice();
-      Store.del("countin").catch(() => {});
-      showClip();
-    },
-    // From the top of the track: the count-in, the band kicking in over CATORCE, then a fade.
+    // From the top: the count-in, the band kicking in, then a fade into the first question.
     play() {
       const c = Sound.ctx, src = c.createBufferSource(), g = c.createGain(), t = c.currentTime;
       const end = countAt[3] + COUNT_HOLD;
@@ -379,17 +331,13 @@
       src.start(t, 0, end + 1.1);
     },
   };
+  Clip.load();
 
   let toastTimer = null;
   function toast(msg) {
     const el = $("toast");
     el.textContent = msg; el.hidden = false;
     clearTimeout(toastTimer); toastTimer = setTimeout(() => el.hidden = true, 7000);
-  }
-  function showClip() {
-    $("btn-clip").textContent = Clip.buffer ? "COUNT-IN: YOUR CLIP" : "LOAD COUNT-IN CLIP";
-    $("btn-clip").classList.toggle("on", !!Clip.buffer);
-    $("btn-clip-clear").hidden = !Clip.buffer;
   }
 
   // ---------- red and white ticker tape for the winner
@@ -582,11 +530,11 @@
     S.i = 0; S.game++;
     // "Unos, dos, tres, catorce!" before the first question
     S.phase = "countin";
+    Sound.countIn();   // picks the clip or the robot voice, and with it the word timing
     S.countMs = Math.round((countAt[3] + COUNT_HOLD) * 1000);
     S.countEndsAt = Date.now() + S.countMs;
     clearTimeout(qTimer);
     qTimer = setTimeout(beginQuestion, S.countMs);
-    Sound.countIn();
     sync();
   }
 
@@ -939,22 +887,6 @@
     else d.documentElement.requestFullscreen?.().catch(() => {});
   }
   $("btn-full").onclick = toggleFull;
-  $("btn-clip").onclick = () => $("clip-file").click();
-  $("btn-clip-clear").onclick = () => { Clip.clear(); toast("Count-in is back to the robot voice."); };
-  $("clip-file").onchange = async e => {
-    const f = e.target.files[0];
-    e.target.value = "";
-    if (!f) return;
-    try {
-      const at = await Clip.use(f, f.name, true);
-      toast(at ? `Loaded "${f.name}". The count-in will play from the top of the track, timed to the words. It's stored on this device only.`
-        : `Loaded "${f.name}", but couldn't pick out the four words, so the on-screen words use the default timing. Use the album version of Vertigo for the best result.`);
-    } catch {
-      toast("That file couldn't be played. Try an MP3, M4A/AAC or WAV of Vertigo.");
-    }
-  };
-  // Bring back a clip loaded on an earlier visit.
-  Store.get("countin").then(v => v && Clip.use(v.blob, v.name, false)).catch(() => {});
 
   // Keep the TV awake while hosting (not all browsers allow it).
   try { navigator.wakeLock?.request("screen").catch(() => {}); } catch {}
