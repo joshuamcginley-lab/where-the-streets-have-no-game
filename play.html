@@ -21,7 +21,7 @@
   }
   header.cover { height: 64px; font-size: 9px; margin: calc(-1 * max(14px, env(safe-area-inset-top, 0px))) calc(-1 * max(16px, env(safe-area-inset-right, 0px))) 16px calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-top: env(safe-area-inset-top, 0px); }
   header.cover .title { font-size: 17px; }
-  .app { max-width: 480px; margin: 0 auto; min-height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 18px; }
+  .app { max-width: 480px; margin: 0 auto; display: grid; grid-template-rows: auto 1fr; gap: 18px; }
   .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); padding-bottom: 14px; position: relative; }
   .top b { color: var(--red); font-family: var(--font-stencil); font-weight: 900; font-size: 22px; letter-spacing: .06em; }
   .me { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -34,6 +34,14 @@
   h2.cat { font-family: var(--font-serif); font-weight: 400; font-size: 26px; line-height: 1.15; color: #fff; padding: 12px 16px; border-radius: 3px;
     background: repeating-linear-gradient(-58deg, #000 0 16px, var(--red) 16px 29px); text-shadow: 0 0 10px rgba(0,0,0,.6); }
   p { margin: 0; }
+  /* the wager screen must fit a small phone without scrolling */
+  .wagerv { display: grid; gap: 12px; }
+  .wagerv .hero { gap: 8px; padding-block: 0; }
+  .wagerv h2.cat { font-size: 21px; padding: 8px 12px; }
+  .wagerv .pad { gap: 8px; }
+  .wagerv .key { min-height: 56px; padding: 10px 14px; }
+  .wagerv .key .ch { font-size: 26px; }
+  .wagerv p { font-size: 14px; }
   .muted { color: var(--muted); }
   .label { font: 600 12px var(--font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
 
@@ -318,10 +326,10 @@
     const names = ["Nothing", "A little", "Half", "Everything"];
     const keys = w.tiers.map((a, k) =>
       `<button type="button" class="key ch${k + 1}" data-wager="${k}"><span class="ch">${k + 1}</span><span>${names[k]}${k ? ` · ${a}` : ""}</span></button>`).join("");
-    return `<div class="hero">${cat}
-        <p class="muted">You have <b>${w.score}</b> points. How much will you bet on this category? Right wins your bet, wrong loses it.</p></div>
+    return `<div class="wagerv"><div class="hero">${cat}
+        <p class="muted">You have <b>${w.score}</b> points. Bet on this category: right wins your bet, wrong loses it.${w.score < 200 ? " Under 200? You can still bet 200, and you can't drop below zero." : ""}</p></div>
       <div class="meter"><i id="wbar"></i></div>
-      <div class="pad">${keys}</div>`;
+      <div class="pad">${keys}</div></div>`;
   }
 
   function countinView(v) {
@@ -347,7 +355,7 @@
     const r = v.rv;
     const keys = v.q.opts.map((o, k) =>
       `<button type="button" class="key ch${k + 1} ${k === r.right ? "right" : v.my === k ? "picked" : "off"}" disabled><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
-    const head = r.ok ? `<div class="verdict ok">Correct</div><div class="big">+${r.gain}</div>`
+    const head = r.ok ? `<div class="verdict ok">Correct</div>${r.gain ? `<div class="big">+${r.gain}</div>` : ""}`
       : `<div class="verdict no">${v.my === null ? "Too slow" : "Not quite"}</div>${r.gain < 0 ? `<div class="big">−${-r.gain}</div>` : ""}`;
     return `<div class="hero">${head}
         <div class="stats"><span>Score <b>${v.me.score}</b></span><span>Place <b>${ordinal(r.place)}</b> of ${r.of}</span>${r.streak > 1 ? `<span>Streak <b>${r.streak}</b></span>` : ""}</div></div>

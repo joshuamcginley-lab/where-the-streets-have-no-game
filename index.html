@@ -26,13 +26,13 @@
   header.cover .title { font-size: 2.5rem; }
   .controls {
     position: fixed; z-index: 4; display: flex; gap: .4rem;
-    right: max(1rem, env(safe-area-inset-right, 0px)); bottom: max(.5rem, env(safe-area-inset-bottom, 0px));
+    right: max(1rem, env(safe-area-inset-right, 0px)); top: max(.4rem, env(safe-area-inset-top, 0px));
   }
   .controls button {
-    background: transparent; border: 0; cursor: pointer; padding: .3rem .5rem;
-    font: 500 .7rem var(--font-mono); letter-spacing: .1em; color: var(--muted); opacity: .7;
+    background: rgba(0,0,0,.55); border: 0; border-radius: .25rem; cursor: pointer; padding: .3rem .55rem;
+    font: 500 .7rem var(--font-mono); letter-spacing: .1em; color: #fff; opacity: .8;
   }
-  .controls button:hover { color: var(--fg); opacity: 1; }
+  .controls button:hover { opacity: 1; background: rgba(0,0,0,.8); }
   .toast {
     position: fixed; z-index: 6; left: 50%; top: 7rem; transform: translateX(-50%); max-width: min(40rem, 90vw);
     background: var(--fg); color: #000; font-size: 1rem; line-height: 1.4; padding: .7rem 1.1rem; border-radius: .3rem;
@@ -158,13 +158,13 @@
 
   /* ---------- the finale: a wager before the last question, or double points ---------- */
   .wager { display: grid; grid-template-rows: auto auto auto auto 1fr auto; gap: .9rem; min-height: 0; }
-  .wager h1 { font-size: 4rem; animation: slam .6s cubic-bezier(.2,.9,.3,1.2) backwards; }
+  .wager h1 { font-size: 3.2rem; animation: slam .6s cubic-bezier(.2,.9,.3,1.2) backwards; }
   /* the category, Final Jeopardy style: the album-cover band with the category as its title */
   .wager .cat { --cw: 2rem; justify-self: start; padding: 1rem 2.4rem; border-radius: .2rem; animation: rise .6s .5s cubic-bezier(.2,.9,.3,1.1) backwards; }
-  .wager .cat .title { font-size: 3rem; white-space: normal; text-align: center; }
+  .wager .cat .title { font-size: 2.4rem; white-space: normal; text-align: center; }
   .wager .cat-wrap { display: grid; gap: .3rem; }
-  .wager .how { font-size: 1.35rem; color: var(--muted); margin: 0; max-width: 60ch; }
-  .wager-row { display: grid; grid-template-columns: 1fr 22rem; gap: 1.6rem; align-items: center; min-height: 0; }
+  .wager .how { font-size: 1.15rem; color: var(--muted); margin: 0; max-width: 60ch; }
+  .wager-row { display: grid; grid-template-columns: 1fr min(19rem, calc((100dvh - 31rem) * 1.6)); gap: 1.6rem; align-items: center; min-height: 0; overflow: hidden; }
   .bets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; align-content: center; }
   .bet { --mc: var(--muted); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .9rem; align-items: center; background: var(--screen);
     border: 2px solid var(--line); border-radius: .45rem; padding: .8rem 1rem; }
@@ -348,6 +348,7 @@
     body { overflow: auto; }
     .lobby, .final, .lobby-top, .wager-row { grid-template-columns: 1fr; }
     .bets { grid-template-columns: 1fr; }
+    .modes { grid-template-columns: 1fr 1fr; }
     .final .host-col { width: min(23rem, 100%); justify-self: center; }
     /* the page scrolls instead of squeezing everything into one screen */
     .tv { flex: none; }
@@ -1403,7 +1404,7 @@
       <p class="label" style="margin:0">Round ${S.round} · the last question</p>
       <h1>Final <em>wager</em></h1>
       <div class="cat-wrap"><span class="label" style="margin:0">The category</span><div class="cover cat"><span class="title">${esc(finalCategory())}</span></div></div>
-      <p class="how">Bet on the last question from your phone. Get it right and win your bet. Get it wrong and lose it.</p>
+      <p class="how">Bet on the last question${S.players.some(p => p.local) ? " (on your phone, or keys 1–4 here)" : " from your phone"}. Get it right and win your bet. Get it wrong and lose it. Under 200 points? You can still bet 200.</p>
       <div class="wager-row"><div class="bets" id="bets"></div><div id="host-slot"></div></div>
       <div class="wager-foot" style="display:flex;gap:1.4rem;align-items:center;flex-wrap:wrap">${picks}<span class="grow" style="flex:1"></span>
         <span class="timer"><span class="meter"><i id="wbar"></i></span><span class="num" id="wnum">${WAGER_SECS}</span></span></div>
@@ -1491,7 +1492,7 @@
       st = p.answer ? "Locked in" : (p.local || p.connected) ? "Thinking…" : "Away";
       if (p.answer) { cls += " locked"; if (!lockSeen.has(p.pid)) { lockSeen.add(p.pid); cls += " just"; } }
     } else {
-      st = p.ok ? `+${p.gain}` : p.gain < 0 ? `−${-p.gain}` : p.answer ? "Missed" : "No answer";
+      st = p.ok ? (p.gain ? `+${p.gain}` : "Right · no bet") : p.gain < 0 ? `−${-p.gain}` : p.answer ? "Missed" : "No answer";
       cls += p.ok ? " gain" : " miss";
     }
     if (!p.local && !p.connected) cls += " away";
@@ -1518,7 +1519,7 @@
     const tie = order.length > 1 && order[1].score === w.score;
     const board = order.map(p => {
       return `<li><span class="pos">${placeOf(p)}</span>${avatar(p.member)}
-        <span class="who"><b>${esc(shownName(p))}</b><span>${p.correct}/${S.deck.length} right · ${signed(p.score - (p.roundStart || 0))}</span></span>
+        <span class="who"><b>${esc(shownName(p))}</b><span>${S.inTour ? `Round ${S.leg}: ` : ""}${p.correct}/${S.deck.length} right · ${signed(p.score - (p.roundStart || 0))}</span></span>
         <span class="pts">${p.score}</span></li>`;
     }).join("");
     const midTour = S.inTour && S.leg < 3;
@@ -1607,7 +1608,7 @@
       if (S.phase === "lobby") startGame();
       else if (S.phase === "host") skipHost();
       else if (S.phase === "reveal") nextQuestion();
-      else if (S.phase === "final" && Date.now() - S.finalAt > 6000 && !Host.speaking) nextRound();   // let the winner have their moment
+      else if (S.phase === "final" && Date.now() - S.finalAt > 4000) { if (Host.speaking) Host.stop(); else nextRound(); }   // let the winner have their moment
     }
   });
   function toggleFull() {
