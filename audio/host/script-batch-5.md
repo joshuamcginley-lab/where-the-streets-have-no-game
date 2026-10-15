@@ -193,7 +193,7 @@ MacPhisto The Fly grown old, "fat and playing Las Vegas", so MacPhisto quotes hi
 [smugly] I should know. I'm wearing three.
 ```
 
-`phone-3.mp3`: a lull
+`phone-3.mp3`: a lull (DROPPED: too camp)
 
 ```
 [nostalgic] When I was younger... I wore sunglasses indoors.
@@ -202,7 +202,7 @@ MacPhisto The Fly grown old, "fat and playing Las Vegas", so MacPhisto quotes hi
 [sighs] Nobody believes in you when you're young.
 ```
 
-## Tier 3: written in earlier batches, never recorded (same text, final file names)
+## Tier 3: DROPPED (too camp). Kept here for the record; the game no longer looks for these. See script-batch-6.md
 
 `all-right-1.mp3`: everyone right (was batch 2)
 

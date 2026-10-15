@@ -62,3 +62,4 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | tie-1.mp3 | Final: a tie | A TIE! / With or without you... / I simply can't choose. |
 | song-3.mp3 | Song clip question | Listen... / Have you found what you're looking for? / I still haven't. And I've looked EVERYWHERE. |
 | cover-2.mp3 | Album cover question | Now... a little picture. / Judge the album by its cover. / Everybody else does. |
+| cover-3.mp3 | Album cover question | Look closely now. / The mask tells you more about the man. / I should know. / I'm wearing three. |
