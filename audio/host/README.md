@@ -4,7 +4,7 @@ Voice lines for the planned MacPhisto host. Not wired into the game yet; preview
 
 After adding a take here and a row to the table below, run `python3 tools/host-lines.py` to rebuild `host-lines.js` (the subtitle timings and the loudness his lips follow).
 
-- Voice: ElevenLabs library voice "AK - British Posh Well-Spoken Old Man" on Eleven v4 (generated on the website; the free plan can't use library voices through the API). No cloning; Bono/U2/MacPhisto are never named in prompts.
+- Voice: ElevenLabs library voice "AK - British Posh Well-Spoken Old Man" on Eleven v4. Batches 1–6 were generated on the website; batch 7 on came through the API on a paid plan: `python3 tools/eleven.py audio/host/script-batch-7.md` makes raw takes in `_raw/` (level them to about −27.5 LUFS, mono 192k, into this folder), then `python3 tools/eleven.py --align audio/host/script-batch-7.md` saves word timings in `align/`, which time the subtitles. No cloning; Bono/U2/MacPhisto are never named in prompts.
 - Treatment: each take is cut at its natural pauses and re-spaced to MacPhisto's measured timing
   (about 0.9 s between phrases, 1.2 s after a big line, 2–4 s where a crowd would react). No EQ or echo.
 
@@ -17,7 +17,7 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | streak-adam-1.mp3 | Adam on a streak | Adam! FOUR in a row! / (rest as Larry) |
 | streak-edge-1.mp3 | The Edge on a streak | Edge! FOUR in a row! / (rest as Larry) |
 | lead-change-1.mp3 | Lead change | Oh, how the mighty FALL... don't they? / I should know. / I used to be GIGANTIC, you know... / Never mind! / On with the show! |
-| winner-1.mp3 | Final winner | Look what you've done... / ...to me. / You've won, young man... and I'm AWFULLY proud. / Of course... it was all MY idea. / Everything was my idea. |
+| winner-1.mp3 | Final winner | Look what you've done... / ...to me. / You've won... and I'm AWFULLY proud. / Of course... it was all MY idea. / Everything was my idea. |
 | welcome-1.mp3 | New game | Welcome, welcome! / Yes... it's really me. / You made me very famous... / and I've never quite forgiven you. |
 | round-start-2.mp3 | Round start | Oh... it's you lot again. / How lovely. / I've had my boots polished, you know. / Shall we see who's been paying attention? |
 | round-start-3.mp3 | Round start (later rounds) | Ladies and gentlemen... ANOTHER round! / I'm very tired, you know. / But for you... I'll make an exception. |
@@ -69,3 +69,22 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | song-4.mp3 | Song clip question | Listen. / Know this one? You've been paying attention. / Don't? You were listening to Pop. |
 | goodnight-4.mp3 | Goodnight | That's the show. / You may now go back to the real thing. / I'm told it's not as good. |
 | last-place-5.mp3 | Last place | Last place. / Think of it as a sort of homecoming. |
+| tour-break-1-1.mp3 | Tournament: between rounds | That's round one. / Next... the songs nobody requests. / I adore them. They never ask for anything. |
+| tour-break-1-2.mp3 | Tournament: between rounds | One round down. / Now the songs the radio forgot. / I remember every one of them. I was in the room. |
+| tour-break-2-1.mp3 | Tournament: between rounds | Two rounds down. One to go. / And at the very end... a little wager. / I do so enjoy watching people bet everything. |
+| tour-break-2-2.mp3 | Tournament: between rounds | The last round. / Deep cuts... and then a bet. / Be careful. The house always wins... and I am the house. |
+| tour-winner-1.mp3 | Tournament champion | Three rounds. / One champion. / You earned it... which is so much less fun than inheriting it. |
+| tour-winner-2.mp3 | Tournament champion | The tournament champion! / Enjoy it. Fame is fleeting. / I should know. I've been fleeting since 1993. |
+| wager-1.mp3 | Final wager | The last question. / But first... a little wager. / Bet what you like. I already know how it ends. |
+| wager-2.mp3 | Final wager | One last question... and a bet. / Wager everything you know, if you like. / Mind you... everything you know is wrong. |
+| wager-3.mp3 | Final wager | The final wager. / Some call it faith. / I call it a very good business. |
+| bet-won-1.mp3 | Bet everything and won | Everything... and right. / Faith, rewarded. / Don't tell anyone. It's bad for business. |
+| bet-won-2.mp3 | Bet everything and won | All in... and right. / I like you. You'll go far. / Probably too far. |
+| bet-lost-1.mp3 | Bet everything and lost | Everything... on one question. / And now... nothing. / Don't worry. That's how I started. |
+| bet-lost-2.mp3 | Bet everything and lost | Oh dear. All of it? / Never mind. / I'll see it goes to a good home. Mine. |
+| double-1.mp3 | Double points | This one is worth double. / Twice the glory... / twice the shame. |
+| double-2.mp3 | Double points | Double points. / Even last place can dream. / Dreaming is free. Losing costs extra. |
+| double-3.mp3 | Double points | Double points on this one. / Think of it as the greatest-hits price. / Twice as much... for something you already had. |
+| who-said-1.mp3 | Who said it? | Now... who said it? / The Fly, the singer, or me. / We're very hard to tell apart. Especially for us. |
+| who-said-2.mp3 | Who said it? | A quotation. Who said it? / Careful... one of us lies for a living. / Possibly all of us. |
+| all-right-5.mp3 | Everyone got it right | All of you. / Mysterious ways, I suppose. |

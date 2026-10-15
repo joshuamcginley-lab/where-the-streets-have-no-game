@@ -939,6 +939,13 @@
     winner: ["winner-1", "winner-2", "winner-3", "winner-5", "winner-6", "winner-7"],
     tie: ["close-2", "tie-1"],
     goodnight: ["goodnight-1", "goodnight-4"],
+    double: ["double-1", "double-2", "double-3"],   // never says "last": mid-tournament it isn't
+    whoSaid: ["who-said-1", "who-said-2"],
+    wager: ["wager-1", "wager-2", "wager-3"],
+    betWon: ["bet-won-1", "bet-won-2"],
+    betLost: ["bet-lost-1", "bet-lost-2"],
+    tourBreak: leg => [`tour-break-${leg}-1`, `tour-break-${leg}-2`],   // after round 1 or 2: what's next
+    tourWinner: ["tour-winner-1", "tour-winner-2"],
   };
 
   const Host = (() => {
@@ -1137,7 +1144,10 @@
   // never the same line twice in a round.
   function revealLine(was) {
     const ps = S.players, multi = ps.length > 1, n = S.deck.length;
-    if (S.i === n - 1) return null;   // the last reveal leads straight to the final scores and the winner line
+    if (S.i === n - 1) {   // the last reveal leads straight to the final scores and the winner line, unless someone bet everything
+      const allIn = ps.filter(p => p.allIn);
+      return allIn.some(p => !p.ok) ? Host.pick(LINES.betLost) : allIn.length ? Host.pick(LINES.betWon) : null;
+    }
     const four = ps.find(p => p.ok && p.streak === 4);
     if (four) return Host.pick(LINES.streak(four.member));
     if (S.lastHostAt === S.i - 1 || S.revealLines >= 4) return null;
@@ -1161,6 +1171,7 @@
     const was = { leader: leader(), streak: new Map(S.players.map(p => [p.pid, p.streak])) };
     const fin = finaleNow();
     S.players.forEach(p => {
+      p.allIn = fin === "wager" && p.wager > 0 && p.wager === wagerTiers(p)[3];   // before the score changes
       p.ok = !!p.answer && p.answer.k === right;
       if (p.ok) {
         p.streak++; p.correct++; p.best = Math.max(p.best, p.streak);
@@ -1203,9 +1214,10 @@
       // A word from MacPhisto before the song, the album cover and the last question (each once a night)
       const q = S.deck[S.i], n = S.deck.length, of = `Question ${S.i + 1} of ${n}`;
       if (S.i === n - 1) {
-        if (S.finale === "wager") hostBeat(LINES.lastq, "Last question · Final wager", startWager, true);
-        else hostBeat(S.inTour ? [] : LINES.lastq, "Last question · Double points", beginQuestion, true);   // his "last question" lines would mislead mid-tournament
+        if (S.finale === "wager") hostBeat(LINES.wager, "Last question · Final wager", startWager);
+        else hostBeat(S.inTour ? LINES.double : [...LINES.lastq, ...LINES.double], "Last question · Double points", beginQuestion, true);   // his "last question" lines would mislead mid-tournament
       }
+      else if (q.c === "Who Said It?") hostBeat(LINES.whoSaid, `${of} · Who said it?`, beginQuestion, true);
       else if (q.song && !["songs", "deep-songs"].includes(roundMode())) hostBeat(LINES.song, `${of} · Name that song`, beginQuestion, true);
       else if (q.cover) hostBeat(LINES.cover, `${of} · Name the album`, beginQuestion, true);
       else beginQuestion();
@@ -1213,8 +1225,8 @@
       S.phase = "final"; S.finalAt = Date.now(); Player.stop(); Sound.win(); sync();
       // MacPhisto crowns the winner once the fanfare's done (a tie gets "neck and neck")
       const o = S.players.slice().sort((a, b) => b.score - a.score), tie = o.length > 1 && o[0].score === o[1].score;
-      // Mid-tournament nobody has won yet, so he saves the crowning for the end
-      const line = S.inTour && S.leg < 3 ? null : Host.pick(tie ? LINES.tie : LINES.winner), g = S.game;
+      // Mid-tournament nobody has won yet: he says what's next, and saves the crowning for the end
+      const line = S.inTour && S.leg < 3 ? Host.pick(LINES.tourBreak(S.leg)) : Host.pick(tie ? LINES.tie : S.inTour ? LINES.tourWinner : LINES.winner), g = S.game;
       if (line) setTimeout(() => { if (S.phase === "final" && S.game === g) Host.say(line); }, 2400);
     }
   }

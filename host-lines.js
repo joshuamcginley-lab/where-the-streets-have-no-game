@@ -200,35 +200,31 @@ window.HOST_LINES = {
  },
  "winner-1": {
   "moment": "Final winner",
-  "dur": 13.64,
+  "dur": 11.31,
   "phrases": [
    {
     "t": 0.0,
     "text": "Look what you've done..."
    },
    {
-    "t": 2.58,
+    "t": 2.24,
     "text": "...to me."
    },
    {
-    "t": 3.76,
-    "text": "You've won, young man... and I'm AWFULLY proud."
+    "t": 3.4,
+    "text": "You've won... and I'm AWFULLY proud."
    },
    {
-    "t": 9.03,
-    "text": "Of course..."
+    "t": 6.56,
+    "text": "Of course... it was all MY idea."
    },
    {
-    "t": 10.01,
-    "text": "it was all MY idea."
-   },
-   {
-    "t": 11.91,
+    "t": 9.46,
     "text": "Everything was my idea."
    }
   ],
   "fps": 25,
-  "env": "000000001c101003400023500000008668a36500000000000000000000000000000445652000000000000000000000dc6b74000000000000000000007eoqg959pzzwfc94687752469dd946a700000000000000353dikh62000007ozf2002a980002300000000000000000000000000000000424200000000000000000000000325955367763110000000000000000000000000000000n700100000000000000242211000000000000000"
+  "env": "0007dgizzz70124ej3002agh4000003lfc85000000000000000000000001221232210000000000000000007opl8646knrf944100000000000ho9cswzic4000000fzqh000034320006841000000000000000003a400003687300000000000000911ea3mkig534339gkde410000000541000000000000004fs403ce4004610001300365432000000000000000000"
  },
  "welcome-1": {
   "moment": "New game",
@@ -1405,5 +1401,381 @@ window.HOST_LINES = {
   ],
   "fps": 25,
   "env": "000004clqlb4100000022221000000000000000000000000000000edc8i4bk78e30cca6600000069626400000012jf63221002000000000000"
+ },
+ "tour-break-1-1": {
+  "moment": "Tournament: between rounds",
+  "dur": 9.09,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "That's round one."
+   },
+   {
+    "t": 2.1,
+    "text": "Next... the songs nobody requests."
+   },
+   {
+    "t": 5.62,
+    "text": "I adore them. They never ask for anything."
+   }
+  ],
+  "fps": 25,
+  "env": "00000hzlb000000004cmlkigee6825dd6100000000000000000004cosi00000000000000000000064003mmjgccd505kjfgjnle306402200000022300000000000000000000000dca4db2000018c7aef800100210000000000001hlffechlh3ce8abid20001d3000ab5ae30000000000000"
+ },
+ "tour-break-1-2": {
+  "moment": "Tournament: between rounds",
+  "dur": 8.75,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "One round down."
+   },
+   {
+    "t": 2.18,
+    "text": "Now the songs the radio forgot."
+   },
+   {
+    "t": 5.14,
+    "text": "I remember every one of them. I was in the room."
+   }
+  ],
+  "fps": 25,
+  "env": "0000027fnlljikjiiecb66007a7310000000000000000000000028a987bdd8865522920007eeccca8000ca8bbab5adbaa3004622a974000000000000000000322uwe0kheaa9cdc8hc2000koc421dokok966do92100001010100000000000005ghaf409aca9666dhha400000000"
+ },
+ "tour-break-2-1": {
+  "moment": "Tournament: between rounds",
+  "dur": 10.68,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Two rounds down. One to go."
+   },
+   {
+    "t": 3.14,
+    "text": "And at the very end... a little wager."
+   },
+   {
+    "t": 6.94,
+    "text": "I do so enjoy watching people bet everything."
+   }
+  ],
+  "fps": 25,
+  "env": "00110uzzpbnrmolee8000ci720000000000000000000012468d820d80c80000000000000000000000ea8d9000973107dcb88bcc3004fb63301245860000000000002me9c910cea858bb975002010000000000000000028doh71fhi800000007ijkfed7523699886439600649a02047007810007941000000007c8200000000001000000000"
+ },
+ "tour-break-2-2": {
+  "moment": "Tournament: between rounds",
+  "dur": 9.56,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "The last round."
+   },
+   {
+    "t": 1.78,
+    "text": "Deep cuts... and then a bet."
+   },
+   {
+    "t": 4.46,
+    "text": "Be careful. The house always wins... and I am the house."
+   }
+  ],
+  "fps": 25,
+  "env": "00000dijmqoe84000011332111000000000000000000001dmo400081820000000000000000000078a82346bhd20c700000000000000000000059g603hzpnl200888863000000004a6aanxwm700038kjkljokob148lnlgfcaa40000000000000487100hxnc4201110000046653454379510000000000000"
+ },
+ "tour-winner-1": {
+  "moment": "Tournament champion",
+  "dur": 7.81,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Three rounds."
+   },
+   {
+    "t": 1.94,
+    "text": "One champion."
+   },
+   {
+    "t": 3.58,
+    "text": "You earned it... which is so much less fun than inheriting it."
+   }
+  ],
+  "fps": 25,
+  "env": "0000009ezzzmpuf9lee72000000000000000000000000000269bcddcd53297520000000000000000000000000gillaabedidca054300000000000000000033014000000016ab67430001620000000eoh6631124331001359851000000000000000"
+ },
+ "tour-winner-2": {
+  "moment": "Tournament champion",
+  "dur": 9.64,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "The tournament champion!"
+   },
+   {
+    "t": 2.56,
+    "text": "Enjoy it. Fame is fleeting."
+   },
+   {
+    "t": 5.76,
+    "text": "I should know. I've been fleeting since 1993."
+   }
+  ],
+  "fps": 25,
+  "env": "000cr5000005xzzzq3jccsb3620001462zxl8604lmne61000000000000000000005efd28fhjoha41000000000000000000bfa765443015000000347200000000000000000000000038720062056576410000000000002ca50053410000368900555410034000244645009565666302300002632200000000"
+ },
+ "wager-1": {
+  "moment": "Final wager",
+  "dur": 8.44,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "The last question."
+   },
+   {
+    "t": 1.92,
+    "text": "But first... a little wager."
+   },
+   {
+    "t": 4.98,
+    "text": "Bet what you like. I already know how it ends."
+   }
+  ],
+  "fps": 25,
+  "env": "0001cohjirxtga1000101230000000000000000000000000002960000008bb9501300000000000000000b999e001db9736bbfcc501110000000000000000156zz43jb66qlilsqib3000010000000000017ihgbdbbld6hehiillf424444464204553110000000000000"
+ },
+ "wager-2": {
+  "moment": "Final wager",
+  "dur": 9.72,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "One last question... and a bet."
+   },
+   {
+    "t": 3.74,
+    "text": "Wager everything you know, if you like."
+   },
+   {
+    "t": 6.46,
+    "text": "Mind you... everything you know is wrong."
+   }
+  ],
+  "fps": 25,
+  "env": "000455688346bccgcda200010100c810010000000000000000000000000ifd923000008c610000000000000000000012iurzl5qxl69uc3ek601kcc9ehedadeedd642300026442354200000000000000000005xumnhd3bffd93131000000000001op7fm609hedacb9eeebgea33121530013597a520000000000"
+ },
+ "wager-3": {
+  "moment": "Final wager",
+  "dur": 6.43,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "The final wager."
+   },
+   {
+    "t": 2.26,
+    "text": "Some call it faith."
+   },
+   {
+    "t": 4.18,
+    "text": "I call it a very good business."
+   }
+  ],
+  "fps": 25,
+  "env": "00047l40000fzztpkeiggea522ac9652030000000000000000000000000uzqikg083cc999000000beb300000000000000000004aojfe011653222320016641002ccc752106a73009f800400000000000"
+ },
+ "bet-won-1": {
+  "moment": "Bet everything and won",
+  "dur": 7.71,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Everything... and right."
+   },
+   {
+    "t": 2.84,
+    "text": "Faith, rewarded."
+   },
+   {
+    "t": 4.9,
+    "text": "Don't tell anyone. It's bad for business."
+   }
+  ],
+  "fps": 25,
+  "env": "0005hvzd12ixj10000000000000000000a931000000025bpqg300000000000000000000000yzwi7200000100000005dhf89hkec4111000000000000000008lii60122dh9754534322420000000006000000iaa810072008b5001210000000000"
+ },
+ "bet-won-2": {
+  "moment": "Bet everything and won",
+  "dur": 7.55,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "All in... and right."
+   },
+   {
+    "t": 3.06,
+    "text": "I like you. You'll go far."
+   },
+   {
+    "t": 5.96,
+    "text": "Probably too far."
+   }
+  ],
+  "fps": 25,
+  "env": "00003uzzxxtgfhotoihifffd7000000000000000000009de7237643000000000000000000000adcehd8ffi1000766200000000000000aceoh2ed6300009cda540000000000000000000000111hn8de518a7000200jnh5000234322000000"
+ },
+ "bet-lost-1": {
+  "moment": "Bet everything and lost",
+  "dur": 7.97,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Everything... on one question."
+   },
+   {
+    "t": 3.38,
+    "text": "And now... nothing."
+   },
+   {
+    "t": 5.6,
+    "text": "Don't worry. That's how I started."
+   }
+  ],
+  "fps": 25,
+  "env": "001zzz82752001211000000000000000000000675320358cb6520001200000200000000000000000000001jj8dj998aghfeb97600000000067799a000000010000000000000000bpph42355432541000000008g9000yzxzrpga0005a65101010000000"
+ },
+ "bet-lost-2": {
+  "moment": "Bet everything and lost",
+  "dur": 7.08,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Oh dear. All of it?"
+   },
+   {
+    "t": 2.64,
+    "text": "Never mind."
+   },
+   {
+    "t": 3.96,
+    "text": "I'll see it goes to a good home. Mine."
+   }
+  ],
+  "fps": 25,
+  "env": "00035ab82000000599bba3001000000000000afepmgh26db50000000000000000015ftj374211111210000000000000000006hkq9000twyg723smnkb00128ba106ga2102661000000000000000000bccc864100000000000"
+ },
+ "double-1": {
+  "moment": "Double points",
+  "dur": 5.96,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "This one is worth double."
+   },
+   {
+    "t": 2.74,
+    "text": "Twice the glory..."
+   },
+   {
+    "t": 4.34,
+    "text": "twice the shame."
+   }
+  ],
+  "fps": 25,
+  "env": "000057czt101007321124430007g6022a99940000000gff10300000000000000000000003dntg30000hd2npqqnppga876a2000000000010008a63000002101206ab75000000000000000"
+ },
+ "double-2": {
+  "moment": "Double points",
+  "dur": 7.63,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Double points."
+   },
+   {
+    "t": 1.88,
+    "text": "Even last place can dream."
+   },
+   {
+    "t": 4.24,
+    "text": "Dreaming is free. Losing costs extra."
+   }
+  ],
+  "fps": 25,
+  "env": "000000740tzz95n930001210000000000000000000000005aom5bba99blmfc00000145420000145321356641233300000000000000000bjjh8dfhfe6000007khea310000000000002beszzse02100012002074000000005400000000000000"
+ },
+ "double-3": {
+  "moment": "Double points",
+  "dur": 8.52,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Double points on this one."
+   },
+   {
+    "t": 2.28,
+    "text": "Think of it as the greatest-hits price."
+   },
+   {
+    "t": 5.02,
+    "text": "Twice as much... for something you already had."
+   }
+  ],
+  "fps": 25,
+  "env": "0005b84zzn3poc002qsvf61007b893440000020000000000000000000000hejat4bpbdrn5000e300379cbb017100004a00000003010000000000000000000000006cea9000dd10dhhef500000000000000000005b001jd900cddcbba206bb88ba19b8329a65300000000"
+ },
+ "who-said-1": {
+  "moment": "Who said it?",
+  "dur": 9.56,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Now... who said it?"
+   },
+   {
+    "t": 2.72,
+    "text": "The Fly, the singer, or me."
+   },
+   {
+    "t": 5.84,
+    "text": "We're very hard to tell apart. Especially for us."
+   }
+  ],
+  "fps": 25,
+  "env": "0000dcddba9a642201000000000000000003yys3000076840000000000000000000001d7101aozwt8lb756300000009h10008pfbc5376930000016feaba999210000000000000000200gpnxk93107dighfb747hc42005004c5620028a63100000000000000000400009pc530032001878aa00000000000"
+ },
+ "who-said-2": {
+  "moment": "Who said it?",
+  "dur": 7.63,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A quotation. Who said it?"
+   },
+   {
+    "t": 2.6,
+    "text": "Careful... one of us lies for a living."
+   },
+   {
+    "t": 5.76,
+    "text": "Possibly all of us."
+   }
+  ],
+  "fps": 25,
+  "env": "000l053evl080cjh523300000000000000000000itd00anh4f7000000000000000000bgorc20058789b3000000000025dghj38c80059cfkjjhe300014776773088885000000000000002fb000k80egefga401bpiefjf600310000000000000"
+ },
+ "all-right-5": {
+  "moment": "Everyone got it right",
+  "dur": 3.71,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "All of you."
+   },
+   {
+    "t": 1.5,
+    "text": "Mysterious ways, I suppose."
+   }
+  ],
+  "fps": 25,
+  "env": "00000dvztfb54001212131000000000000000002500000148hdgg9c9001chnfcca51024410020036878430000000"
  }
 };
