@@ -880,6 +880,32 @@
   // He talks between questions, never over one: at the start of a round, before the song, album and
   // last questions (once a night each), on some reveals, at the final scores, and in the lobby.
   // Anything he says can be skipped: Enter on the TV, or the VIP's phone.
+  // What he can say at each moment. Lines not recorded yet (not in host-lines.js) are simply skipped,
+  // so a new take starts playing as soon as its MP3 and README row are added.
+  const LINES = {
+    welcome: ["welcome-1", "welcome-2"],
+    join: ["join-1", "join-2"],
+    full: ["lobby-full-1"],
+    round1: ["start-4", "round-start-1", "round-start-4", "round-start-5"],
+    roundN: ["round-start-2", "round-start-3", "next-round-1", "next-round-2", "next-round-3", "next-round-4"],
+    song: ["song-1", "song-2", "song-3"],
+    cover: ["cover-1", "cover-2", "cover-3"],
+    lastq: ["last-question-1", "last-question-2", "last-q-1", "last-q-3"],
+    streak: m => [`streak-${m}-1`, "streak-any-1", "streak-any-2"],
+    lead: ["lead-change-1", "lead-change-2", "lead-change-3", "lead-change-4"],
+    broken: ["streak-broken-1", "streak-broken-2", "streak-broken-3"],
+    allRight: ["all-right-1", "all-right-2", "all-right-3", "all-right-4"],
+    hurry: ["hurry-1", "hurry-2"],
+    nobody: ["nobody-right-2", "nobody-right-4", "nobody-right-5"],
+    nobodyGroup: ["nobody-right-1", "nobody-right-3"],   // "Not one of you": needs company
+    close: ["close-1", "close-2"],
+    lastPlace: ["last-place-1", "last-place-2", "last-place-3", "last-place-4"],
+    phone: ["phone-1", "phone-2", "phone-3"],
+    winner: ["winner-1", "winner-2", "winner-3", "winner-4", "winner-5", "winner-6", "winner-7"],
+    tie: ["close-2", "tie-1"],
+    goodnight: ["goodnight-1", "goodnight-2", "goodnight-3"],
+  };
+
   const Host = (() => {
     const box = document.createElement("div");
     const mp = window.MacPhisto && window.HOST_LINES ? MacPhisto.mount(box) : null;
@@ -966,7 +992,7 @@
     Host.stop();
     // MacPhisto opens the round, then the count-in
     const label = `Round ${S.round} · ${MODES.find(m => m.id === S.mode).name}`;
-    hostBeat(S.round === 1 ? ["start-4", "round-start-1"] : ["round-start-2", "round-start-3", "next-round-2"], label, countIn);
+    hostBeat(S.round === 1 ? LINES.round1 : LINES.roundN, label, countIn);
   }
 
   function countIn() {
@@ -1021,19 +1047,19 @@
     const ps = S.players, multi = ps.length > 1, n = S.deck.length;
     if (S.i === n - 1) return null;   // the last reveal leads straight to the final scores and the winner line
     const four = ps.find(p => p.ok && p.streak === 4);
-    if (four) return Host.pick([`streak-${four.member}-1`]);
+    if (four) return Host.pick(LINES.streak(four.member));
     if (S.lastHostAt === S.i - 1 || S.revealLines >= 4) return null;
     const fresh = ids => ids.filter(id => !S.roundLines.has(id));
     const pick = (p, ids, tonight) => (Math.random() < p && fresh(ids).length ? Host.pick(fresh(ids), tonight) : null);
     const lead = leader(), by = ps.slice().sort((a, b) => b.score - a.score);
-    if (multi && was.leader && lead && lead !== was.leader) return pick(1, ["lead-change-1"]);
-    if (ps.some(p => !p.ok && (was.streak.get(p.pid) || 0) >= 3)) return pick(1, ["streak-broken-1"]);
-    if (multi && ps.every(p => p.ok)) return pick(.6, ["all-right-3"]);
-    if (!ps.some(p => p.answer)) return pick(.8, ["hurry-1"]);
-    if (!ps.some(p => p.ok)) return pick(.6, multi ? ["nobody-right-1", "nobody-right-2"] : ["nobody-right-2"]);   // "Not ONE of you?" needs company
-    if (multi && S.i >= 4 && by[0].score - by[1].score <= 75) return pick(.5, ["close-2"]);
-    if (multi && S.i >= 5 && by[0].score - by[by.length - 1].score >= 450) return pick(.45, ["last-place-1", "last-place-2", "last-place-3"]);
-    return pick(.15, ["phone-1"], true);
+    if (multi && was.leader && lead && lead !== was.leader) return pick(1, LINES.lead);
+    if (ps.some(p => !p.ok && (was.streak.get(p.pid) || 0) >= 3)) return pick(1, LINES.broken);
+    if (multi && ps.every(p => p.ok)) return pick(.6, LINES.allRight);
+    if (!ps.some(p => p.answer)) return pick(.8, LINES.hurry);
+    if (!ps.some(p => p.ok)) return pick(.6, multi ? [...LINES.nobody, ...LINES.nobodyGroup] : LINES.nobody);
+    if (multi && S.i >= 4 && by[0].score - by[1].score <= 75) return pick(.5, LINES.close);
+    if (multi && S.i >= 5 && by[0].score - by[by.length - 1].score >= 450) return pick(.45, LINES.lastPlace);
+    return pick(.15, LINES.phone, true);
   }
 
   function reveal() {
@@ -1076,15 +1102,15 @@
     if (S.i < S.deck.length) {
       // A word from MacPhisto before the song, the album cover and the last question (each once a night)
       const q = S.deck[S.i], n = S.deck.length, of = `Question ${S.i + 1} of ${n}`;
-      if (S.i === n - 1) hostBeat(["last-question-2", "last-q-3"], "Last question", beginQuestion, true);
-      else if (q.song && S.mode !== "songs") hostBeat(["song-1"], `${of} · Name that song`, beginQuestion, true);
-      else if (q.cover) hostBeat(["cover-1"], `${of} · Name the album`, beginQuestion, true);
+      if (S.i === n - 1) hostBeat(LINES.lastq, "Last question", beginQuestion, true);
+      else if (q.song && S.mode !== "songs") hostBeat(LINES.song, `${of} · Name that song`, beginQuestion, true);
+      else if (q.cover) hostBeat(LINES.cover, `${of} · Name the album`, beginQuestion, true);
       else beginQuestion();
     } else {
       S.phase = "final"; S.finalAt = Date.now(); Player.stop(); Sound.win(); sync();
       // MacPhisto crowns the winner once the fanfare's done (a tie gets "neck and neck")
       const o = S.players.slice().sort((a, b) => b.score - a.score), tie = o.length > 1 && o[0].score === o[1].score;
-      const line = Host.pick(tie ? ["close-2"] : ["winner-1", "winner-2", "winner-3", "winner-5"]), g = S.game;
+      const line = Host.pick(tie ? LINES.tie : LINES.winner), g = S.game;
       if (line) setTimeout(() => { if (S.phase === "final" && S.game === g) Host.say(line); }, 2400);
     }
   }
@@ -1106,7 +1132,7 @@
     seatedCount = S.players.filter(p => p.member).length;
     resetScores();
     sync();
-    if (goodnight) setTimeout(() => { if (S.phase === "lobby") Host.sayNext(Host.pick(["goodnight-1"]), () => S.phase === "lobby"); }, 600);
+    if (goodnight) setTimeout(() => { if (S.phase === "lobby") Host.sayNext(Host.pick(LINES.goodnight), () => S.phase === "lobby"); }, 600);
   }
 
   // Lobby chatter: a welcome for the first player to pick a character, a word for the next
@@ -1115,7 +1141,7 @@
   function lobbyChatter() {
     const n = S.players.filter(p => p.member).length;
     if (n > seatedCount && S.phase === "lobby") {
-      const id = n === MAX ? Host.pick(["lobby-full-1"], true) : Host.pick(seatedCount === 0 ? ["welcome-1"] : ["join-1"], true);
+      const id = n === MAX ? Host.pick(LINES.full, true) : Host.pick(seatedCount === 0 ? LINES.welcome : LINES.join, true);
       Host.sayNext(id, () => S.phase === "lobby");
     }
     seatedCount = n;
