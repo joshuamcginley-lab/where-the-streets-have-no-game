@@ -913,5 +913,121 @@ window.HOST_LINES = {
   ],
   "fps": 25,
   "env": "00000mzzr30qze100er6000004zzyk34530000000000000000000000000000008hj794ji7iic40hnl9018202ceea3866agc87000019b8765330000000000000000000000000000c8ceaa400061003adb96caa30000000000004775578a73f6010974210000000000000000000000000000000000009a41000000000000100009a9055022025754100000000000000000000000"
+ },
+ "streak-broken-2": {
+  "moment": "Streak broken",
+  "dur": 9.3,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Oh!"
+   },
+   {
+    "t": 1.48,
+    "text": "The streak is DEAD."
+   },
+   {
+    "t": 3.95,
+    "text": "Don't be sad."
+   },
+   {
+    "t": 5.69,
+    "text": "Death is a career move."
+   },
+   {
+    "t": 7.62,
+    "text": "Ask my record company."
+   }
+  ],
+  "fps": 25,
+  "env": "000786400000000bopvvj9100000000000000110000000127ba103g70000001466776400010000000000000000000000000smc705mh3000034661199a6000000000000000000007gjh009f20b04459105bhgeb6500000000000000000000003fqp000fnokhfmm02lkb02cc640812311000000000"
+ },
+ "streak-broken-3": {
+  "moment": "Streak broken",
+  "dur": 6.06,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "All that running..."
+   },
+   {
+    "t": 2.25,
+    "text": "just to stand still."
+   },
+   {
+    "t": 4.69,
+    "text": "I know the feeling."
+   }
+  ],
+  "fps": 25,
+  "env": "0000000okgh9007520023457dfg7586623000000000000000000000000150000000000000101221000000001100000000000000000000000000006ahjecgpmf6cb0006a8845541000000000"
+ },
+ "winner-6": {
+  "moment": "Final winner",
+  "dur": 11.26,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Our champion!"
+   },
+   {
+    "t": 2.36,
+    "text": "When I was young, there were reports of egomania."
+   },
+   {
+    "t": 6.34,
+    "text": "So I became EVERYTHING they said."
+   },
+   {
+    "t": 9.56,
+    "text": "I see you've done the same."
+   }
+  ],
+  "fps": 25,
+  "env": "0000fzzzzilwma0001254nzzi54008gd710000000000000000000000000a7b9aa8385001adcb5000000000000004957a99f600004b50000020000ad41a8655777411000000000000000000000000000002gzfizzocb26i402bjjf52000001mzv720045400496533789600046000000000000000000000001582000acb87ggd300bgb998200595432000000000"
+ },
+ "last-place-4": {
+  "moment": "Last place",
+  "dur": 8.15,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Bottom of the table..."
+   },
+   {
+    "t": 2.25,
+    "text": "Sometimes you can't make it on your own."
+   },
+   {
+    "t": 5.62,
+    "text": "Fortunately..."
+   },
+   {
+    "t": 7.14,
+    "text": "I can."
+   }
+  ],
+  "fps": 25,
+  "env": "00001ejf539887100230102643057752000000000000000000000000000cbck70llkjhdc810000000008j80843bkh8229a6302634454544221201000000000000000000000000000izzu47c8774002339kj70000000000000006li9a0109ec8520000000000"
+ },
+ "winner-7": {
+  "moment": "Final winner",
+  "dur": 9.95,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Oh, it's a BEAUTIFUL day!"
+   },
+   {
+    "t": 3.66,
+    "text": "Magnificent... simply magnificent."
+   },
+   {
+    "t": 8.02,
+    "text": "I'll take ten percent, of course."
+   }
+  ],
+  "fps": 25,
+  "env": "00007jzzzzse511031e800004cp200000000000005onzzj35ga004cb630985332100000000000000000000000000000ahf100000001016tc1025000000000000000000000001zm81000cbcb3012ddb920144689am90000000000000000000000000000007glg00hof10000i85002000f7000000000032000000000000"
  }
 };

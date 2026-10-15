@@ -47,3 +47,8 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | lead-change-2.mp3 | Lead change | A new leader! / Celebrity is a job, you know. / The hours are dreadful. / But the boots are free. |
 | lead-change-3.mp3 | Lead change | Oh dear... the old leader... / Stuck in a MOMENT. / Can't get out of it, I'm told. |
 | lead-change-4.mp3 | Lead change | Top of the table! / Somebody's got to play the rock star. / I used to say that... in leather trousers. / Before the trousers won. |
+| streak-broken-2.mp3 | Streak broken | Oh! The streak is DEAD. / Don't be sad. / Death is a career move. / Ask my record company. |
+| streak-broken-3.mp3 | Streak broken | All that running... / just to stand still. / I know the feeling. |
+| winner-6.mp3 | Final winner | Our champion! / When I was young, there were reports of egomania. / So I became EVERYTHING they said. / I see you've done the same. |
+| last-place-4.mp3 | Last place | Bottom of the table... / Sometimes you can't make it on your own. / Fortunately... I can. |
+| winner-7.mp3 | Final winner | Oh, it's a BEAUTIFUL day! / Magnificent... simply magnificent. / I'll take ten percent, of course. |
