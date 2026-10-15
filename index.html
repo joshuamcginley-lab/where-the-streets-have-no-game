@@ -220,7 +220,19 @@
   .ans.ch3 { --c: var(--ch3); animation-delay: .16s; }
   .ans.ch4 { --c: var(--ch4); animation-delay: .24s; }
   .ans .ch { font-size: 2.4rem; }
-  .ans .pickers { display: flex; gap: .3rem; }
+  .ans .pickers { display: flex; gap: .3rem; align-items: center; }
+  .ans .pickers .who { display: flex; gap: .3rem; }
+  /* put-them-in-order: the place each card has been given, and its year at the reveal */
+  .ans .rank { font-family: var(--font-stencil); font-weight: 900; font-size: 1.6rem; color: var(--fg); }
+  .ans .yr { display: block; font: 500 1.1rem var(--font-mono); letter-spacing: .08em; color: var(--good); }
+  .ans .yr:empty { display: none; }
+  .reveal-on .question .hint { display: none; }
+  .question .hint { display: block; font: 500 1rem var(--font-mono); letter-spacing: .08em; color: var(--muted); margin-top: .4rem; text-transform: uppercase; }
+  /* a cover question: what a right answer is worth right now (it drops as the cover pulls back) */
+  .cover-frame { position: relative; }
+  .cover-frame .worth { position: absolute; left: .5rem; bottom: .5rem; background: rgba(0,0,0,.75); color: #fff; padding: .3rem .6rem; border-radius: .3rem;
+    font: 500 .9rem var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+  .cover-frame .worth b { font-family: var(--font-stencil); font-size: 1.5rem; letter-spacing: .02em; color: var(--good); }
   .ans .pickers .av { width: 2.7rem; animation: pop .4s cubic-bezier(.2,.9,.3,1.4) both; }
   .couch-on .ans:not(.done) { cursor: pointer; }
   .couch-on .ans:not(.done):hover { border-color: var(--fg); transform: translateY(-2px); }
@@ -390,9 +402,9 @@
 <script src="macphisto.js"></script>
 <script>
 (() => {
-  const { MODES, Q, RANKS } = U2;
+  const { MODES, Q, RANKS, ORDER } = U2;
   const { MEMBERS, byId, avatar, loadPhotos } = U2M;
-  const MAX = 4, ROUND = 10, SECS = 20, REVEAL_MS = 12000, WAGER_SECS = 15, COUNT_HOLD = 2.55, LOBBY_GRACE_MS = 60000, STALE_MS = 12000;
+  const MAX = 4, ROUND = 10, SECS = 20, ORDER_SECS = 30, COVER_BONUS = 200, REVEAL_MS = 12000, WAGER_SECS = 15, COUNT_HOLD = 2.55, LOBBY_GRACE_MS = 60000, STALE_MS = 12000;
   const CODE_CHARS = "BCDFGHJKLMNPQRSTVWXZ";
   const COUNT_WORDS = ["UNOS", "DOS", "TRES", "¡CATORCE!"];
   // When each word lands, in seconds. The gap before CATORCE is the joke, and CATORCE then
@@ -746,6 +758,7 @@
       if (m.t === "ping") return c.send({ t: "pong" });
       if (m.t === "pick") return pick(p, m.member);
       if (m.t === "answer") return submit(p, m.k);
+      if (m.t === "order") return submitOrder(p, m.seq);
       if (m.t === "wager") return placeWager(p, m.k);
       if (p !== vip()) return;
       if (m.t === "mode" && (S.phase === "lobby" || S.phase === "final") && MODES.some(x => x.id === m.mode)) setMode(m.mode);
@@ -832,8 +845,19 @@
     return { q: "Name the album", a: cover.title, w: shuffle(near).slice(0, 3).map(x => x.title), cover };
   }
 
+  // "Put them in order": four items from one set, all from different years. Right is oldest first.
+  // right[i] is the index (into opts) of the item that belongs in place i.
+  function orderQuestion(mode) {
+    const set = Used.take("order-" + mode, ORDER.filter(o => o.modes.includes(mode)), 1, o => o.id)[0];
+    const picked = [];
+    for (const [t, y] of shuffle(set.items)) if (picked.length < 4 && !picked.some(x => x.y === y)) picked.push({ t, y });
+    const right = picked.map((_, k) => k).sort((a, b) => picked[a].y - picked[b].y);
+    return { q: set.q, order: true, opts: picked.map(x => x.t), years: picked.map(x => x.y), right, a: "", w: [],
+             f: `From ${picked[right[0]].y} to ${picked[right[3]].y}: ${picked[right[3]].y - picked[right[0]].y} years in four cards.` };
+  }
+
   // Ten questions. Name That Song is all clips (mostly hits, some deep cuts);
-  // the other modes are trivia with one clip and one album cover slipped in somewhere in the middle.
+  // the other modes are trivia with one clip, one album cover and one put-them-in-order slipped in somewhere in the middle.
   // No repeats: the TV remembers every question and clip it has used (in this browser, across
   // nights) and only deals unused ones. When a pool runs low it starts over on that pool.
   const Used = {
@@ -873,10 +897,11 @@
     const pool = SONGS.filter(x => x.tier === tier);
     // Casual gets the studio albums; Deep Cuts gets those plus the Deep Cuts-only covers.
     const covers = COVERS.filter(x => x.tier === "casual" || mode === "deep");
-    const [songAt, coverAt] = shuffle([2, 3, 4, 5, 6, 7]);   // two different slots in the middle
+    const [songAt, coverAt, orderAt] = shuffle([2, 3, 4, 5, 6, 7]);   // three different slots in the middle
     const extras = [];
     if (pool.length) extras.push([songAt, () => songQuestion(Used.take("song-" + tier, pool, 1, songId)[0])]);
     if (covers.length) extras.push([coverAt, () => coverQuestion(Used.take("cover-" + mode, covers, 1, x => x.id)[0])]);
+    if (ORDER?.some(o => o.modes.includes(mode))) extras.push([orderAt, () => orderQuestion(mode)]);
     // Only deal (and mark as used) the trivia questions that will actually be asked
     const deck = Used.take(mode, Q.filter(q => q.m === mode), ROUND - extras.length, q => q.q);
     extras.sort((a, b) => a[0] - b[0]).forEach(([at, make]) => deck.splice(at, 0, make()));
@@ -946,6 +971,7 @@
     goodnight: ["goodnight-4", "goodnight-1", "goodnight-5", "goodnight-6"],
     double: ["double-3", "double-1", "double-4", "double-2", "double-5"],   // never says "last": mid-tournament it isn't
     whoSaid: ["who-said-2", "who-said-3", "who-said-1", "who-said-4"],
+    order: ["order-1", "order-2", "order-3"],   // before a put-them-in-order question
     wager: ["wager-2", "wager-1", "wager-3"],
     betWon: ["bet-won-2", "bet-won-1", "bet-won-3"],
     betLost: ["bet-lost-1", "bet-lost-3", "bet-lost-2"],
@@ -1049,7 +1075,7 @@
       S.inTour = true;
     } else S.inTour = false;
     if (restart) S.players = S.players.filter(p => p.local || p.connected);
-    S.deck = buildDeck(roundMode()).map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) }));
+    S.deck = buildDeck(roundMode()).map(q => (q.order ? q : { ...q, opts: shuffle([q.a, ...q.w]) }));
     S.deck.forEach(q => { if (q.cover) new Image().src = q.cover.art; });   // fetch the cover now so it's there when its question comes up
     if (restart || !S.round) { resetScores(); S.round = 1; }
     else {
@@ -1086,10 +1112,12 @@
     S.phase = "question";
     const q = S.deck[S.i];
     if (q.song) Player.play(q.song.preview); else Player.stop();
-    S.players.forEach(p => { p.answer = null; p.gain = 0; p.ok = false; });
-    S.endsAt = Date.now() + SECS * 1000;
+    S.players.forEach(p => { p.answer = null; p.gain = 0; p.ok = false; p.placed = 0; });
+    S.qSecs = q.order ? ORDER_SECS : SECS;   // sorting four things takes longer than picking one
+    couchSeq = [];
+    S.endsAt = Date.now() + S.qSecs * 1000;
     clearTimeout(qTimer);
-    qTimer = setTimeout(reveal, SECS * 1000 + 200);
+    qTimer = setTimeout(reveal, S.qSecs * 1000 + 200);
     sync();
   }
 
@@ -1130,11 +1158,33 @@
   }
 
   function submit(p, k) {
-    if (S.phase !== "question" || p.answer || !Number.isInteger(k) || k < 0 || k > 3 || !p.member) return;
+    if (S.phase !== "question" || S.deck[S.i].order || p.answer || !Number.isInteger(k) || k < 0 || k > 3 || !p.member) return;
     p.answer = { k, at: Date.now() };
     Touches.lockIn(p);   // the character's own lock-in sound (and card effect)
     sync();
     maybeAllAnswered();
+  }
+
+  // A put-them-in-order answer: all four, as indexes into opts, first place first
+  function submitOrder(p, seq) {
+    if (S.phase !== "question" || !S.deck[S.i].order || p.answer || !p.member) return;
+    if (!Array.isArray(seq) || seq.length !== 4 || !seq.every(k => Number.isInteger(k) && k >= 0 && k < 4) || new Set(seq).size !== 4) return;
+    p.answer = { seq: seq.slice(), at: Date.now() };
+    Touches.lockIn(p);
+    sync();
+    maybeAllAnswered();
+  }
+  // The player on the TV: a click or key 1–4 answers, or in a sorting question puts the next one in place
+  // (the last one goes in by itself; Backspace takes the last one back).
+  let couchSeq = [];
+  function couchTap(k) {
+    const c = S.players.find(p => p.local);
+    if (!c) return;
+    if (!S.deck[S.i]?.order) return submit(c, k);
+    if (S.phase !== "question" || c.answer || couchSeq.includes(k)) return;
+    couchSeq.push(k);
+    if (couchSeq.length === 3) couchSeq.push([0, 1, 2, 3].find(x => !couchSeq.includes(x)));
+    if (couchSeq.length === 4) submitOrder(c, couchSeq); else render();
   }
 
   function maybeAllAnswered() {
@@ -1174,7 +1224,7 @@
     if (multi && ps.every(p => p.ok)) return pick(.6, LINES.allRight);
     if (!ps.some(p => p.answer)) return pick(.8, LINES.hurry);
     const answered = ps.filter(p => p.answer);
-    if (answered.length > 1 && !ps.some(p => p.ok) && answered.every(p => p.answer.k === answered[0].answer.k)) return pick(.8, LINES.sameWrong);
+    if (answered.length > 1 && !S.deck[S.i].order && !ps.some(p => p.ok) && answered.every(p => p.answer.k === answered[0].answer.k)) return pick(.8, LINES.sameWrong);
     if (!ps.some(p => p.ok)) return pick(.6, multi ? [...LINES.nobodyGroup, ...LINES.nobody] : LINES.nobody);
     if (multi && ps.filter(p => p.ok).length === 1) { const r = pick(ps.length > 2 ? .5 : .25, LINES.loneRight); if (r) return r; }
     if (ps.some(p => p.ok && S.endsAt - p.answer.at < 1500)) { const r = pick(.6, LINES.buzzer); if (r) return r; }
@@ -1186,21 +1236,23 @@
   function reveal() {
     if (S.phase !== "question") return;
     clearTimeout(qTimer);
-    const q = S.deck[S.i], right = q.opts.indexOf(q.a);
+    const q = S.deck[S.i], right = q.order ? -1 : q.opts.indexOf(q.a);
     const was = { leader: leader(), streak: new Map(S.players.map(p => [p.pid, p.streak])) };
     const fin = finaleNow();
     S.players.forEach(p => {
       p.allIn = fin === "wager" && p.wager > 0 && p.wager === wagerTiers(p)[3];   // before the score changes
-      p.ok = !!p.answer && p.answer.k === right;
+      p.placed = q.order && p.answer ? p.answer.seq.filter((k, i) => k === q.right[i]).length : 0;
+      p.ok = !!p.answer && (q.order ? p.placed === 4 : p.answer.k === right);
       if (p.ok) {
         p.streak++; p.correct++; p.best = Math.max(p.best, p.streak);
-        const frac = Math.max(0, Math.min(1, (S.endsAt - p.answer.at) / (SECS * 1000)));
-        p.gain = 100 + Math.round(frac * 100) + Math.min(100, (p.streak - 1) * 25);
+        const frac = Math.max(0, Math.min(1, (S.endsAt - p.answer.at) / (S.qSecs * 1000)));
+        // A cover pays more for answering early, while it's still zoomed in
+        p.gain = 100 + Math.round(frac * (q.cover ? COVER_BONUS : 100)) + Math.min(100, (p.streak - 1) * 25);
         if (fin === "double") p.gain *= 2;
         if (fin === "wager") p.gain = p.wager || 0;
       } else {
         p.streak = 0;
-        p.gain = fin === "wager" ? -Math.min(p.wager || 0, p.score) : 0;   // a lost bet, never below zero
+        p.gain = fin === "wager" ? -Math.min(p.wager || 0, p.score) : q.order && p.placed >= 2 ? 50 : 0;   // a lost bet, never below zero; half the order right gets something
       }
       p.score += p.gain;
     });
@@ -1236,6 +1288,7 @@
         if (S.finale === "wager") hostBeat(LINES.wager, "Last question · Final wager", startWager);
         else hostBeat(S.inTour ? LINES.double : [...LINES.lastq, ...LINES.double], "Last question · Double points", beginQuestion, true);   // his "last question" lines would mislead mid-tournament
       }
+      else if (q.order) hostBeat(LINES.order, `${of} · Put them in order`, beginQuestion, true);
       else if (q.c === "Who Said It?") hostBeat(LINES.whoSaid, `${of} · Who said it?`, beginQuestion, true);
       else if (q.song && !["songs", "deep-songs"].includes(roundMode())) hostBeat(LINES.song, `${of} · Name that song`, beginQuestion, true);
       else if (q.cover) hostBeat(LINES.cover, `${of} · Name the album`, beginQuestion, true);
@@ -1312,11 +1365,12 @@
     if (S.phase === "wager") v.wager = { category: finalCategory(), tiers: wagerTiers(p), mine: p.wager, score: p.score, left: Math.max(0, S.wagerEndsAt - now), ms: WAGER_SECS * 1000 };
     if (S.phase === "countin") Object.assign(v, { countLeft: Math.max(0, S.countEndsAt - now), countMs: S.countMs, countAt });
     if (S.phase === "question" || S.phase === "reveal") {
-      v.q = { n: S.i + 1, total: S.deck.length, opts: q.opts, left: Math.max(0, S.endsAt - now), song: !!q.song, cover: !!q.cover,
-              finale: finaleNow(), wager: p.wager };
-      v.my = p.answer ? p.answer.k : null;
+      v.q = { n: S.i + 1, total: S.deck.length, opts: q.opts, left: Math.max(0, S.endsAt - now), secs: S.qSecs, song: !!q.song, cover: !!q.cover,
+              order: !!q.order, finale: finaleNow(), wager: p.wager };
+      v.my = p.answer ? p.answer.seq ?? p.answer.k : null;
     }
-    if (S.phase === "reveal") v.rv = { right: q.opts.indexOf(q.a), ok: p.ok, gain: p.gain, streak: p.streak, place: placeOf(p), of: S.players.length, left: Math.max(0, S.revealEndsAt - now) };
+    if (S.phase === "reveal") v.rv = { right: q.order ? q.right : q.opts.indexOf(q.a), years: q.years, placed: p.placed, ok: p.ok, gain: p.gain, streak: p.streak,
+                                       place: placeOf(p), of: S.players.length, left: Math.max(0, S.revealEndsAt - now) };
     if (S.phase === "final") v.fin = { place: placeOf(p), of: S.players.length, score: p.score, gained: p.score - (p.roundStart || 0), correct: p.correct, total: S.deck.length, rank: rankFor(p), round: S.round,
       tour: S.inTour ? { leg: S.leg, next: S.leg < 3 ? TOUR_NAMES[TOUR[S.leg]] : null } : null,
       tie: S.players.some(x => x !== p && x.score === p.score) };
@@ -1465,7 +1519,7 @@
     const q = S.deck[S.i];
     const mode = modeName();
     const answers = q.opts.map((o, k) =>
-      `<button type="button" class="ans ch${k + 1}" id="ans-${k}" data-k="${k}"><span class="ch">${k + 1}</span><span>${esc(o)}</span><span class="pickers"></span></button>`).join("");
+      `<button type="button" class="ans ch${k + 1}" id="ans-${k}" data-k="${k}"><span class="ch">${k + 1}</span><span>${esc(o)}${q.order ? `<span class="yr"></span>` : ""}</span><span class="pickers">${q.order ? `<span class="rank"></span>` : ""}</span></button>`).join("");
     const s = q.song, c = q.cover;
     const fact = s
       ? `<div class="song"><img class="art" src="${esc(s.art)}" alt=""><p>From <b>${esc(s.album)}</b> (${s.year}).<span class="credit">Preview courtesy of Apple Music</span></p></div>`
@@ -1473,12 +1527,12 @@
       : `<p>${esc(q.f)}</p>`;
     // A cover question puts the cover beside the answers, starting zoomed in on its crop point.
     const body = c
-      ? `<div class="qbody"><div class="cover-frame framed"><img id="cover-img" src="${esc(c.art)}" alt="" style="transform-origin:${c.crop.x}% ${c.crop.y}%;transform:scale(${c.crop.zoom})"></div><div class="answers">${answers}</div></div>`
+      ? `<div class="qbody"><div class="cover-frame framed"><img id="cover-img" src="${esc(c.art)}" alt="" style="transform-origin:${c.crop.x}% ${c.crop.y}%;transform:scale(${c.crop.zoom})"><span class="worth" id="worth">Worth <b id="worth-n">${100 + COVER_BONUS}</b></span></div><div class="answers">${answers}</div></div>`
       : `<div class="answers">${answers}</div>`;
     return `<section class="play">
       <div class="hud mono"><span class="tag">${mode}</span><span>Round <b>${S.round}</b></span><span>Question <b>${S.i + 1}</b> of ${S.deck.length}</span>${
         finaleNow() ? `<span class="finale">${finaleNow() === "wager" ? `Final wager · ${esc(finalCategory())}` : "Double points"}</span>` : ""}<span class="grow"></span><span id="hud-right"></span></div>
-      <p class="question">${esc(q.q)}${s ? `<span class="listening" aria-label="Playing on the TV"><i></i><i></i><i></i><i></i><i></i></span>` : ""}</p>
+      <p class="question">${esc(q.q)}${q.order ? `<span class="hint">${S.players.some(p => p.local) ? "Keys 1–4 in order here, or on your phone" : "Sort them on your phone"}</span>` : ""}${s ? `<span class="listening" aria-label="Playing on the TV"><i></i><i></i><i></i><i></i><i></i></span>` : ""}</p>
       ${body}
       <div class="strip" id="strip"></div>
       <div class="fact" id="fact" hidden>${fact}<div class="host-slot" id="host-slot-rv" hidden></div><div class="next"><button type="button" class="btn" id="btn-next">${S.i + 1 < S.deck.length ? "Next question" : "Final scores"}</button><div class="meter"><i id="rv-bar"></i></div></div></div>
@@ -1486,15 +1540,30 @@
   }
 
   function updatePlay() {
-    const q = S.deck[S.i], rev = S.phase === "reveal", right = q.opts.indexOf(q.a);
+    const q = S.deck[S.i], rev = S.phase === "reveal", right = q.order ? -1 : q.opts.indexOf(q.a);
     const couch = S.players.find(p => p.local);
     const hr = $("hud-right");
     if (hr.dataset.phase !== S.phase) {
       hr.dataset.phase = S.phase;
-      hr.innerHTML = rev ? `<span class="answer-is">ANSWER ${right + 1}</span>`
-        : `<span class="timer" id="timer"><span class="meter"><i id="bar"></i></span><span class="num" id="num">${SECS}</span></span>`;
+      hr.innerHTML = rev ? `<span class="answer-is">${q.order ? "IN ORDER" : `ANSWER ${right + 1}`}</span>`
+        : `<span class="timer" id="timer"><span class="meter"><i id="bar"></i></span><span class="num" id="num">${S.qSecs}</span></span>`;
     }
-    q.opts.forEach((o, k) => {
+    if (q.order) q.opts.forEach((o, k) => {
+      // While sorting: the TV player's picks so far. At the reveal the cards line up oldest first,
+      // with their years and the faces of everyone who put that one in the right place.
+      const b = $("ans-" + k), pos = rev ? q.right.indexOf(k) : couchSeq.indexOf(k);
+      b.classList.toggle("done", rev || !couch || !!couch.answer);
+      b.classList.toggle("mine", !rev && pos >= 0);
+      b.classList.toggle("right", rev);
+      b.style.order = rev ? pos : "";
+      b.tabIndex = rev || !couch || couch.answer ? -1 : 0;
+      b.querySelector(".rank").textContent = pos >= 0 ? ["1st", "2nd", "3rd", "4th"][pos] : "";
+      b.querySelector(".yr").textContent = rev ? q.years[k] : "";
+      const html = rev ? S.players.filter(p => p.answer?.seq?.[pos] === k).map(p => avatar(p.member)).join("") : "";
+      const pk = b.querySelector(".pickers .who") || b.querySelector(".pickers").appendChild(Object.assign(document.createElement("span"), { className: "who" }));
+      if (pk.innerHTML !== html) pk.innerHTML = html;
+    });
+    else q.opts.forEach((o, k) => {
       const b = $("ans-" + k);
       b.classList.toggle("done", rev || !couch || !!couch.answer);
       b.classList.toggle("mine", !rev && couch?.answer?.k === k);
@@ -1506,7 +1575,7 @@
       if (pk.innerHTML !== html) pk.innerHTML = html;
     });
     $("strip").innerHTML = [0, 1, 2, 3].map(i => playerCard(S.players[i])).join("");
-    if (q.cover && rev) $("cover-img").style.transform = "scale(1)";   // pull back to the whole cover
+    if (q.cover && rev) { $("cover-img").style.transform = "scale(1)"; $("worth").hidden = true; }   // pull back to the whole cover
     $("fact").hidden = !rev;
     const hs = $("host-slot-rv");
     hs.hidden = !(rev && S.hostLine);
@@ -1523,7 +1592,7 @@
       st = p.answer ? "Locked in" : (p.local || p.connected) ? "Thinking…" : "Away";
       if (p.answer) { cls += " locked"; if (!lockSeen.has(p.pid)) { lockSeen.add(p.pid); cls += " just"; } }
     } else {
-      st = p.ok ? (p.gain ? `+${p.gain}` : "Right · no bet") : p.gain < 0 ? `−${-p.gain}` : p.answer ? "Missed" : "No answer";
+      st = p.ok ? (p.gain ? `+${p.gain}` : "Right · no bet") : p.gain < 0 ? `−${-p.gain}` : p.gain > 0 ? `+${p.gain} · ${p.placed} of 4` : p.answer ? "Missed" : "No answer";
       cls += p.ok ? " gain" : " miss";
     }
     if (!p.local && !p.connected) cls += " away";
@@ -1580,7 +1649,7 @@
     const now = Date.now();
     if (S.phase === "question" && $("bar")) {
       const left = Math.max(0, S.endsAt - now), sec = Math.ceil(left / 1000), low = left < 5000;
-      $("bar").style.transform = `scaleX(${left / (SECS * 1000)})`;
+      $("bar").style.transform = `scaleX(${left / (S.qSecs * 1000)})`;
       $("num").textContent = sec;
       $("timer").classList.toggle("low", low);
       document.body.classList.toggle("hurry", low);
@@ -1588,7 +1657,8 @@
       lastTickSec = sec;
       // The cover pulls back to half its starting zoom as the clock runs down, at an even pace to the eye.
       const img = $("cover-img"), c = S.deck[S.i].cover;
-      if (img && c && !REDUCE) img.style.transform = `scale(${c.crop.zoom * Math.pow(.5, 1 - left / (SECS * 1000))})`;
+      if (img && c && !REDUCE) img.style.transform = `scale(${c.crop.zoom * Math.pow(.5, 1 - left / (S.qSecs * 1000))})`;
+      if (c && $("worth-n")) $("worth-n").textContent = 100 + Math.round(COVER_BONUS * left / (S.qSecs * 1000));   // what a right answer is worth now
     }
     if (S.phase === "wager" && $("wbar")) {
       const left = Math.max(0, S.wagerEndsAt - now);
@@ -1618,7 +1688,7 @@
     if (e.detail) t.blur();   // a mouse click shouldn't leave focus behind for Enter to click again
     if (t.dataset.mode) setMode(t.dataset.mode);
     else if (t.dataset.member) toggleCouch(t.dataset.member);
-    else if (t.dataset.k !== undefined) { const c = S.players.find(p => p.local); if (c) submit(c, Number(t.dataset.k)); }
+    else if (t.dataset.k !== undefined) couchTap(Number(t.dataset.k));
     else if (t.id === "btn-start") startGame();
     else if (t.id === "btn-next") nextQuestion();
     else if (t.id === "btn-again") nextRound();
@@ -1634,7 +1704,9 @@
     if (S.phase === "wager" && ["1", "2", "3", "4"].includes(k)) {
       const c = S.players.find(p => p.local); if (c) placeWager(c, Number(k) - 1);
     } else if (S.phase === "question" && ["1", "2", "3", "4"].includes(k)) {
-      const c = S.players.find(p => p.local); if (c) submit(c, Number(k) - 1);
+      couchTap(Number(k) - 1);
+    } else if (S.phase === "question" && k === "backspace" && couchSeq.length && !S.players.find(p => p.local)?.answer) {
+      couchSeq.pop(); render();
     } else if (k === "enter" && document.activeElement?.tagName !== "BUTTON") {
       if (S.phase === "lobby") startGame();
       else if (S.phase === "host") skipHost();

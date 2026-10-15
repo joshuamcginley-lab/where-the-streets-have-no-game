@@ -154,3 +154,6 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | join-3.mp3 | A player joins | Ah. Another player. / Do come in. Wipe your feet. / I've just had the floor done. In gold. |
 | join-4.mp3 | A player joins | Welcome. / Sign here... and here... and here. / Don't read it. Nobody reads it. |
 | join-5.mp3 | A player joins | Ah... you made it. / Find a seat. Not that one. / That one's mine. |
+| order-1.mp3 | Put them in order | A little history lesson. / Put them in order. Oldest first. / I remember all of it. I was there. Mostly. |
+| order-2.mp3 | Put them in order | Now... a little order. / Not my strong suit, I'm afraid. / Chaos is more my line of work. |
+| order-3.mp3 | Put them in order | In order, please. Oldest first. / Take your time. / Time is the one thing I have plenty of. |

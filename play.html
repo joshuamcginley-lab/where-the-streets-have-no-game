@@ -108,6 +108,9 @@
   .key.picked.thump { animation: thump .35s ease-out; }
   .key.right { border-color: var(--good); background: color-mix(in srgb, var(--good) 16%, var(--screen)); }
   .key.off { opacity: .3; }
+  .pad.order .key.off { opacity: .75; }
+  .key .yr { font: 500 14px var(--font-mono); letter-spacing: .06em; color: var(--good); margin-left: 6px; }
+  .key .ch:empty::before { content: "·"; opacity: .4; }
   .key:disabled { cursor: default; }
 
   .qfin { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 26px; line-height: 1; color: var(--good); margin: 0; }
@@ -161,6 +164,7 @@
 
   const params = new URLSearchParams(location.search);
   const C = {
+    seq: [],   // a put-them-in-order answer in progress
     status: "form",            // form | connecting | live | lost | error
     code: (params.get("room") || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4),
     name: store("wtshng-name") || "",
@@ -224,6 +228,7 @@
     const prev = C.v;
     C.v = m; C.status = "live"; C.everJoined = true;
     if (m.q) C.deadline = Date.now() + m.q.left;
+    if (m.phase !== "question" || prev?.phase !== "question" || prev.q.n !== m.q.n) C.seq = [];   // a sort in progress belongs to one question
     if (m.wager) C.wagerDeadline = Date.now() + m.wager.left;
     if (m.rv) C.revealDeadline = Date.now() + m.rv.left;
     wake();   // in every phase: a phone that locks in the lobby loses its seat
@@ -340,18 +345,58 @@
       `<span class="w" style="animation-delay:${(at[i] - elapsed).toFixed(2)}s">${w}</span>`).join("")}</div>`;
   }
 
+  // Put-them-in-order: tap the cards first to last. The phone keeps the picks until the last one goes in
+  // (the fourth fills itself in), then sends them all. The cards update in place, so quick taps all count.
+  function orderView(v) {
+    const done = v.my !== null, seq = done ? v.my : C.seq;
+    // Once it's in, the cards stand in the order this player chose
+    const keys = (done ? seq : v.q.opts.map((_, k) => k)).map(k => {
+      const pos = seq.indexOf(k);
+      return `<button type="button" class="key ch${k + 1} ${pos >= 0 ? "picked" : ""} ${done ? "off" : ""}" data-o="${k}" ${done ? "disabled" : ""}><span class="ch">${pos >= 0 ? pos + 1 : ""}</span><span>${esc(v.q.opts[k])}</span></button>`;
+    }).join("");
+    return `<div class="qhead mono"><span>Q ${v.q.n}/${v.q.total}</span><span id="secs"></span></div>
+      <div class="meter"><i id="bar"></i></div>
+      <p class="muted">${done ? "Locked in. Waiting for the others." : "Tap them in order, earliest first."}</p>
+      <div class="pad order">${keys}</div>
+      ${done ? "" : `<button type="button" class="btn ghost" id="btn-undo" ${C.seq.length ? "" : "hidden"}>Undo</button>`}`;
+  }
+  function updateOrder() {
+    document.querySelectorAll("[data-o]").forEach(b => {
+      const pos = C.seq.indexOf(Number(b.dataset.o));
+      b.classList.toggle("picked", pos >= 0);
+      b.querySelector(".ch").textContent = pos >= 0 ? pos + 1 : "";
+    });
+    if ($("btn-undo")) $("btn-undo").hidden = !C.seq.length;
+  }
+
   function questionView(v) {
+    if (v.q.order) return orderView(v);
     const picked = v.my;
     const keys = v.q.opts.map((o, k) =>
       `<button type="button" class="key ch${k + 1} ${picked === k ? "picked thump" : picked !== null ? "off" : ""}" data-k="${k}" ${picked !== null ? "disabled" : ""}><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
     return `<div class="qhead mono"><span>Q ${v.q.n}/${v.q.total}</span><span id="secs"></span></div>
       <div class="meter"><i id="bar"></i></div>
       ${v.q.finale ? `<p class="qfin">${v.q.finale === "wager" ? `Final wager: ${v.q.wager || 0} on the line` : "Double points!"}</p>` : ""}
-      <p class="muted">${picked !== null ? "Locked in. Waiting for the others." : v.q.song ? "Listen to the TV. Which song is it?" : v.q.cover ? "Look at the TV. Which album is it?" : "The question is on the TV. Pick your answer."}</p>
+      <p class="muted">${picked !== null ? "Locked in. Waiting for the others." : v.q.song ? "Listen to the TV. Which song is it?" : v.q.cover ? "Look at the TV. Which album is it? The sooner you know, the more it's worth." : "The question is on the TV. Pick your answer."}</p>
       <div class="pad">${keys}</div>`;
   }
 
+  // The right order, oldest first, with years: green where this player had it in the right place
+  function orderReveal(v) {
+    const r = v.rv, mine = v.my || [];
+    const rows = r.right.map((k, pos) =>
+      `<button type="button" class="key ch${k + 1} ${mine[pos] === k ? "right" : ""}" disabled><span class="ch">${pos + 1}</span><span>${esc(v.q.opts[k])} <span class="yr">${r.years[k]}</span></span></button>`).join("");
+    const head = r.ok ? `<div class="verdict ok">Correct</div><div class="big">+${r.gain}</div>`
+      : r.gain > 0 ? `<div class="verdict ok">Close</div><div class="big">+${r.gain}</div><p class="muted">${r.placed} of 4 in the right place</p>`
+      : `<div class="verdict no">${v.my === null ? "Too slow" : "Not quite"}</div>`;
+    return `<div class="hero">${head}
+        <div class="stats"><span>Score <b>${v.me.score}</b></span><span>Place <b>${ordinal(r.place)}</b> of ${r.of}</span>${r.streak > 1 ? `<span>Streak <b>${r.streak}</b></span>` : ""}</div></div>
+      ${v.vip ? `<button type="button" class="btn" id="btn-next">${v.q.n < v.q.total ? "Next question" : "Final scores"}</button>` : ""}
+      <div class="pad">${rows}</div>`;
+  }
+
   function revealView(v) {
+    if (v.q.order) return orderReveal(v);
     const r = v.rv;
     const keys = v.q.opts.map((o, k) =>
       `<button type="button" class="key ch${k + 1} ${k === r.right ? "right" : v.my === k ? "picked" : "off"}" disabled><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
@@ -386,7 +431,7 @@
   function frame() {
     if (C.v?.phase === "question" && $("bar")) {
       const left = Math.max(0, C.deadline - Date.now());
-      $("bar").style.transform = `scaleX(${left / 20000})`;
+      $("bar").style.transform = `scaleX(${left / ((C.v.q.secs || 20) * 1000)})`;
       $("bar").parentElement.classList.toggle("low", left < 5000);
       $("secs").textContent = Math.ceil(left / 1000) + "s";
     }
@@ -415,7 +460,17 @@
     // the heels of the last one if the screen changed in between. A first tap always counts.
     const now = Date.now(), quick = now - (C.lastTapAt || 0) < 450 && (C.shownAt || 0) > (C.lastTapAt || 0);
     C.lastTapAt = now;
-    if (quick && (b.dataset.k !== undefined || b.dataset.wager !== undefined || b.id === "btn-skip")) return;
+    if (quick && (b.dataset.k !== undefined || b.dataset.o !== undefined || b.dataset.wager !== undefined || b.id === "btn-skip")) return;
+    if (b.dataset.o !== undefined && C.v?.phase === "question" && C.v.my === null) {
+      const k = Number(b.dataset.o);
+      if (C.seq.includes(k)) return;
+      C.seq.push(k); buzz(12);
+      if (C.seq.length === 3) C.seq.push([0, 1, 2, 3].find(x => !C.seq.includes(x)));
+      if (C.seq.length < 4) return updateOrder();
+      C.v.my = C.seq.slice(); render(); buzz(buzzFor("lock", 25));   // show it right away; the TV confirms
+      return send({ t: "order", seq: C.v.my });
+    }
+    if (b.id === "btn-undo") { C.seq.pop(); return updateOrder(); }
     if (b.dataset.member) { send({ t: "pick", member: b.dataset.member }); buzz(15); }
     else if (b.dataset.mode) send({ t: "mode", mode: b.dataset.mode });
     else if (b.dataset.k !== undefined && C.v?.phase === "question" && C.v.my === null) {

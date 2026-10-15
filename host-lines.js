@@ -3037,5 +3037,65 @@ window.HOST_LINES = {
   ],
   "fps": 25,
   "env": "0000afkd74320000000000048bdde9hbf11000000000000000000000000000000cpjoa68700002863000000000000000000avzz60jth5001100000000000000000dkd4068633300068779a73100000000000"
+ },
+ "order-1": {
+  "moment": "Put them in order",
+  "dur": 8.83,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A little history lesson."
+   },
+   {
+    "t": 2.16,
+    "text": "Put them in order. Oldest first."
+   },
+   {
+    "t": 4.9,
+    "text": "I remember all of it. I was there. Mostly."
+   }
+  ],
+  "fps": 25,
+  "env": "0004pmcel21bccc6000gn000014420000000000000000000000000002uh0ipsykjhab61210100000000000cvsj4g5000004200000000000000000000015iibae798b89de8f50000aeedge7000000000000000000001bjgmq534ltmki811200000000000004cc3000000022000000"
+ },
+ "order-2": {
+  "moment": "Put them in order",
+  "dur": 7.71,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Now... a little order."
+   },
+   {
+    "t": 2.8,
+    "text": "Not my strong suit, I'm afraid."
+   },
+   {
+    "t": 5.52,
+    "text": "Chaos is more my line of work."
+   }
+  ],
+  "fps": 25,
+  "env": "004gjlhb7742000000000000000007b96a503d850000999653000000000000000000049eing206fgi7000100fmid983000353011676640006555561530000000000000000003700zzvqi981002c920ggbbced8ae98aba9a7107cccc500400000"
+ },
+ "order-3": {
+  "moment": "Put them in order",
+  "dur": 7.81,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "In order, please. Oldest first."
+   },
+   {
+    "t": 3.36,
+    "text": "Take your time."
+   },
+   {
+    "t": 4.76,
+    "text": "Time is the one thing I have plenty of."
+   }
+  ],
+  "fps": 25,
+  "env": "000zxrf40ewyzo3631000004430000000000000000000zztxd5l90000005f81000000000000000000000000fg307h9015a8765444100000000000000007vnlic557879200aeb7556gfdea0013534479a988800000000bdcb900143210000000000"
  }
 };

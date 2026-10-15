@@ -261,6 +261,26 @@ window.U2 = (() => {
     ...DEEP.map(q => ({ ...q, m: "deep" })),
   ];
 
+  // "Put them in order": each round deals one, four items from one of these sets, all different years.
+  // The players sort them oldest first. Only years that are certain go here.
+  const ORDER = [
+    { id: "albums", modes: ["casual", "deep"], q: "Put these albums in order: oldest first", items: [
+      ["Boy", 1980], ["October", 1981], ["War", 1983], ["The Unforgettable Fire", 1984], ["The Joshua Tree", 1987],
+      ["Rattle and Hum", 1988], ["Achtung Baby", 1991], ["Zooropa", 1993], ["Pop", 1997], ["All That You Can't Leave Behind", 2000],
+      ["How to Dismantle an Atomic Bomb", 2004], ["No Line on the Horizon", 2009], ["Songs of Innocence", 2014],
+      ["Songs of Experience", 2017], ["Songs of Surrender", 2023]] },
+    { id: "moments", modes: ["casual", "deep"], q: "Put these U2 moments in order: earliest first", items: [
+      ["The band forms at school in Dublin", 1976], ["Live Aid at Wembley", 1985], ["The Joshua Tree wins Album of the Year", 1988],
+      ["Rattle and Hum opens in cinemas", 1988], ["Achtung Baby sessions in Berlin", 1990], ["\"Beautiful Day\" wins Record of the Year", 2001],
+      ["The Super Bowl halftime show", 2002], ["Rock and Roll Hall of Fame induction", 2005], ["Bono's honorary knighthood", 2007],
+      ["A free show at the Brandenburg Gate", 2009], ["Headlining Glastonbury", 2011], ["Songs of Innocence lands in every iTunes", 2014],
+      ["Bono's memoir Surrender comes out", 2022], ["Opening the Sphere in Las Vegas", 2023]] },
+    { id: "tours", modes: ["deep"], q: "Put these tours in order: earliest first", items: [
+      ["Boy Tour", 1980], ["The Unforgettable Fire Tour", 1984], ["The Joshua Tree Tour", 1987], ["Lovetown Tour", 1989],
+      ["Zoo TV Tour", 1992], ["PopMart Tour", 1997], ["Elevation Tour", 2001], ["Vertigo Tour", 2005], ["U2 360° Tour", 2009],
+      ["Innocence + Experience Tour", 2015], ["Experience + Innocence Tour", 2018], ["U2:UV at the Sphere", 2023]] },
+  ];
+
   // Scored on correct answers out of 10.
   const RANKS = [
     { min: 10, name: "Where the Streets Have No Name" },
@@ -270,5 +290,5 @@ window.U2 = (() => {
     { min: 0,  name: "Still Haven't Found It" },
   ];
 
-  return { MODES, Q, RANKS };
+  return { MODES, Q, RANKS, ORDER };
 })();
