@@ -108,7 +108,7 @@ Paste each block into ElevenLabs as one generation (voice: AK - British Posh Wel
 `hurry-1.mp3`
 
 ```
-[impatient] Tick tock... tick tock.
+[impatient] Eleven o'clock... tick tock... tick tock.
 ```
 
 `hurry-2.mp3`
