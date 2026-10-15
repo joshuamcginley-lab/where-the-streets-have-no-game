@@ -33,7 +33,7 @@ window.MacPhisto = (() => {
     "streak-larry-1": STREAK("larry"), "streak-bono-1": STREAK("bono"),
     "streak-adam-1": STREAK("adam"), "streak-edge-1": STREAK("edge"),
     "lead-change-1": [{ p: 2, walls: { all: { text: "GIGANTIC" } } }, { p: 3, walls: { all: { face: 1 } } }],
-    "winner-1": [{ p: 0, walls: { all: { text: "LOOK WHAT YOU'VE DONE TO ME" } } }, { p: 2, walls: { all: { face: 1 } } }],
+    "winner-1": [{ p: 0, walls: { 0: { text: "LOOK WHAT YOU'VE DONE TO ME" }, 1: { text: "LOOK" }, 2: { text: "WHAT YOU'VE DONE" } } }, { p: 2, walls: { all: { face: 1 } } }],
     "winner-2": [{ p: 0, walls: { all: { text: "WINNER" } } }, { p: 1, walls: { all: { face: 1 } } }],
     "winner-3": [{ p: 1, walls: { all: { text: "RICH & FAMOUS" } } }, { p: 2, walls: { all: { face: 1 } } }],
     "winner-5": [{ p: 2, walls: { all: { text: "GLAMOROUS" } } }],
@@ -43,7 +43,7 @@ window.MacPhisto = (() => {
     "song-1": [{ p: 0, walls: { all: { eq: 1 } } }],
     "last-question-2": [{ p: 1, phone: 1 }],
     "phone-1": [{ p: 0, phone: 1 }, { p: 2, walls: { all: { text: "ENGAGED" } } }],
-    "goodnight-1": [{ p: 3, phone: 1 }],
+    "goodnight-1": [{ p: 2, phone: 1 }],
     "join-1": [{ p: 3, walls: { all: { text: "" } } }, { p: 4, walls: { 0: { text: "6" } } }, { p: 5, walls: { 1: { text: "6" } } },
                { p: 6, walls: { 2: { text: "6" } } }, { p: 7, phone: 1 }],
     "lobby-full-1": [{ p: 1, walls: { all: { avatar: "edge" } } }, { p: 2, walls: { all: { avatar: "adam" } } },
@@ -52,30 +52,30 @@ window.MacPhisto = (() => {
     "start-4": [{ p: 4, walls: { all: { static: 1 } } }],
     "last-q-3": [{ p: 3, walls: { all: { eyes: 1 } } }, { p: 4, walls: { all: { cameras: 1 } } }],
     "last-place-3": [{ p: 2, walls: { all: { text: "DECIBELS" } }, flash: 1 }, { p: 3, walls: { all: { face: 1 } } }],
-    // batch 5 (phrase numbers follow the script; check them against host-lines.js when the takes land)
+    // batch 5 and 6
     "streak-any-1": [{ p: 0, walls: { all: { text: "4 IN A ROW" } } }, { p: 1, walls: { all: { face: 1 } } }],
     "streak-any-2": [{ p: 0, walls: { all: { text: "4 IN A ROW" } } }, { p: 1, walls: { all: { static: 1 } } }, { p: 2, walls: { all: { face: 1 } } }],
     "lead-change-2": [{ p: 1, walls: { all: { text: "CELEBRITY IS A JOB" } } }, { p: 3, zoom: "boots" }],
     "lead-change-3": [{ p: 1, walls: { all: { text: "STUCK IN A MOMENT" } } }],
-    "lead-change-4": [{ p: 1, walls: { all: { text: "SOMEBODY'S GOT TO PLAY THE ROCK STAR" } } }, { p: 2, walls: { all: { face: 1 } } }, { p: 3, zoom: "boots" }],
-    "streak-broken-2": [{ p: 1, walls: { all: { static: 1 } } }, { p: 2, walls: { all: { face: 1 } } }, { p: 3, walls: { all: { text: "DEATH IS A CAREER MOVE" } } }, { p: 4, walls: { all: { face: 1 } } }],
+    "lead-change-4": [{ p: 1, walls: { 0: { text: "SOMEBODY'S GOT TO PLAY THE ROCK STAR" }, 1: { text: "ROCK" }, 2: { text: "STAR" } } }, { p: 2, walls: { all: { face: 1 } } }, { p: 3, zoom: "boots" }],
+    "streak-broken-2": [{ p: 0, at: 1.48, walls: { all: { static: 1 } } }, { p: 1, walls: { all: { face: 1 } } }, { p: 2, walls: { all: { text: "DEATH IS A CAREER MOVE" } } }, { p: 3, walls: { all: { face: 1 } } }],
     "streak-broken-3": [{ p: 1, walls: { all: { text: "RUNNING TO STAND STILL" } } }, { p: 2, walls: { all: { face: 1 } } }],
-    "winner-6": [{ p: 1, at: 1.2, walls: { all: { text: "EGOMANIA" } } }, { p: 3, walls: { all: { face: 1 } } }],
+    "winner-6": [{ p: 1, at: 2.2, walls: { all: { text: "EGOMANIA" } } }, { p: 3, walls: { all: { face: 1 } } }],
     "winner-7": [{ p: 0, walls: { all: { text: "BEAUTIFUL DAY" } } }, { p: 2, walls: { all: { face: 1 } } }],
     "round-start-4": [{ p: 1, walls: { all: { static: 1 } } }, { p: 2, walls: { all: { text: "TELEVISION" } } }, { p: 3, walls: { all: { face: 1 } } },
                       { p: 4, at: 0.3, horns: 1 }],
     "round-start-5": [{ p: 1, walls: { all: { text: "WATCH MORE TV" } } }, { p: 2, walls: { all: { believe: 1 } } },
-                      { p: 4, walls: { all: { text: "EVERYTHING YOU KNOW IS WRONG" } } }],
+                      { p: 4, walls: { 0: { text: "EVERYTHING YOU KNOW IS WRONG" } } }],   // LIE stays on the small walls
     "next-round-4": [{ p: 2, walls: { 0: { text: "UNOS" }, 1: { text: "DOS" }, 2: { text: "TRES" } } }, { p: 3, walls: { all: { text: "¡CATORCE!" } } }],
     "welcome-2": [{ p: 0, walls: { all: { text: "ACHTUNG BABY" } } }, { p: 1, walls: { all: { face: 1 } } }],
     "nobody-right-5": [{ p: 1, walls: { all: { text: "IGNORANCE IS BLISS" } } }, { p: 3, walls: { all: { text: "ADMIT NOTHING" } } }],
     "tie-1": [{ p: 1, walls: { all: { text: "WITH OR WITHOUT YOU" } } }, { p: 2, walls: { all: { face: 1 } } }],
-    "all-right-4": [{ p: 2, walls: { all: { text: "ONE" } } }, { p: 3, walls: { all: { face: 1 } } }],
+    "all-right-4": [{ p: 1, at: 1.0, walls: { all: { text: "ONE" } } }, { p: 2, walls: { all: { face: 1 } } }],
     "song-3": [{ p: 0, walls: { all: { eq: 1 } } }],
     "song-4": [{ p: 0, walls: { all: { eq: 1 } } }, { p: 4, at: 0.9, walls: { all: { text: "POP" } } }],
     "lead-change-5": [{ p: 1, walls: { all: { text: "BOY" } } }, { p: 2, walls: { all: { text: "WAR" } } }, { p: 3, walls: { all: { face: 1 } } }],
     "last-place-5": [{ p: 1, walls: { all: { text: "A SORT OF HOMECOMING" } } }],
-    "last-question-3": [{ p: 2, walls: { all: { text: "WHERE THE STREETS HAVE NAMES" } } }, { p: 3, walls: { all: { face: 1 } } }],
+    "last-question-3": [{ p: 2, walls: { 0: { text: "WHERE THE STREETS HAVE NAMES" }, 1: { text: "STREETS" }, 2: { text: "NAMES" } } }, { p: 3, walls: { all: { face: 1 } } }],
     "goodnight-4": [{ p: 1, walls: { all: { text: "THE REAL THING" } } }, { p: 2, walls: { all: { face: 1 } } }],
     "nobody-right-6": [{ p: 1, walls: { all: { text: "ACHTUNG = ATTENTION" } } }, { p: 2, walls: { all: { face: 1 } } }],
   };
@@ -285,15 +285,19 @@ window.MacPhisto = (() => {
         });
         spec.fade = { els: fade, at: performance.now() };   // the frame loop fades them
       } else if (spec.text != null) {
+        // Try every line length and keep the layout that gives the biggest letters on this wall
         const words = spec.text.split(" ");
-        const maxChars = Math.max(4, Math.round(w.w / 7));
-        const rows = [];
-        for (const word of words) {
-          if (rows.length && (rows[rows.length - 1] + " " + word).length <= maxChars) rows[rows.length - 1] += " " + word;
-          else rows.push(word);
+        let rows = [spec.text], fs = 0;
+        for (let maxChars = 1; maxChars <= spec.text.length; maxChars++) {
+          const r = [];
+          for (const word of words) {
+            if (r.length && (r[r.length - 1] + " " + word).length <= maxChars) r[r.length - 1] += " " + word;
+            else r.push(word);
+          }
+          const longest = Math.max(...r.map(x => x.length));
+          const f = Math.min(w.h / (r.length * 1.15), (w.w * 0.9) / (longest * 0.62));
+          if (f > fs) { fs = f; rows = r; }
         }
-        const longest = Math.max(...rows.map(r => r.length));
-        const fs = Math.min(w.h / (rows.length * 1.15), (w.w * 0.9) / (longest * 0.62));
         rows.forEach((r, k) => {
           const t = el("text", { x: cx, y: cy + (k - (rows.length - 1) / 2) * fs * 1.08, "text-anchor": "middle", "dominant-baseline": "central",
             fill: "#e2ecff", "font-size": fs.toFixed(1), "font-family": "IBM Plex Mono, ui-monospace, monospace", "font-weight": 600 }, g);
@@ -342,6 +346,7 @@ window.MacPhisto = (() => {
     // Show a message on every wall for a while (between lines, e.g. "PLACE YOUR BETS")
     function hold(text, ms = 8000) {
       if (cur) return;
+      if (!text || !ms) { wallNext.fill(0); return; }   // release: back to the slogans
       for (let i = 0; i < WALLS.length; i++) wallSet(i, { text });
       wallNext.fill(performance.now() + ms);
     }
@@ -362,7 +367,12 @@ window.MacPhisto = (() => {
     function showSub(text) {
       if (!text) { sub.classList.remove("on"); return; }
       const esc = text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-      sub.innerHTML = esc.replace(/\b([A-Z]{2,}[A-Z']*)\b/g, w => (w === "TV" ? w : `<em>${w.toLowerCase()}</em>`));
+      sub.innerHTML = esc.replace(/\b([A-Z]{2,}[A-Z']*)\b/g, (w, _m, i, all) => {
+        if (w === "TV") return w;
+        const start = i === 0 || /[!?]\s+$|[^.]\.\s+$/.test(all.slice(0, i));   // a sentence starts here ("..." carries on)
+        const low = w.toLowerCase();
+        return `<em>${start ? w[0] + low.slice(1) : low}</em>`;
+      });
       sub.classList.add("on");
     }
 
@@ -394,7 +404,7 @@ window.MacPhisto = (() => {
       cur = null;
       showSub("");
       resetGags();
-      wallNext.fill(0);
+      wallNext.fill(wallState.some(st => st && !st.face) ? performance.now() + 1800 : 0);   // let a last slogan be read
       r(played);   // true if any of it was heard
     }
     function stop() {

@@ -70,10 +70,11 @@
   // one group of buttons per game moment, in the order the README lists them
   const groups = {};
   for (const [id, line] of Object.entries(HOST_LINES)) (groups[line.moment] ||= []).push([id, line]);
-  const order = ["Game start", "New game", "A player joins", "All four characters taken", "Round start", "Round start (later rounds)",
+  const order = ["Game start", "New game", "A player joins", "All four characters taken", "Round start (first round)", "Round start",
+    "Round 2 start (before the count-in)", "Round start (later rounds)",
     "Song clip question", "Album cover question", "Everyone got it right", "Nobody got it right", "Time running out",
-    "Larry on a streak", "Bono on a streak", "Adam on a streak", "The Edge on a streak", "Streak broken", "Lead change",
-    "Close race", "Last place", "Phone gag (a lull)", "Last question", "Between rounds", "Final winner", "Goodnight"];
+    "Four in a row (anyone)", "Larry on a streak", "Bono on a streak", "Adam on a streak", "The Edge on a streak", "Streak broken", "Lead change",
+    "Close race", "Last place", "Phone gag (a lull)", "Last question", "Between rounds", "Final winner", "Final: a tie", "Goodnight"];
   const names = Object.keys(groups).sort((a, b) => ((order.indexOf(a) + 1) || 99) - ((order.indexOf(b) + 1) || 99));
   const box = document.getElementById("groups");
   let playing = null;
@@ -87,7 +88,11 @@
       b.innerHTML = `<b>${id}</b><span></span>`;
       // CAPS were stress marks for the voice; show them as italics, like the subtitles
       b.querySelector("span").innerHTML = line.phrases.map(p => p.text).join(" ").replace(/&/g, "&amp;").replace(/</g, "&lt;")
-        .replace(/\b([A-Z]{2,}[A-Z']*)\b/g, w => (w === "TV" ? w : `<em>${w.toLowerCase()}</em>`));
+        .replace(/\b([A-Z]{2,}[A-Z']*)\b/g, (w, _m, i, all) => {
+          if (w === "TV") return w;
+          const start = i === 0 || /[!?]\s+$|[^.]\.\s+$/.test(all.slice(0, i)), low = w.toLowerCase();
+          return `<em>${start ? w[0] + low.slice(1) : low}</em>`;
+        });
       b.addEventListener("click", () => {
         if (playing === b) { host.stop(); return; }
         if (playing) playing.setAttribute("aria-pressed", "false");

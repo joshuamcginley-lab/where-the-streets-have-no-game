@@ -30,6 +30,9 @@
 
   h1 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 44px; line-height: .9; margin: 0; text-wrap: balance; }
   h2 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 34px; line-height: .95; margin: 0; text-wrap: balance; }
+  /* the final wager's category, in the album-cover style */
+  h2.cat { font-family: var(--font-serif); font-weight: 400; font-size: 26px; line-height: 1.15; color: #fff; padding: 12px 16px; border-radius: 3px;
+    background: repeating-linear-gradient(-58deg, #000 0 16px, var(--red) 16px 29px); text-shadow: 0 0 10px rgba(0,0,0,.6); }
   p { margin: 0; }
   .muted { color: var(--muted); }
   .label { font: 600 12px var(--font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
@@ -93,11 +96,14 @@
   .enter .key.ch3 { animation-delay: .12s; }
   .enter .key.ch4 { animation-delay: .18s; }
   .key:active:not(:disabled) { transform: scale(.98); }
-  .key.picked { border-color: var(--fg); background: color-mix(in srgb, var(--fg) 12%, var(--screen)); animation: thump .35s ease-out; }
+  .key.picked { border-color: var(--fg); background: color-mix(in srgb, var(--fg) 12%, var(--screen)); }
+  .key.picked.thump { animation: thump .35s ease-out; }
   .key.right { border-color: var(--good); background: color-mix(in srgb, var(--good) 16%, var(--screen)); }
   .key.off { opacity: .3; }
   .key:disabled { cursor: default; }
 
+  .qfin { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 26px; line-height: 1; color: var(--good); margin: 0; }
+  .enter .qfin { animation: slam .5s cubic-bezier(.2,.9,.3,1.1) both; }
   .verdict { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 64px; line-height: .9; animation: slam .5s cubic-bezier(.2,.9,.3,1.1) both; }
   .verdict.ok { color: var(--good); }
   .verdict.no { color: var(--bad); }
@@ -107,9 +113,10 @@
   .hero .av { animation: pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
   .calm .hero .av, .calm .char .av { animation: none; }
   h1 em { font-style: normal; font-family: var(--font-stencil); color: var(--ink-on-signal); background: var(--red); padding: 0 .14em; display: inline-block; transform: skewX(-10deg); }
-  .countin { position: fixed; inset: 0; z-index: 3; display: grid; place-items: center; --sw: 22px; --stripe-speed: .45s; background: var(--stripes); animation: stripe-run var(--stripe-speed) linear infinite; }
-  .countin .w { grid-area: 1 / 1; font-family: var(--font-stencil); font-weight: 900; font-size: 96px; line-height: .9; background: var(--bg); padding: 4px 18px 0; opacity: 0; animation: word .62s cubic-bezier(.2,.9,.3,1.1) both; }
-  .countin .w:last-child { background: var(--fg); color: var(--red); font-size: 64px; opacity: 1; animation: pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
+  /* one column exactly the screen's width, so a word can never widen the grid and push itself off-centre */
+  .countin { position: fixed; inset: 0; z-index: 3; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; --sw: 22px; --stripe-speed: .45s; background: var(--stripes); animation: stripe-run var(--stripe-speed) linear infinite; }
+  .countin .w { grid-area: 1 / 1; font-family: var(--font-stencil); font-weight: 900; font-size: min(96px, 22vw); line-height: .9; background: var(--bg); padding: 4px 18px 0; white-space: nowrap; max-width: 94vw; justify-self: center; opacity: 0; animation: word .62s cubic-bezier(.2,.9,.3,1.1) both; }
+  .countin .w:last-child { background: var(--fg); color: var(--red); font-size: min(64px, 15vw); opacity: 1; animation: pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
   .countin.hold { animation-play-state: paused; }
   .row { display: grid; gap: 10px; }
 </style>
@@ -176,7 +183,8 @@
           C.status = "error";
           C.error = C.everJoined ? `Room ${C.code} has closed. If the TV started a new room, enter its code.` : `There's no room called ${C.code}. Check the code on the TV.`;
           C.everJoined = false; render();
-        } else retry();
+        } else if (C.everJoined) retry();
+        else { C.status = "error"; C.error = "Couldn't reach the TV. Check the room code and try again."; C.handle?.close(); C.handle = null; render(); }
       },
     });
   }
@@ -208,6 +216,7 @@
     const prev = C.v;
     C.v = m; C.status = "live"; C.everJoined = true;
     if (m.q) C.deadline = Date.now() + m.q.left;
+    if (m.wager) C.wagerDeadline = Date.now() + m.wager.left;
     if (m.rv) C.revealDeadline = Date.now() + m.rv.left;
     wake();   // in every phase: a phone that locks in the lobby loses its seat
     if (m.rv && prev?.phase !== "reveal") buzz(m.rv.ok ? buzzFor("right", [40, 60, 40]) : [160]);
@@ -236,12 +245,13 @@
     const focusId = document.activeElement?.id;
     // Screens with entrance animations are only rebuilt when they change, so another
     // player's update doesn't replay them.
-    const key = C.status !== "live" ? C.status : v.phase === "question" ? `question:${v.q.n}` : v.phase === "reveal" ? `reveal:${v.q.n}:${v.vip}`
-      : v.phase === "final" ? `final:${v.fin.round}:${v.mode}:${v.vip}` : v.phase === "host" ? `host:${v.host.key}:${v.vip}`
+    const key = C.status !== "live" ? C.status : v.phase === "question" ? `question:${v.q.n}:${v.my}` : v.phase === "reveal" ? `reveal:${v.q.n}:${v.vip}`
+      : v.phase === "final" ? `final:${v.fin.round}:${v.vip ? v.mode : ""}:${v.vip}` : v.phase === "host" ? `host:${v.host.key}:${v.vip}`
       : v.phase === "wager" ? `wager:${v.wager.mine}` : v.phase;
     const fresh = key !== C.shownKey;
     C.shownKey = key;
-    if (!fresh && (key.startsWith("reveal") || key.startsWith("final") || key.startsWith("host") || key.startsWith("wager") || key === "countin")) return;
+    if (fresh) C.shownAt = Date.now();
+    if (!fresh && (key.startsWith("question") || key.startsWith("reveal") || key.startsWith("final") || key.startsWith("host") || key.startsWith("wager") || key === "countin")) return;
     s.classList.toggle("enter", fresh);
     s.classList.remove("calm");
     if (C.status === "form" || C.status === "error") s.innerHTML = formView();
@@ -302,13 +312,15 @@
   // The final wager: bet part of your score on the last question
   function wagerView(v) {
     const w = v.wager;
-    if (w.mine !== null) return `<div class="hero"><div class="label">FINAL WAGER</div><h2>Bet placed</h2>
+    const cat = `<div class="label">FINAL WAGER · THE CATEGORY</div><h2 class="cat">${esc(w.category)}</h2>`;
+    if (w.mine !== null) return `<div class="hero">${cat}<p class="muted" style="margin:0">Bet placed</p>
         <div class="big">${w.mine}</div><p class="muted">Right and you win it. Wrong and you lose it. Eyes on the TV.</p></div>`;
     const names = ["Nothing", "A little", "Half", "Everything"];
     const keys = w.tiers.map((a, k) =>
       `<button type="button" class="key ch${k + 1}" data-wager="${k}"><span class="ch">${k + 1}</span><span>${names[k]}${k ? ` · ${a}` : ""}</span></button>`).join("");
-    return `<div class="hero"><div class="label">FINAL WAGER</div><h2>Place your bet</h2>
-        <p class="muted">You have <b>${w.score}</b> points. Bet on the last question: right wins your bet, wrong loses it.</p></div>
+    return `<div class="hero">${cat}
+        <p class="muted">You have <b>${w.score}</b> points. How much will you bet on this category? Right wins your bet, wrong loses it.</p></div>
+      <div class="meter"><i id="wbar"></i></div>
       <div class="pad">${keys}</div>`;
   }
 
@@ -323,10 +335,10 @@
   function questionView(v) {
     const picked = v.my;
     const keys = v.q.opts.map((o, k) =>
-      `<button type="button" class="key ch${k + 1} ${picked === k ? "picked" : picked !== null ? "off" : ""}" data-k="${k}" ${picked !== null ? "disabled" : ""}><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
+      `<button type="button" class="key ch${k + 1} ${picked === k ? "picked thump" : picked !== null ? "off" : ""}" data-k="${k}" ${picked !== null ? "disabled" : ""}><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
     return `<div class="qhead mono"><span>Q ${v.q.n}/${v.q.total}</span><span id="secs"></span></div>
       <div class="meter"><i id="bar"></i></div>
-      ${v.q.finale ? `<p class="verdict ok" style="margin:0">${v.q.finale === "wager" ? `Final wager: ${v.q.wager || 0} on the line` : "Double points!"}</p>` : ""}
+      ${v.q.finale ? `<p class="qfin">${v.q.finale === "wager" ? `Final wager: ${v.q.wager || 0} on the line` : "Double points!"}</p>` : ""}
       <p class="muted">${picked !== null ? "Locked in. Waiting for the others." : v.q.song ? "Listen to the TV. Which song is it?" : v.q.cover ? "Look at the TV. Which album is it?" : "The question is on the TV. Pick your answer."}</p>
       <div class="pad">${keys}</div>`;
   }
@@ -344,13 +356,14 @@
   }
 
   function finalView(v) {
-    const f = v.fin;
+    const f = v.fin, top = f.place === 1 && !f.tie && f.of > 1;
+    const signed = n => (n < 0 ? "−" + -n : "+" + n);
     return `<div class="hero">${avatar(v.me.member)}
-        <div class="label">${f.tour ? (f.tour.next ? `TOURNAMENT · AFTER ROUND ${f.tour.leg} OF 3` : f.place === 1 ? "TOURNAMENT CHAMPION" : "TOURNAMENT · FINAL STANDINGS")
-          : `${f.round > 1 ? `AFTER ROUND ${f.round} · ` : ""}${f.place === 1 ? "TONIGHT'S HEADLINER" : "STANDINGS"}`}</div>
+        <div class="label">${f.tour ? (f.tour.next ? `TOURNAMENT · AFTER ROUND ${f.tour.leg} OF 3` : top ? "TOURNAMENT CHAMPION" : f.place === 1 && f.tie ? "TOURNAMENT · TIE AT THE TOP" : "TOURNAMENT · FINAL STANDINGS")
+          : `${f.round > 1 ? `AFTER ROUND ${f.round} · ` : ""}${top ? "TONIGHT'S HEADLINER" : f.place === 1 && f.tie ? "TIE AT THE TOP" : "STANDINGS"}`}</div>
         <div class="verdict ${f.place === 1 ? "ok" : ""}">${ordinal(f.place)} place</div>
         <div class="big">${f.score}</div>
-        <div class="stats"><span>This round <b>+${f.gained}</b></span><span>Right <b>${f.correct}/${f.total}</b></span></div></div>
+        <div class="stats"><span>This round <b>${signed(f.gained)}</b></span><span>Right <b>${f.correct}/${f.total}</b></span></div></div>
       ${v.vip && f.tour?.next ? `<div class="vipbox"><span class="label">TOURNAMENT · NEXT UP: ${esc(f.tour.next.toUpperCase())}</span>
           <button type="button" class="btn" id="btn-again">Start round ${f.tour.leg + 1} of 3</button>
           <button type="button" class="btn ghost" id="btn-lobby">New game</button></div>`
@@ -358,7 +371,7 @@
           <div class="seg">${MODES.map(m => `<button type="button" id="mode-${m.id}" data-mode="${m.id}" aria-pressed="${v.mode === m.id}">${m.name}</button>`).join("")}</div>
           <button type="button" class="btn" id="btn-again">${v.mode === "tournament" ? "New tournament" : `Start round ${f.round + 1}`}</button>
           <button type="button" class="btn ghost" id="btn-lobby">New game</button></div>`
-        : `<p class="muted" style="text-align:center">The VIP picks the next round.</p>`}`;
+        : `<p class="muted" style="text-align:center">${f.tour?.next ? `Next up: ${esc(f.tour.next)}. The VIP starts it.` : "The VIP picks the next round."}</p>`}`;
   }
 
   // ---------- timers
@@ -369,6 +382,7 @@
       $("bar").parentElement.classList.toggle("low", left < 5000);
       $("secs").textContent = Math.ceil(left / 1000) + "s";
     }
+    if (C.v?.phase === "wager" && $("wbar")) $("wbar").style.transform = `scaleX(${Math.max(0, C.wagerDeadline - Date.now()) / C.v.wager.ms})`;
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
@@ -389,6 +403,11 @@
   $("screen").addEventListener("click", e => {
     const b = e.target.closest("button");
     if (!b || b.disabled) return;
+    // A double tap mustn't land on whatever appeared under the finger: drop a tap that comes hard on
+    // the heels of the last one if the screen changed in between. A first tap always counts.
+    const now = Date.now(), quick = now - (C.lastTapAt || 0) < 450 && (C.shownAt || 0) > (C.lastTapAt || 0);
+    C.lastTapAt = now;
+    if (quick && (b.dataset.k !== undefined || b.dataset.wager !== undefined || b.id === "btn-skip")) return;
     if (b.dataset.member) { send({ t: "pick", member: b.dataset.member }); buzz(15); }
     else if (b.dataset.mode) send({ t: "mode", mode: b.dataset.mode });
     else if (b.dataset.k !== undefined && C.v?.phase === "question" && C.v.my === null) {
@@ -399,7 +418,11 @@
     else if (b.id === "btn-start") send({ t: "start" });
     else if (b.id === "btn-next") send({ t: "next" });
     else if (b.id === "btn-skip") send({ t: "skip" });
-    else if (b.dataset.wager !== undefined && C.v?.phase === "wager" && C.v.wager.mine === null) { send({ t: "wager", k: Number(b.dataset.wager) }); buzz(buzzFor("lock", 25)); }
+    else if (b.dataset.wager !== undefined && C.v?.phase === "wager" && C.v.wager.mine === null) {
+      const k = Number(b.dataset.wager);
+      C.v.wager.mine = C.v.wager.tiers[k]; render(); buzz(buzzFor("lock", 25));   // show it right away; the TV confirms
+      send({ t: "wager", k });
+    }
     else if (b.id === "btn-again") send({ t: "again" });
     else if (b.id === "btn-lobby") send({ t: "lobby" });
   });

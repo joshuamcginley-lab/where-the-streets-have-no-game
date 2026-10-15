@@ -157,8 +157,12 @@
   .final .host-col { width: 21rem; align-self: center; }
 
   /* ---------- the finale: a wager before the last question, or double points ---------- */
-  .wager { display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 1rem; min-height: 0; }
-  .wager h1 { font-size: 5rem; animation: slam .6s cubic-bezier(.2,.9,.3,1.2) backwards; }
+  .wager { display: grid; grid-template-rows: auto auto auto auto 1fr auto; gap: .9rem; min-height: 0; }
+  .wager h1 { font-size: 4rem; animation: slam .6s cubic-bezier(.2,.9,.3,1.2) backwards; }
+  /* the category, Final Jeopardy style: the album-cover band with the category as its title */
+  .wager .cat { --cw: 2rem; justify-self: start; padding: 1rem 2.4rem; border-radius: .2rem; animation: rise .6s .5s cubic-bezier(.2,.9,.3,1.1) backwards; }
+  .wager .cat .title { font-size: 3rem; white-space: normal; text-align: center; }
+  .wager .cat-wrap { display: grid; gap: .3rem; }
   .wager .how { font-size: 1.35rem; color: var(--muted); margin: 0; max-width: 60ch; }
   .wager-row { display: grid; grid-template-columns: 1fr 22rem; gap: 1.6rem; align-items: center; min-height: 0; }
   .bets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; align-content: center; }
@@ -409,7 +413,6 @@
       if (!this.ctx) try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch {}
       if (this.ctx?.state === "suspended") this.ctx.resume().catch(() => {});
     },
-    get live() { return this.ctx?.state === "running"; },
     tone(f, dur = .12, type = "square", vol = .04, delay = 0) {
       if (!this.ctx) return;
       const t = this.ctx.currentTime + delay, o = this.ctx.createOscillator(), g = this.ctx.createGain();
@@ -809,7 +812,8 @@
   function songQuestion(song) {
     // Wrong answers: songs from around the same time, so the year alone doesn't give it away.
     // A hit only gets other hits, so a B-side never gives the answer away by being obscure.
-    const near = SONGS.filter(x => x.title !== song.title && (song.tier !== "hit" || x.tier === "hit"))
+    // In the deep-cut Name That Song round, a deep cut only gets deep cuts, so a hit can't be ruled out at a glance.
+    const near = SONGS.filter(x => x.title !== song.title && (song.tier === "hit" ? x.tier === "hit" : roundMode() !== "deep-songs" || x.tier === "deep"))
       .map(x => ({ x, d: Math.abs(x.year - song.year) + Math.random() * 3 }))
       .sort((a, b) => a.d - b.d).slice(0, 8).map(o => o.x);
     return { q: "Name that song", a: song.title, w: shuffle(near).slice(0, 3).map(x => x.title), song };
@@ -835,14 +839,21 @@
     key: "wtshng-used",
     data: (() => { try { return JSON.parse(localStorage.getItem("wtshng-used")) || {}; } catch { return {}; } })(),
     save() { try { localStorage.setItem(this.key, JSON.stringify(this.data)); } catch {} },
-    // Take n items from list that haven't been used in this pool; reset the pool if too few remain.
+    recent: new Set(),   // everything dealt since the TV page loaded: never repeated tonight
+    // Take n items from list that haven't been used in this pool. When too few are left, deal all of
+    // those first, top up with ones not seen tonight, and start the pool's memory over from there.
     take(pool, list, n, id) {
-      let seen = new Set(this.data[pool] || []);
-      let fresh = list.filter(x => !seen.has(id(x)));
-      if (fresh.length < n) { seen = new Set(); fresh = list.slice(); }
-      const picked = shuffle(fresh).slice(0, n);
-      picked.forEach(x => seen.add(id(x)));
-      this.data[pool] = [...seen];
+      const seen = new Set(this.data[pool] || []);
+      const fresh = shuffle(list.filter(x => !seen.has(id(x))));
+      let picked = fresh.slice(0, n), restart = false;
+      if (picked.length < n) {
+        restart = true;
+        const rest = shuffle(list.filter(x => seen.has(id(x))));
+        const notTonight = rest.filter(x => !this.recent.has(pool + ":" + id(x)));
+        picked = picked.concat(notTonight, rest.filter(x => this.recent.has(pool + ":" + id(x)))).slice(0, n);
+      }
+      picked.forEach(x => this.recent.add(pool + ":" + id(x)));
+      this.data[pool] = restart ? picked.map(id) : [...seen, ...picked.map(id)];
       this.save();
       return picked;
     },
@@ -1006,8 +1017,7 @@
   function startRound(fresh) {
     // Everyone still here must have a character.
     if (!canStart()) return sync();
-    // A new game drops anyone who left. Between rounds, someone whose phone is asleep keeps their seat and score.
-    if (fresh) S.players = S.players.filter(p => p.local || p.connected);
+    // A new game (or a new tournament) drops anyone who left. Between rounds, someone whose phone is asleep keeps their seat and score.
     // A tournament carries on to its next round; otherwise (new game, or after its last round) it starts over, scores and all.
     let restart = fresh;
     if (S.mode === "tournament") {
@@ -1015,6 +1025,7 @@
       else { S.leg = 1; restart = true; }
       S.inTour = true;
     } else S.inTour = false;
+    if (restart) S.players = S.players.filter(p => p.local || p.connected);
     S.deck = buildDeck(roundMode()).map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) }));
     S.deck.forEach(q => { if (q.cover) new Image().src = q.cover.art; });   // fetch the cover now so it's there when its question comes up
     if (restart || !S.round) { resetScores(); S.round = 1; }
@@ -1084,10 +1095,16 @@
   }
   function endWager() {
     if (S.phase !== "wager") return;
+    Host.walls("", 0);
     S.players.forEach(p => { if (p.wager === null) p.wager = 0; });
     beginQuestion();
   }
   const finaleNow = () => (S.i === S.deck.length - 1 ? S.finale : null);
+  // The final question's category, shown while everyone bets (Final Jeopardy style)
+  function finalCategory() {
+    const q = S.deck[S.deck.length - 1] || {};
+    return q.c || (q.song ? "Name That Song" : q.cover ? "Album Covers" : "Deep Cuts");
+  }
 
   function submit(p, k) {
     if (S.phase !== "question" || p.answer || !Number.isInteger(k) || k < 0 || k > 3 || !p.member) return;
@@ -1186,7 +1203,7 @@
       const q = S.deck[S.i], n = S.deck.length, of = `Question ${S.i + 1} of ${n}`;
       if (S.i === n - 1) {
         if (S.finale === "wager") hostBeat(LINES.lastq, "Last question · Final wager", startWager, true);
-        else hostBeat(LINES.lastq, "Last question · Double points", beginQuestion, true);
+        else hostBeat(S.inTour ? [] : LINES.lastq, "Last question · Double points", beginQuestion, true);   // his "last question" lines would mislead mid-tournament
       }
       else if (q.song && !["songs", "deep-songs"].includes(roundMode())) hostBeat(LINES.song, `${of} · Name that song`, beginQuestion, true);
       else if (q.cover) hostBeat(LINES.cover, `${of} · Name the album`, beginQuestion, true);
@@ -1195,13 +1212,15 @@
       S.phase = "final"; S.finalAt = Date.now(); Player.stop(); Sound.win(); sync();
       // MacPhisto crowns the winner once the fanfare's done (a tie gets "neck and neck")
       const o = S.players.slice().sort((a, b) => b.score - a.score), tie = o.length > 1 && o[0].score === o[1].score;
-      const line = Host.pick(tie ? LINES.tie : LINES.winner), g = S.game;
+      // Mid-tournament nobody has won yet, so he saves the crowning for the end
+      const line = S.inTour && S.leg < 3 ? null : Host.pick(tie ? LINES.tie : LINES.winner), g = S.game;
       if (line) setTimeout(() => { if (S.phase === "final" && S.game === g) Host.say(line); }, 2400);
     }
   }
 
   // Mode can change in the lobby or between rounds; the results screen is rebuilt to show it.
   function setMode(id) {
+    if (S.inTour && S.leg < 3 && S.phase === "final") return;   // the tournament's next round is fixed
     S.mode = id;
     if (S.phase === "final") builtKey = "";
     sync();
@@ -1211,7 +1230,7 @@
   function toLobby(goodnight = false) {
     clearTimeout(qTimer); clearTimeout(rTimer);
     S.round = 0;
-    Player.stop(); Clip.stop(); Host.stop(); hostToken++;
+    Player.stop(); Clip.stop(); Host.stop(); Host.walls("", 0); hostToken++;
     S.phase = "lobby"; S.hostLine = null; S.inTour = false;
     S.players = S.players.filter(p => p.local || p.connected);
     seatedCount = S.players.filter(p => p.member).length;
@@ -1258,7 +1277,7 @@
       waiting: active().filter(x => !x.member).length,
     };
     if (S.phase === "host") v.host = { key: S.hostKey, label: S.hostLabel };
-    if (S.phase === "wager") v.wager = { tiers: wagerTiers(p), mine: p.wager, score: p.score, left: Math.max(0, S.wagerEndsAt - now), ms: WAGER_SECS * 1000 };
+    if (S.phase === "wager") v.wager = { category: finalCategory(), tiers: wagerTiers(p), mine: p.wager, score: p.score, left: Math.max(0, S.wagerEndsAt - now), ms: WAGER_SECS * 1000 };
     if (S.phase === "countin") Object.assign(v, { countLeft: Math.max(0, S.countEndsAt - now), countMs: S.countMs, countAt });
     if (S.phase === "question" || S.phase === "reveal") {
       v.q = { n: S.i + 1, total: S.deck.length, opts: q.opts, left: Math.max(0, S.endsAt - now), song: !!q.song, cover: !!q.cover,
@@ -1267,7 +1286,8 @@
     }
     if (S.phase === "reveal") v.rv = { right: q.opts.indexOf(q.a), ok: p.ok, gain: p.gain, streak: p.streak, place: placeOf(p), of: S.players.length, left: Math.max(0, S.revealEndsAt - now) };
     if (S.phase === "final") v.fin = { place: placeOf(p), of: S.players.length, score: p.score, gained: p.score - (p.roundStart || 0), correct: p.correct, total: S.deck.length, rank: rankFor(p), round: S.round,
-      tour: S.inTour ? { leg: S.leg, next: S.leg < 3 ? TOUR_NAMES[TOUR[S.leg]] : null } : null };
+      tour: S.inTour ? { leg: S.leg, next: S.leg < 3 ? TOUR_NAMES[TOUR[S.leg]] : null } : null,
+      tie: S.players.some(x => x !== p && x.score === p.score) };
     return v;
   }
 
@@ -1312,7 +1332,7 @@
         setTimeout(() => el.classList.add("hold"), countAt[3] * 1000);
       }
       else if (S.phase === "host") { st.innerHTML = hostHtml(); Host.place($("host-slot"), ""); }
-      else if (S.phase === "wager") { st.innerHTML = wagerHtml(); Host.place($("host-slot"), "overlay"); Host.walls("PLACE YOUR BETS", WAGER_SECS * 1000); }
+      else if (S.phase === "wager") { st.innerHTML = wagerHtml(); Host.place($("host-slot"), "overlay"); Host.walls(finalCategory().toUpperCase(), WAGER_SECS * 1000); }
       else if (S.phase === "final") { st.innerHTML = finalHtml(); Host.place($("host-slot"), "overlay"); Touches.win(S.players.slice().sort((a, b) => b.score - a.score)[0]); }
       else { st.innerHTML = playShell(); lockSeen = new Set(); }
     }
@@ -1382,6 +1402,7 @@
     return `<section class="wager">
       <p class="label" style="margin:0">Round ${S.round} · the last question</p>
       <h1>Final <em>wager</em></h1>
+      <div class="cat-wrap"><span class="label" style="margin:0">The category</span><div class="cover cat"><span class="title">${esc(finalCategory())}</span></div></div>
       <p class="how">Bet on the last question from your phone. Get it right and win your bet. Get it wrong and lose it.</p>
       <div class="wager-row"><div class="bets" id="bets"></div><div id="host-slot"></div></div>
       <div class="wager-foot" style="display:flex;gap:1.4rem;align-items:center;flex-wrap:wrap">${picks}<span class="grow" style="flex:1"></span>
@@ -1424,7 +1445,7 @@
       : `<div class="answers">${answers}</div>`;
     return `<section class="play">
       <div class="hud mono"><span class="tag">${mode}</span><span>Round <b>${S.round}</b></span><span>Question <b>${S.i + 1}</b> of ${S.deck.length}</span>${
-        finaleNow() ? `<span class="finale">${finaleNow() === "wager" ? "Final wager" : "Double points"}</span>` : ""}<span class="grow"></span><span id="hud-right"></span></div>
+        finaleNow() ? `<span class="finale">${finaleNow() === "wager" ? `Final wager · ${esc(finalCategory())}` : "Double points"}</span>` : ""}<span class="grow"></span><span id="hud-right"></span></div>
       <p class="question">${esc(q.q)}${s ? `<span class="listening" aria-label="Playing on the TV"><i></i><i></i><i></i><i></i><i></i></span>` : ""}</p>
       ${body}
       <div class="strip" id="strip"></div>
@@ -1488,6 +1509,8 @@
     return tie ? "Tournament · tie at the top" : n > 1 ? "Tournament champion" : "Tournament · final score";
   }
 
+  const signed = n => (n < 0 ? "−" + -n : "+" + n);
+
   function finalHtml() {
     const order = S.players.slice().sort((a, b) => b.score - a.score);
     const w = order[0];
@@ -1495,7 +1518,7 @@
     const tie = order.length > 1 && order[1].score === w.score;
     const board = order.map(p => {
       return `<li><span class="pos">${placeOf(p)}</span>${avatar(p.member)}
-        <span class="who"><b>${esc(shownName(p))}</b><span>${p.correct}/${S.deck.length} right · +${p.score - (p.roundStart || 0)}</span></span>
+        <span class="who"><b>${esc(shownName(p))}</b><span>${p.correct}/${S.deck.length} right · ${signed(p.score - (p.roundStart || 0))}</span></span>
         <span class="pts">${p.score}</span></li>`;
     }).join("");
     const midTour = S.inTour && S.leg < 3;

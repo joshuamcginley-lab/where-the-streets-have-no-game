@@ -72,7 +72,15 @@ def fit(text, segs):
                 e = err + (sum(w[i:k]) / W - share[j]) ** 2 + (0 if k == n or k in starts else 1.0)  # prefer the script's own breaks
                 if (k, j + 1) not in best or e < best[(k, j + 1)][0]: best[(k, j + 1)] = (e, cuts + [k])
     cuts = [0] + best[(n, m)][1]
-    return [{"t": round(segs[j][0], 2), "text": " ".join(parts[cuts[j]:cuts[j + 1]])} for j in range(m)]
+    subs = [{"t": round(segs[j][0], 2), "text": " ".join(parts[cuts[j]:cuts[j + 1]])} for j in range(m)]
+    # A lone "Oh..." or a clause cut at its comma reads badly on its own: show it with what follows
+    out = []
+    for sub in subs:
+        if out and re.match(r"^(Oh|Ooh|Ah|Well|Now)\W*$", out[-1]["text"]) or out and out[-1]["text"].endswith(","):
+            out[-1]["text"] += " " + sub["text"]
+        else:
+            out.append(sub)
+    return out
 
 readme = open("audio/host/README.md").read()
 rows = re.findall(r"^\| *([\w-]+)\.mp3 *\| *(.+?) *\| *(.+?) *\|\s*$", readme, re.M)
