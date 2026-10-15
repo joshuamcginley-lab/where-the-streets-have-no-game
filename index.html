@@ -72,6 +72,15 @@
   .listening i:nth-child(4) { animation-delay: -.15s; } .listening i:nth-child(5) { animation-delay: -.45s; }
   .reveal-on .listening i { animation-play-state: paused; opacity: .4; }
   @keyframes eq { from { transform: scaleY(.15); } to { transform: scaleY(1); } }
+  /* name-the-album: the cover sits beside the answers, as big as the row allows (up to 22rem) */
+  .qbody { display: grid; grid-template-columns: auto 1fr; gap: 1.4rem; min-height: 0; container-type: size; }
+  .qbody .answers { min-width: 0; }
+  .cover-frame {
+    --fw: .45rem; width: min(22rem, 100cqh); aspect-ratio: 1; align-self: center; overflow: hidden;
+    animation: rise .45s cubic-bezier(.2,.9,.3,1.1) backwards;
+  }
+  .cover-frame img { display: block; width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+  .reveal-on .cover-frame img { transition: transform 1.4s cubic-bezier(.2,.8,.2,1); }
   .fact .art { width: 6.5rem; height: 6.5rem; object-fit: cover; flex: none; }
   .fact .song { display: flex; gap: 1.2rem; align-items: center; }
   .fact .credit { display: block; font: 500 .8rem var(--font-mono); letter-spacing: .08em; color: var(--muted); margin-top: .35rem; text-transform: uppercase; }
@@ -238,6 +247,8 @@
     .lobby, .final { grid-template-columns: 1fr; }
     .slots, .strip { grid-template-columns: 1fr 1fr; }
     .answers { grid-template-columns: 1fr; }
+    .qbody { grid-template-columns: 1fr; container-type: normal; }
+    .cover-frame { width: min(22rem, 100%); justify-self: center; }
   }
 </style>
 </head>
@@ -257,6 +268,7 @@
 <script src="questions.js"></script>
 <script src="members.js"></script>
 <script src="songs.js"></script>
+<script src="covers.js"></script>
 <script src="net.js"></script>
 <script>
 (() => {
@@ -502,8 +514,20 @@
     return { q: "Name that song", a: song.title, w: shuffle(near).slice(0, 3).map(x => x.title), song };
   }
 
+  // ---------- name the album
+  // The TV starts zoomed in on a detail of the cover and pulls back as the clock runs down.
+  const COVERS = window.U2C?.COVERS || [];
+
+  function coverQuestion(cover) {
+    // Wrong answers: studio albums from around the same time (never the Deep Cuts-only covers).
+    const near = COVERS.filter(x => x.tier === "casual" && x.title !== cover.title)
+      .map(x => ({ x, d: Math.abs(x.year - cover.year) + Math.random() * 3 }))
+      .sort((a, b) => a.d - b.d).slice(0, 6).map(o => o.x);
+    return { q: "Name the album", a: cover.title, w: shuffle(near).slice(0, 3).map(x => x.title), cover };
+  }
+
   // Ten questions. Name That Song is all clips (mostly hits, some deep cuts);
-  // the other modes are trivia with one clip slipped in somewhere in the middle.
+  // the other modes are trivia with one clip and one album cover slipped in somewhere in the middle.
   // No repeats: the TV remembers every question and clip it has used (in this browser, across
   // nights) and only deals unused ones. When a pool runs low it starts over on that pool.
   const Used = {
@@ -534,7 +558,11 @@
     const deck = Used.take(mode, Q.filter(q => q.m === mode), ROUND, q => q.q);
     const tier = mode === "deep" ? "deep" : "hit";
     const pool = SONGS.filter(x => x.tier === tier);
-    if (pool.length) deck[2 + Math.floor(Math.random() * 6)] = songQuestion(Used.take("song-" + tier, pool, 1, songId)[0]);
+    const [songAt, coverAt] = shuffle([2, 3, 4, 5, 6, 7]);   // two different slots in the middle
+    if (pool.length) deck[songAt] = songQuestion(Used.take("song-" + tier, pool, 1, songId)[0]);
+    // Casual gets the studio albums; Deep Cuts gets those plus the Deep Cuts-only covers.
+    const covers = COVERS.filter(x => x.tier === "casual" || mode === "deep");
+    if (covers.length) deck[coverAt] = coverQuestion(Used.take("cover-" + mode, covers, 1, x => x.id)[0]);
     return deck;
   }
 
@@ -580,6 +608,7 @@
     S.players = S.players.filter(p => p.local || p.connected);
     if (!canStart()) return sync();
     S.deck = buildDeck(S.mode).map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) }));
+    S.deck.forEach(q => { if (q.cover) new Image().src = q.cover.art; });   // fetch the cover now so it's there when its question comes up
     if (fresh || !S.round) { resetScores(); S.round = 1; }
     else {
       S.round++;
@@ -696,7 +725,7 @@
     };
     if (S.phase === "countin") Object.assign(v, { countLeft: Math.max(0, S.countEndsAt - now), countMs: S.countMs, countAt });
     if (S.phase === "question" || S.phase === "reveal") {
-      v.q = { n: S.i + 1, total: S.deck.length, opts: q.opts, left: Math.max(0, S.endsAt - now), song: !!q.song };
+      v.q = { n: S.i + 1, total: S.deck.length, opts: q.opts, left: Math.max(0, S.endsAt - now), song: !!q.song, cover: !!q.cover };
       v.my = p.answer ? p.answer.k : null;
     }
     if (S.phase === "reveal") v.rv = { right: q.opts.indexOf(q.a), ok: p.ok, gain: p.gain, streak: p.streak, place: placeOf(p), of: S.players.length, left: Math.max(0, S.revealEndsAt - now) };
@@ -812,14 +841,19 @@
     const mode = MODES.find(m => m.id === S.mode).name;
     const answers = q.opts.map((o, k) =>
       `<button type="button" class="ans ch${k + 1}" id="ans-${k}" data-k="${k}"><span class="ch">${k + 1}</span><span>${esc(o)}</span><span class="pickers"></span></button>`).join("");
-    const s = q.song;
+    const s = q.song, c = q.cover;
     const fact = s
       ? `<div class="song"><img class="art" src="${esc(s.art)}" alt=""><p>From <b>${esc(s.album)}</b> (${s.year}).<span class="credit">Preview courtesy of Apple Music</span></p></div>`
+      : c ? `<p><b>${esc(c.title)}</b> (${c.year}).${c.note ? " " + esc(c.note) : ""}<span class="credit">Artwork courtesy of Apple Music</span></p>`
       : `<p>${esc(q.f)}</p>`;
+    // A cover question puts the cover beside the answers, starting zoomed in on its crop point.
+    const body = c
+      ? `<div class="qbody"><div class="cover-frame framed"><img id="cover-img" src="${esc(c.art)}" alt="" style="transform-origin:${c.crop.x}% ${c.crop.y}%;transform:scale(${c.crop.zoom})"></div><div class="answers">${answers}</div></div>`
+      : `<div class="answers">${answers}</div>`;
     return `<section class="play">
       <div class="hud mono"><span class="tag">${mode}</span><span>Round <b>${S.round}</b></span><span>Question <b>${S.i + 1}</b> of ${S.deck.length}</span><span class="grow"></span><span id="hud-right"></span></div>
       <p class="question">${esc(q.q)}${s ? `<span class="listening" aria-label="Playing on the TV"><i></i><i></i><i></i><i></i><i></i></span>` : ""}</p>
-      <div class="answers">${answers}</div>
+      ${body}
       <div class="strip" id="strip"></div>
       <div class="fact" id="fact" hidden>${fact}<div class="next"><button type="button" class="btn" id="btn-next">${S.i + 1 < S.deck.length ? "Next question" : "Final scores"}</button><div class="meter"><i id="rv-bar"></i></div></div></div>
     </section>`;
@@ -846,6 +880,7 @@
       if (pk.innerHTML !== html) pk.innerHTML = html;
     });
     $("strip").innerHTML = [0, 1, 2, 3].map(i => playerCard(S.players[i])).join("");
+    if (q.cover && rev) $("cover-img").style.transform = "scale(1)";   // pull back to the whole cover
     $("fact").hidden = !rev;
     $("stage").classList.toggle("reveal-on", rev);
   }
@@ -907,6 +942,9 @@
       document.body.classList.toggle("hurry", low);
       if (sec !== lastTickSec && sec <= 5 && sec > 0) Sound.tick();
       lastTickSec = sec;
+      // The cover pulls back to half its starting zoom as the clock runs down, at an even pace to the eye.
+      const img = $("cover-img"), c = S.deck[S.i].cover;
+      if (img && c && !REDUCE) img.style.transform = `scale(${c.crop.zoom * Math.pow(.5, 1 - left / (SECS * 1000))})`;
     }
     if (S.phase === "reveal" && $("rv-bar")) $("rv-bar").style.transform = `scaleX(${Math.max(0, S.revealEndsAt - now) / REVEAL_MS})`;
     document.querySelectorAll(".sc[data-pid]").forEach(el => {
