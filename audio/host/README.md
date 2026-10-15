@@ -21,3 +21,4 @@ Voice lines for the planned MacPhisto host. Not wired into the game yet.
 | round-start-3.mp3 | Round start (later rounds) | Ladies and gentlemen... ANOTHER round! / I'm very tired, you know. / But for you... I'll make an exception. |
 | close-2.mp3 | Close race | Neck and neck! / Just like me and the President... / Except he won't take my calls. |
 | hurry-1.mp3 | Time running out | Eleven o'clock... tick tock... tick tock. |
+| streak-broken-1.mp3 | Streak broken | Oh! The streak is BROKEN! / Fame is so fleeting... isn't it? / Except mine. |
