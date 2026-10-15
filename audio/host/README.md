@@ -19,3 +19,4 @@ Voice lines for the planned MacPhisto host. Not wired into the game yet.
 | welcome-1.mp3 | New game | Welcome, welcome! / Yes... it's really me. / You made me very famous... / and I've never quite forgiven you. |
 | round-start-2.mp3 | Round start | Oh... it's you lot again. / How lovely. / I've had my boots polished, you know. / Shall we see who's been paying attention? |
 | round-start-3.mp3 | Round start (later rounds) | Ladies and gentlemen... ANOTHER round! / I'm very tired, you know. / But for you... I'll make an exception. |
+| close-2.mp3 | Close race | Neck and neck! / Just like me and the President... / Except he won't take my calls. |

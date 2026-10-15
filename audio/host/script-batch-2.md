@@ -81,7 +81,7 @@ Paste each block into ElevenLabs as one generation (voice: AK - British Posh Wel
 
 ```
 [playful] Neck and neck!
-[proud] Just like me and God...
+[proud] Just like me and the President...
 [sighs] Except he won't take my calls.
 ```
 
