@@ -63,3 +63,9 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | song-3.mp3 | Song clip question | Listen... / Have you found what you're looking for? / I still haven't. And I've looked EVERYWHERE. |
 | cover-2.mp3 | Album cover question | Now... a little picture. / Judge the album by its cover. / Everybody else does. |
 | cover-3.mp3 | Album cover question | Look closely now. / The mask tells you more about the man. / I should know. / I'm wearing three. |
+| lead-change-5.mp3 | Lead change | A new leader. / From Boy... to War... in one question. |
+| nobody-right-6.mp3 | Nobody got it right | Nobody? / Achtung means attention, you know. / Wasted on you. |
+| last-question-3.mp3 | Last question | The last question. / Then I'm off home... / where the streets have names. Dreadful. |
+| song-4.mp3 | Song clip question | Listen. / Know this one? You've been paying attention. / Don't? You were listening to Pop. |
+| goodnight-4.mp3 | Goodnight | That's the show. / You may now go back to the real thing. / I'm told it's not as good. |
+| last-place-5.mp3 | Last place | Last place. / Think of it as a sort of homecoming. |

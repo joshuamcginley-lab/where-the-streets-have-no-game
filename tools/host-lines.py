@@ -69,7 +69,7 @@ def fit(text, segs):
             if (i, j) not in best: continue
             err, cuts = best[(i, j)]
             for k in range(i + 1, n - (m - j - 1) + 1):
-                e = err + (sum(w[i:k]) / W - share[j]) ** 2 + (0 if k == n or k in starts else 0.02)  # prefer the script's own breaks
+                e = err + (sum(w[i:k]) / W - share[j]) ** 2 + (0 if k == n or k in starts else 1.0)  # prefer the script's own breaks
                 if (k, j + 1) not in best or e < best[(k, j + 1)][0]: best[(k, j + 1)] = (e, cuts + [k])
     cuts = [0] + best[(n, m)][1]
     return [{"t": round(segs[j][0], 2), "text": " ".join(parts[cuts[j]:cuts[j + 1]])} for j in range(m)]

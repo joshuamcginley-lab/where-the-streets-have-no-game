@@ -1297,5 +1297,137 @@ window.HOST_LINES = {
   ],
   "fps": 25,
   "env": "000016bb001000050007jh5300000463111110000000000000000000000000006cbbdejhfa40000210308b7206a98887a85201532000244337730000000000000000000000000000000chbqi965e417999c4213000000000000000000ajflhfe7989ca00009gcd831000000"
+ },
+ "lead-change-5": {
+  "moment": "Lead change",
+  "dur": 6.35,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A new leader."
+   },
+   {
+    "t": 2.06,
+    "text": "From Boy..."
+   },
+   {
+    "t": 3.6,
+    "text": "to War..."
+   },
+   {
+    "t": 4.93,
+    "text": "in one question."
+   }
+  ],
+  "fps": 25,
+  "env": "0000gkjggfjomg8401111000000000000000000000000000000000475a94002ddhbjicab860000000000000000006bc758dd8522100100000000000000001410000257897000820000000000000000"
+ },
+ "nobody-right-6": {
+  "moment": "Nobody got it right",
+  "dur": 6.32,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Nobody?"
+   },
+   {
+    "t": 1.79,
+    "text": "Achtung means attention, you know."
+   },
+   {
+    "t": 4.27,
+    "text": "Wasted on you."
+   }
+  ],
+  "fps": 25,
+  "env": "00000166669g5de6fca90000000000000000000000000adb50000jofkhgpqohe1b700112iid332051221110003881000000000000001686200000000000001257b600002617544332345440000000"
+ },
+ "last-question-3": {
+  "moment": "Last question",
+  "dur": 7.63,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "The last question."
+   },
+   {
+    "t": 2.25,
+    "text": "Then I'm off home..."
+   },
+   {
+    "t": 4.05,
+    "text": "where the streets have names."
+   },
+   {
+    "t": 6.72,
+    "text": "Dreadful."
+   }
+  ],
+  "fps": 25,
+  "env": "00013zuzzzyk4200005012110000100000000000000000000000000016qwzertudhrl9100aiia75474220000000000000000000762032000000017930000057102765553444100000000000000000000000000000000023500000000000000"
+ },
+ "song-4": {
+  "moment": "Song clip question",
+  "dur": 7.52,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Listen."
+   },
+   {
+    "t": 1.48,
+    "text": "Know this one?"
+   },
+   {
+    "t": 2.75,
+    "text": "You've been paying attention."
+   },
+   {
+    "t": 4.95,
+    "text": "Don't?"
+   },
+   {
+    "t": 6.17,
+    "text": "You were listening to Pop."
+   }
+  ],
+  "fps": 25,
+  "env": "000006da000000000000000000000000000008ggiccia000hif732000000000000000278a403idd0aicja9700cgef520d32000000000000000000000000007g3badulkea1000000000000000007gigjmhj800cjga0j8000apedb00000000"
+ },
+ "goodnight-4": {
+  "moment": "Goodnight",
+  "dur": 7.16,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "That's the show."
+   },
+   {
+    "t": 2.13,
+    "text": "You may now go back to the real thing."
+   },
+   {
+    "t": 5.17,
+    "text": "I'm told it's not as good."
+   }
+  ],
+  "fps": 25,
+  "env": "0000137fi900003c435ckmgb6301000000000000000000000000005d7ij7fed8aadbfc980afd38fd1003307e853773110000000000000000000000000000000003dbc604103efca6532730000bccb306500018a52000000000"
+ },
+ "last-place-5": {
+  "moment": "Last place",
+  "dur": 4.57,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Last place."
+   },
+   {
+    "t": 2.11,
+    "text": "Think of it as a sort of homecoming."
+   }
+  ],
+  "fps": 25,
+  "env": "000004clqlb4100000022221000000000000000000000000000000edc8i4bk78e30cca6600000069626400000012jf63221002000000000000"
  }
 };

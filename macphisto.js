@@ -72,9 +72,12 @@ window.MacPhisto = (() => {
     "tie-1": [{ p: 1, walls: { all: { text: "WITH OR WITHOUT YOU" } } }, { p: 2, walls: { all: { face: 1 } } }],
     "all-right-4": [{ p: 2, walls: { all: { text: "ONE" } } }, { p: 3, walls: { all: { face: 1 } } }],
     "song-3": [{ p: 0, walls: { all: { eq: 1 } } }],
-    "song-4": [{ p: 0, walls: { all: { eq: 1 } } }, { p: 2, walls: { all: { text: "POP" } } }],
-    "lead-change-5": [{ p: 1, walls: { 0: { text: "BOY" } } }, { p: 1, at: 0.9, walls: { 1: { text: "WAR" } } }],
-    "nobody-right-6": [{ p: 1, walls: { all: { text: "ACHTUNG" } } }],
+    "song-4": [{ p: 0, walls: { all: { eq: 1 } } }, { p: 4, at: 0.9, walls: { all: { text: "POP" } } }],
+    "lead-change-5": [{ p: 1, walls: { all: { text: "BOY" } } }, { p: 2, walls: { all: { text: "WAR" } } }, { p: 3, walls: { all: { face: 1 } } }],
+    "last-place-5": [{ p: 1, walls: { all: { text: "A SORT OF HOMECOMING" } } }],
+    "last-question-3": [{ p: 2, walls: { all: { text: "WHERE THE STREETS HAVE NAMES" } } }, { p: 3, walls: { all: { face: 1 } } }],
+    "goodnight-4": [{ p: 1, walls: { all: { text: "THE REAL THING" } } }, { p: 2, walls: { all: { face: 1 } } }],
+    "nobody-right-6": [{ p: 1, walls: { all: { text: "ACHTUNG = ATTENTION" } } }, { p: 2, walls: { all: { face: 1 } } }],
   };
 
   const WALLS = [{ x: 52, y: 66, w: 72, h: 80 }, { x: 352, y: 46, w: 54, h: 54 }, { x: 374, y: 116, w: 56, h: 42 }];
