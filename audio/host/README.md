@@ -15,3 +15,4 @@ Voice lines for the planned MacPhisto host. Not wired into the game yet.
 | streak-adam-1.mp3 | Adam on a streak | Adam! FOUR in a row! / (rest as Larry) |
 | streak-edge-1.mp3 | The Edge on a streak | Edge! FOUR in a row! / (rest as Larry) |
 | lead-change-1.mp3 | Lead change | Oh, how the mighty FALL... don't they? / I should know. / I used to be GIGANTIC, you know... / Never mind! / On with the show! |
+| winner-1.mp3 | Final winner | Look what you've done... / ...to me. / You've won, young man... and I'm AWFULLY proud. / Of course... it was all MY idea. / Everything was my idea. |
