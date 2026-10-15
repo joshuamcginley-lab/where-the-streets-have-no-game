@@ -343,17 +343,33 @@
   .winner .ring { position: relative; }
   .winner.t-larry .av { animation: pop .8s cubic-bezier(.2,.9,.3,1.4) both, heartthrob 1.3s .7s cubic-bezier(.3,1.4,.5,1) forwards; }
   @keyframes heartthrob { 30% { transform: rotate(-15deg) scale(1.08); } 100% { transform: rotate(-10deg) translateY(-.3rem) scale(1.04); } }
+  /* Larry: one burst per hit of his drum fill, the crash the biggest */
   .burst i {
-    position: absolute; left: 50%; top: 50%; width: 2.2rem; height: 2.2rem; margin: -1.1rem; background: #fff; opacity: 0;
+    position: absolute; left: 50%; top: 50%; width: 1.6rem; height: 1.6rem; margin: -.8rem; background: #fff; opacity: 0;
     clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
-    animation: burst 1.3s .9s cubic-bezier(.2,.8,.3,1) both;
+    animation: burst 1.8s var(--d, .9s) cubic-bezier(.15,.75,.3,1) both;
   }
-  .burst i:nth-child(3n) { background: var(--mc); width: 1.5rem; height: 1.5rem; margin: -.75rem; animation-delay: 1s; }
-  @keyframes burst { 0% { transform: rotate(var(--a)) translateY(-4rem) scale(0); opacity: 1; } 55% { opacity: 1; } 100% { transform: rotate(var(--a)) translateY(-10rem) scale(1) rotate(90deg); opacity: 0; } }
+  .burst i:nth-child(2n) { background: var(--mc); }
+  .burst.crash i { width: 2.4rem; height: 2.4rem; margin: -1.2rem; animation-duration: 2.4s; }
+  @keyframes burst { 0% { transform: rotate(var(--a)) translateY(-4rem) scale(0); opacity: 1; } 50% { opacity: 1; } 100% { transform: rotate(var(--a)) translateY(calc(-1 * var(--far, 10rem))) scale(1) rotate(90deg); opacity: 0; } }
+  /* The Edge: rings sent out from the winner on each repeat of the echo */
+  .fx .echo-ring { position: absolute; border-radius: 50%; border: .35rem solid #ff5a3c; box-shadow: 0 0 1.2rem rgba(255,90,60,.6); }
+  /* Bono: the shades settle on the winner, then a glint runs across the lenses */
+  .winner .av { position: relative; overflow: hidden; }
+  .winner .av .glint { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+    background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.85) 48%, transparent 60%); background-size: 260% 100%;
+    animation: glint 1.4s ease-in-out both; }
+  @keyframes glint { from { background-position: 120% 0; } to { background-position: -40% 0; } }
+  /* Adam: the lemon on its cables, in two halves that come apart */
+  .fx .lemon .half { position: absolute; inset: 0; }
+  .fx .lemon .half.l { clip-path: inset(0 50% 0 0); transform-origin: 50% 50%; }
+  .fx .lemon .half.r { clip-path: inset(0 0 0 50%); transform-origin: 50% 50%; }
+  .fx .lemon .cable { position: absolute; bottom: 60%; width: 2px; height: 120vh; background: linear-gradient(#0000, #8a8a8a); }
+  .fx .lemon .cable.l { left: 30%; } .fx .lemon .cable.r { right: 30%; }
   /* Screen-wide pieces, added to .fx and removed when they finish */
-  .fx .flyby { position: absolute; left: 0; top: 34%; width: 46vw; }
+  .fx .flyby { position: absolute; left: 0; top: 0; width: 46vw; filter: drop-shadow(0 .5rem 1rem rgba(0,0,0,.5)); }
   .fx .flyby svg, .fx .lemon svg { display: block; width: 100%; height: auto; }
-  .fx .lemon { position: absolute; left: 0; bottom: 3vh; width: 22vw; filter: drop-shadow(0 .6rem 1.2rem rgba(0,0,0,.6)); }
+  .fx .lemon { position: absolute; left: 0; top: 0; width: 22vw; aspect-ratio: 220 / 150; filter: drop-shadow(0 .6rem 1.2rem rgba(0,0,0,.6)); }
   @media (prefers-reduced-motion: reduce) {
     .pl.t-bono.tright .stamp { animation: none; transform: rotate(-7deg); }   /* still says hello, without the slam */
   }
@@ -384,7 +400,7 @@
 </style>
 </head>
 <body>
-<div class="ver" aria-hidden="true">v78 · Oct 15</div>
+<div class="ver" aria-hidden="true">v79 · Oct 15</div>
 <header class="cover"><button type="button" class="title" id="btn-home" title="Back to the start screen">Everything You Know Is Wrong</button></header>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <div class="fx" id="fx" aria-hidden="true"></div>
@@ -517,33 +533,54 @@
     clearTimeout(toastTimer); toastTimer = setTimeout(() => el.hidden = true, 7000);
   }
 
-  // ---------- red and white ticker tape for the winner (or Larry's stars)
+  // ---------- Zoo Ecus for the winner: on the 1993 Zooropa tour U2 showered crowds with their own
+  // banknotes. Drawn here (a note of our own, not a copy): they flutter down slowly, turning over.
   const Confetti = (() => {
     const cv = $("confetti"), cx = cv.getContext("2d");
-    let W = 0, H = 0, bits = [];
-    function size() { W = cv.width = innerWidth; H = cv.height = innerHeight; }
+    let W = 0, H = 0, bits = [], front = null, back = null, nw = 0, nh = 0;
+    function size() { W = cv.width = innerWidth; H = cv.height = innerHeight; front = null; }
     addEventListener("resize", size); size();
-    function burst(n = 160, stars = false) {
+    // One note, drawn once at the size it falls at; the back is the darker side
+    function note(dark) {
+      const c = document.createElement("canvas"), g = c.getContext("2d"), w = nw, h = nh, k = w / 120;
+      c.width = w; c.height = h;
+      g.fillStyle = dark ? "#2f6b2a" : "#dfeab0"; g.fillRect(0, 0, w, h);
+      g.strokeStyle = dark ? "#9fd08a" : "#3d7d34"; g.lineWidth = 2.2 * k; g.strokeRect(3 * k, 3 * k, w - 6 * k, h - 6 * k);
+      g.lineWidth = .8 * k; g.strokeRect(6 * k, 6 * k, w - 12 * k, h - 12 * k);
+      g.fillStyle = dark ? "#cfe8c0" : "#3d7d34"; g.textAlign = "center"; g.textBaseline = "middle";
+      g.font = `900 ${12 * k}px "IBM Plex Mono", monospace`;
+      [[13, 14], [w / k - 13, 14], [13, h / k - 13], [w / k - 13, h / k - 13]].forEach(([x, y]) => g.fillText("1", x * k, y * k));
+      if (dark) {   // the back: a big 1 in a rosette
+        g.beginPath(); g.arc(w / 2, h / 2, 15 * k, 0, 7); g.lineWidth = 1.4 * k; g.strokeStyle = "#cfe8c0"; g.stroke();
+        g.font = `900 ${20 * k}px "IBM Plex Mono", monospace`; g.fillText("1", w / 2, h / 2 + k);
+      } else {
+        g.font = `700 ${6 * k}px "IBM Plex Mono", monospace`; g.fillText("ZOOROPA 93", w / 2, 11 * k);
+        g.font = `900 ${11 * k}px Georgia, serif`; g.fillStyle = "#3d7d34"; g.fillText("ONE", w / 2, 24 * k);
+        g.font = `900 ${12 * k}px Georgia, serif`; g.fillStyle = "#c8452c"; g.fillText("ZOO ECU", w / 2, 37 * k);
+        g.font = `600 ${4.6 * k}px "IBM Plex Mono", monospace`; g.fillStyle = "#3d7d34"; g.fillText("BANKNOTE OF ZOO · WATCH MORE TV", w / 2, 48 * k);
+      }
+      return c;
+    }
+    // n notes, released over a few seconds so they keep drifting down
+    function burst(n = 60) {
       if (REDUCE) return;
+      if (!front) { nw = Math.round(Math.max(70, Math.min(130, W * .065))); nh = Math.round(nw * .5); front = note(false); back = note(true); }
       for (let i = 0; i < n; i++) bits.push({
-        x: Math.random() * W, y: -Math.random() * H * .6 - 20, vx: (Math.random() - .5) * 80, vy: 90 + Math.random() * 180,
-        w: 5 + Math.random() * 6, h: 14 + Math.random() * 22, a: Math.random() * 6, va: (Math.random() - .5) * 7, f: Math.random() * 6,
-        c: (stars ? ["#ffffff", "#a98bff", "#ffd86b", "#f4f0e8"] : ["#c8452c", "#f4f0e8", "#c8452c", "#000000"])[i % 4], star: stars,
+        x: Math.random() * W, y: -nh - Math.random() * H * 1.1, vy: 38 + Math.random() * 42,
+        sway: 18 + Math.random() * 40, sf: .6 + Math.random() * .7, sp: Math.random() * 6,
+        flip: Math.random() * 6, vf: 1.6 + Math.random() * 1.8, tilt: (Math.random() - .5) * .9, t: 0,
       });
     }
     function draw(dt) {
       if (!bits.length) return;
       cx.clearRect(0, 0, W, H);
-      bits = bits.filter(b => b.y < H + 40);
+      bits = bits.filter(b => b.y < H + nh * 2);
       for (const b of bits) {
-        b.x += b.vx * dt; b.y += b.vy * dt; b.a += b.va * dt; b.f += dt * 6;
-        cx.save(); cx.translate(b.x, b.y); cx.rotate(b.a); cx.fillStyle = b.c;
-        if (b.star) {   // a four-point star that twinkles as it falls
-          const r = b.w * 1.4 * (.45 + .55 * Math.abs(Math.cos(b.f)));
-          cx.beginPath();
-          for (let j = 0; j < 8; j++) cx.lineTo(Math.cos(j * Math.PI / 4) * r * (j % 2 ? .28 : 1), Math.sin(j * Math.PI / 4) * r * (j % 2 ? .28 : 1));
-          cx.fill();
-        } else { cx.scale(1, Math.cos(b.f)); cx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h); }
+        b.t += dt; b.y += b.vy * dt; b.flip += b.vf * dt;
+        const x = b.x + Math.sin(b.t * b.sf * 2 + b.sp) * b.sway, turn = Math.cos(b.flip);
+        cx.save(); cx.translate(x, b.y); cx.rotate(b.tilt + Math.sin(b.t * b.sf * 2 + b.sp) * .25);
+        cx.scale(1, Math.max(.06, Math.abs(turn)));   // turning over, edge-on in between
+        cx.drawImage(turn >= 0 ? front : back, -nw / 2, -nh / 2);
         cx.restore();
       }
       if (!bits.length) cx.clearRect(0, 0, W, H);
@@ -620,7 +657,8 @@
       const el = document.createElement("div");
       el.className = cls; el.innerHTML = html;
       $("fx").appendChild(el);
-      el.animate(frames, { fill: "both", ...opts }).onfinish = () => el.remove();
+      const { keep, ...o } = opts;   // keep: it stays where it ends up (and removes itself later)
+      el.animate(frames, { fill: "both", ...o }).onfinish = () => { if (!keep) el.remove(); };
       return el;
     }
     const SHADES = `<svg viewBox="0 22 64 24" aria-hidden="true"><defs><linearGradient id="fly-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3638"/><stop offset=".55" stop-color="#0a0909"/></linearGradient></defs>
@@ -648,7 +686,19 @@
       band.push({ offset: 1, filter: "brightness(1) saturate(1)" }); ring.push({ offset: 1, boxShadow: "0 0 0 0 rgba(255,90,60,0)" });
       setTimeout(() => {
         document.querySelector("header.cover").animate(band, { duration: n * ECHO * 1000 });
-        document.querySelector(".winner .ring")?.animate(ring, { duration: n * ECHO * 1000 });
+        const r = document.querySelector(".winner .ring");
+        if (!r) return;
+        r.animate(ring, { duration: n * ECHO * 1000 });
+        // and each repeat sends a ring outward from the winner, slow and fainter, like the echo itself
+        const b = r.getBoundingClientRect();
+        for (let k = 0; k < 6; k++) {
+          const o = document.createElement("div");
+          o.className = "echo-ring";
+          Object.assign(o.style, { left: b.left + "px", top: b.top + "px", width: b.width + "px", height: b.height + "px" });
+          $("fx").appendChild(o);
+          o.animate([{ transform: "scale(1)", opacity: .85 * .7 ** k }, { transform: "scale(2.6)", opacity: 0 }],
+            { duration: 1800, delay: k * ECHO * 1000, easing: "cubic-bezier(.2,.6,.3,1)", fill: "both" }).onfinish = () => o.remove();
+        }
       }, at * 1000);
     }
 
@@ -656,9 +706,27 @@
     const T = {
       bono: {
         lock() { Sound.lock(); noise(0, .16, .03, [700, 4000], 1.2); },
-        win() {
-          noise(.5, .6, .04, [500, 5000], 1.2); hola();
-          if (!REDUCE) piece("flyby", SHADES, [{ transform: "translateX(-50vw) rotate(-8deg)" }, { transform: "translateX(110vw) rotate(5deg)" }], { duration: 1500, delay: 400, easing: "cubic-bezier(.45,0,.35,1)" });
+        win(w) {
+          noise(.6, 1.6, .035, [400, 3000], 1.2); hola();
+          const av = w?.querySelector(".av");
+          if (REDUCE || !av) return;
+          // Where the shades sit on the avatar (the icon's lenses span y 22–46 of its 64), measured
+          // from the ring, which isn't animating, so the avatar's pop doesn't throw it off
+          const ring = w.querySelector(".ring").getBoundingClientRect(), pad = parseFloat(getComputedStyle(w.querySelector(".ring")).paddingLeft);
+          const a = { x: ring.left + pad, y: ring.top + pad, s: ring.width - 2 * pad };
+          const tw = a.s, tx = a.x, ty = a.y + a.s * 22 / 64, big = 2.4;
+          const el = piece("flyby", SHADES, [
+            { transform: `translate(${-tw * big}px, ${innerHeight * .25}px) scale(${big}) rotate(-14deg)`, opacity: 0 },
+            { opacity: 1, offset: .15 },
+            { transform: `translate(${tx - tw * .15}px, ${ty - tw * .12}px) scale(1.12) rotate(3deg)`, offset: .78 },
+            { transform: `translate(${tx}px, ${ty}px) scale(1) rotate(0deg)`, opacity: 1 },
+          ], { duration: 2600, delay: 600, easing: "cubic-bezier(.25,.1,.25,1)" });
+          el.style.width = tw + "px"; el.style.top = "0"; el.style.transformOrigin = "0 0";
+          // Then a slow glint across the lenses, and the shades are part of the picture
+          setTimeout(() => {
+            if (!av.isConnected) return;
+            av.insertAdjacentHTML("beforeend", `<span class="glint"></span>`);
+          }, 3150);
         },
       },
       edge: {
@@ -668,22 +736,39 @@
       },
       adam: {
         lock() { drum(130, 42, 0, .4, .5); noise(0, .02, .05, 1500); },
-        win() {
-          drum(110, 40, .6, .5, .45); drum(90, 38, 1.6, .5, .35);
-          if (!REDUCE) piece("lemon", LEMON, [
-            { transform: "translateX(-25vw) translateY(0) rotate(-160deg)" },
-            { transform: "translateX(30vw) translateY(-6vh) rotate(150deg)", offset: .35 },
-            { transform: "translateX(70vw) translateY(0) rotate(400deg)", offset: .7 },
-            { transform: "translateX(105vw) translateY(-2vh) rotate(600deg)" },
-          ], { duration: 3600, delay: 500, easing: "linear" });
+        win(w) {
+          drum(110, 40, .6, .5, .45); drum(90, 38, 3.5, .5, .35); noise(3.5, .9, .05, [300, 2400], .8);
+          const r = w?.querySelector(".ring");
+          if (REDUCE || !r) return;
+          // PopMart's lemon famously jammed shut. This one comes down on its cables, stops over the
+          // winner, and opens for them.
+          const ring = r.getBoundingClientRect(), lw = ring.width * 1.7, lh = lw * 150 / 220;
+          const x = ring.left + ring.width / 2 - lw / 2, y = ring.top + ring.height / 2 - lh / 2;
+          const half = side => `<div class="half ${side}">${LEMON}</div>`;
+          const el = piece("lemon", `<i class="cable l"></i><i class="cable r"></i>${half("l")}${half("r")}`, [
+            { transform: `translate(${x}px, ${-lh - 40}px)` },
+            { transform: `translate(${x}px, ${y + 12}px)`, offset: .85 },
+            { transform: `translate(${x}px, ${y}px)` },
+          ], { duration: 2600, delay: 500, easing: "cubic-bezier(.3,.6,.3,1)", keep: true });
+          el.style.width = lw + "px";
+          const halves = el.querySelectorAll(".half"), cables = el.querySelectorAll(".cable");
+          [-1, 1].forEach((d, k) => halves[k].animate([
+            { transform: "none", opacity: 1 },
+            { transform: `translateX(${d * lw * .38}px) rotate(${d * 28}deg)`, opacity: 1, offset: .6 },
+            { transform: `translateX(${d * lw * .55}px) translateY(${lh * .3}px) rotate(${d * 40}deg)`, opacity: 0 },
+          ], { duration: 1500, delay: 3500, easing: "cubic-bezier(.3,.7,.3,1)", fill: "both" }));
+          cables.forEach(c => c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 600, delay: 4200, fill: "both" }));
+          setTimeout(() => el.remove(), 5300);
         },
       },
       larry: {
         lock() { roll(); },
         win(w) {
           fill(.6);
-          w?.querySelector(".ring").insertAdjacentHTML("beforeend",
-            `<span class="burst" style="--mc:${byId("larry").color}">${Array.from({ length: 12 }, (_, i) => `<i style="--a:${i * 30}deg"></i>`).join("")}</span>`);
+          const s = .09, hits = [[0, 5, 6], [2 * s, 5, 7], [4 * s, 6, 8], [6 * s, 6, 9], [8 * s, 12, 12]];   // when, how many, how far (rem)
+          w?.querySelector(".ring").insertAdjacentHTML("beforeend", hits.map(([t, n, far], h) =>
+            `<span class="burst${h === 4 ? " crash" : ""}" style="--mc:${byId("larry").color};--d:${(.6 + t).toFixed(2)}s;--far:${far}rem">${
+              Array.from({ length: n }, (_, i) => `<i style="--a:${(i * 360 / n + h * 17) % 360}deg"></i>`).join("")}</span>`).join(""));
         },
       },
     };
@@ -704,8 +789,10 @@
       $("fx").replaceChildren();   // nothing left over from the last reveal
       const w = document.querySelector(".winner");
       w?.classList.add("t-" + p.member);
-      Confetti.burst(220, p.member === "larry");
       try { T[p.member]?.win?.(w); } catch {}
+      // The character's moment first; the money comes down once it has landed
+      const g = S.game;
+      setTimeout(() => { if (S.game === g && S.phase === "final") Confetti.burst(p.member === "adam" ? 55 : 45); }, p.member === "adam" ? 4300 : 2600);
     }
     // What a strip card needs: its classes, how far into its effect it is, and anything drawn over the avatar
     function card(p) {
@@ -1339,7 +1426,7 @@
       const o = S.players.slice().sort((a, b) => b.score - a.score), tie = o.length > 1 && o[0].score === o[1].score;
       // Mid-tournament nobody has won yet: he says what's next, and saves the crowning for the end
       const line = S.inTour && S.leg < 3 ? Host.pick(LINES.tourBreak(S.leg)) : Host.pick(tie ? LINES.tie : S.inTour ? LINES.tourWinner : LINES.winner), g = S.game;
-      if (line) setTimeout(() => { if (S.phase === "final" && S.game === g) Host.say(line); }, 2400);
+      if (line) setTimeout(() => { if (S.phase === "final" && S.game === g) Host.say(line); }, 4800);   // after the winner's moment has landed
     }
   }
 
