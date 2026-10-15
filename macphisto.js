@@ -1,6 +1,7 @@
 // MacPhisto, the host: a little gold-lamé devil on a miniature ZOO TV stage.
 // Video walls, scaffold towers with orange lights, two hanging Trabants, monitors on the deck.
-// While he talks, the video walls show his face close up and his lips follow the voice.
+// While he talks, the video walls are a live broadcast of him: close-ups, eyes, lips and the full figure in
+// different tints, cut on every phrase; his lips follow the voice.
 // The voice is a plain <audio> element (no Web Audio, which Safari mutes until clicked);
 // the lips follow a loudness envelope measured ahead of time (host-lines.js, "env").
 //
@@ -23,9 +24,16 @@ window.MacPhisto = (() => {
   })();
   // The ZOO TV screen slogans. "BELIEVE" is special: all but L-I-E fade away.
   const SLOGANS = ["TASTE IS THE ENEMY OF ART", "RELIGION IS A CLUB", "IGNORANCE IS BLISS", "REBELLION IS PACKAGED", "BELIEVE", "EVERYTHING YOU KNOW IS WRONG"];
+  // Between lines the walls now and then flash words in quick succession, ZOO TV style
+  const CUTUPS = [["WATCH", "MORE", "TV"], ["CALL", "NOW"], ["BELIEVE", "EVERYTHING"], ["ADMIT", "NOTHING"], ["ZOO", "TV"], ["EVERYTHING", "YOU KNOW", "IS WRONG"]];
+  // The camera tints: each wall's picture goes through one of these
+  const TINTS = ["blue", "red", "amber", "green", "mono"];
+  const TINT_BG = { blue: "#0c1834", red: "#2a0608", amber: "#2a1604", green: "#04200c", mono: "#121214" };
 
   // What happens on stage during a line. p = the subtitle phrase it starts on.
-  // walls: what the video walls show ("all" or wall 0/1/2): text, avatar, static, cameras, eyes, eq.
+  // walls: what the video walls show ("all" or wall 0/1/2): text, avatar, static, cameras, eyes, eq, bars (colour bars,
+  // optional caption), applause (a blinking sign), cutup (words flashed in turn). face: back to the live cameras;
+  // face with a shot ("close", "eyes", "lips", "wide") and a tint picks the picture instead.
   const STREAK = id => [{ p: 0, walls: { all: { avatar: id } } }, { p: 1, walls: { all: { face: 1 } } }, { p: 3, phone: 1 }];
   const GAGS = {
     "round-start-1": [{ p: 0, at: 1.0, horns: 1 }],
@@ -103,6 +111,93 @@ window.MacPhisto = (() => {
     "nobody-right-6": [{ p: 1, walls: { all: { text: "ACHTUNG = ATTENTION" } } }, { p: 2, walls: { all: { face: 1 } } }],
   };
 
+  // More gags, added to any above for the same line
+  const T = text => ({ all: { text } }), FACE = { all: { face: 1 } };
+  const SHOT = (shot, tint) => ({ all: { face: 1, shot, tint } });
+  const THREE = { 0: { face: 1, shot: "close", tint: "blue" }, 1: { face: 1, shot: "close", tint: "red" }, 2: { face: 1, shot: "close", tint: "amber" } };
+  const MORE = {
+    "round-start-1": [{ p: 1, walls: { all: { cutup: ["ON", "WITH", "THE", "SHOW"] } } }, { p: 2, walls: FACE }],
+    "nobody-right-1": [{ p: 0, walls: T("NOT ONE") }, { p: 1, walls: FACE }, { p: 3, phone: 1 }],
+    "welcome-1": [{ p: 0, walls: T("WELCOME") }, { p: 1, walls: FACE }, { p: 2, walls: { 1: { text: "FAMOUS" } } }, { p: 3, walls: FACE }],
+    "round-start-2": [{ p: 0, walls: { all: { cameras: 1 } } }, { p: 1, walls: FACE }],
+    "round-start-3": [{ p: 0, walls: T("ANOTHER ROUND") }, { p: 1, walls: FACE }],
+    "close-2": [{ p: 0, walls: { 0: { text: "NECK" }, 1: { text: "AND" }, 2: { text: "NECK" } } }, { p: 2, walls: FACE }],
+    "last-place-1": [{ p: 1, walls: T("BOTTOM") }, { p: 3, walls: FACE }, { p: 4, walls: SHOT("close", "red") }],
+    "last-place-2": [{ p: 0, walls: T("LAST PLACE") }, { p: 1, walls: FACE }, { p: 2, walls: SHOT("close", "red") }],
+    "cover-1": [{ p: 0, walls: { all: { bars: 1 } } }, { p: 1, walls: FACE }],
+    "last-question-2": [{ p: 0, walls: T("ONE MORE") }, { p: 1, walls: T("TAXI") }, { p: 2, walls: FACE }],
+    "next-round-2": [{ p: 1, walls: T("JUST ONE MORE") }, { p: 2, walls: FACE }],
+    "goodnight-1": [{ p: 0, walls: T("THAT'S THE SHOW") }, { p: 1, walls: { all: { applause: 1 } } }, { p: 2, walls: FACE }],
+    "all-right-3": [{ p: 0, walls: { all: { cameras: 1 } } }, { p: 1, walls: FACE }, { p: 2, walls: T("CHEATING") }, { p: 3, walls: FACE }],
+    "last-place-4": [{ p: 1, walls: T("YOU CAN'T MAKE IT ON YOUR OWN") }, { p: 2, walls: FACE }],
+    "join-2": [{ p: 0, walls: T("HELLO, HELLO") }, { p: 1, walls: FACE }],
+    "cover-2": [{ p: 0, walls: { all: { bars: 1 } } }, { p: 1, walls: FACE }],
+    "cover-3": [{ p: 1, walls: SHOT("eyes", "blue") }, { p: 2, walls: FACE }, { p: 3, walls: THREE }],
+    "tour-break-1-1": [{ p: 0, walls: T("ROUND ONE") }, { p: 1, walls: { all: { eq: 1 } } }, { p: 2, walls: FACE }],
+    "tour-break-1-2": [{ p: 0, walls: T("ROUND ONE") }, { p: 1, walls: { all: { static: 1 } } }, { p: 2, walls: FACE }],
+    "tour-break-2-1": [{ p: 0, walls: T("ONE TO GO") }, { p: 1, walls: FACE }, { p: 2, walls: T("BET EVERYTHING") }],
+    "tour-winner-1": [{ p: 0, walls: T("3 ROUNDS") }, { p: 1, walls: T("1 CHAMPION") }, { p: 2, walls: FACE }],
+    "wager-1": [{ p: 1, walls: T("PLACE YOUR BETS") }, { p: 2, walls: SHOT("eyes", "red") }],
+    "bet-won-2": [{ p: 0, walls: T("ALL IN") }, { p: 1, walls: FACE }],
+    "bet-lost-2": [{ p: 0, walls: { all: { static: 1 } } }, { p: 1, walls: FACE }, { p: 2, walls: SHOT("close", "red") }],
+    "double-2": [{ p: 0, walls: T("2X") }, { p: 1, walls: FACE }],
+    "who-said-2": [{ p: 0, walls: T("WHO SAID IT?") }, { p: 1, walls: FACE }, { p: 2, walls: THREE }],
+    "all-right-5": [{ p: 1, walls: T("MYSTERIOUS WAYS") }],
+    "streak-any-3": [{ p: 0, walls: T("4 IN A ROW") }, { p: 1, walls: FACE }, { p: 2, walls: { all: { cutup: ["SUNGLASSES", "STADIUMS"] } } }],
+    "streak-any-4": [{ p: 0, walls: T("4 IN A ROW") }, { p: 1, walls: FACE }],
+    "streak-any-5": [{ p: 0, walls: T("4 IN A ROW") }, { p: 1, walls: T("ACHTUNG") }],
+    "streak-any-6": [{ p: 0, walls: { 0: { text: "4" }, 1: { text: "IN A" }, 2: { text: "ROW" } } }, { p: 1, walls: FACE }, { p: 2, walls: SHOT("close", "amber") }],
+    "lead-change-6": [{ p: 0, walls: T("NEW LEADER") }, { p: 1, walls: { all: { cameras: 1 } } }, { p: 2, walls: SHOT("eyes", "blue") }],
+    "lead-change-7": [{ p: 0, walls: T("NEW LEADER") }, { p: 1, walls: FACE }],
+    "lead-change-9": [{ p: 0, walls: T("NEW LEADER") }, { p: 1, walls: FACE }, { p: 2, walls: T("WAVE") }],
+    "streak-broken-4": [{ p: 0, walls: { all: { static: 1 } } }, { p: 1, walls: FACE }],
+    "streak-broken-5": [{ p: 0, walls: { all: { bars: 1, caption: "PLEASE STAND BY" } } }, { p: 1, walls: FACE }],
+    "streak-broken-6": [{ p: 0, walls: { all: { static: 1 } } }, { p: 1, walls: { all: { avatar: "edge" } } }, { p: 2, walls: FACE }],
+    "all-right-6": [{ p: 0, walls: T("EVERYONE") }, { p: 1, walls: FACE }, { p: 2, walls: SHOT("wide", "amber") }],
+    "all-right-7": [{ p: 0, walls: T("ALL CORRECT") }, { p: 1, walls: FACE }, { p: 2, walls: T("THE MANAGEMENT") }],
+    "nobody-right-7": [{ p: 0, walls: T("NOBODY") }, { p: 1, walls: T("IGNORANCE IS BLISS") }],
+    "nobody-right-8": [{ p: 0, walls: T("NOT ONE") }, { p: 1, walls: FACE }],
+    "nobody-right-9": [{ p: 0, walls: T("NOBODY") }, { p: 1, walls: FACE }],
+    "same-wrong-2": [{ p: 0, walls: T("SAME ANSWER") }, { p: 1, walls: T("WRONG") }, { p: 2, walls: FACE }],
+    "lone-right-1": [{ p: 0, walls: { 0: { text: "ONLY ONE" }, 1: { static: 1 }, 2: { static: 1 } } }, { p: 1, walls: FACE }, { p: 2, walls: { all: { cameras: 1 } } }],
+    "lone-right-3": [{ p: 0, walls: T("JUST ONE") }, { p: 1, walls: FACE }],
+    "buzzer-1": [{ p: 0, walls: T("JUST IN TIME") }, { p: 1, walls: FACE }],
+    "buzzer-2": [{ p: 0, walls: T("LAST SECOND") }, { p: 1, walls: FACE }, { p: 2, walls: { 1: { applause: 1 } } }],
+    "close-4": [{ p: 0, walls: { 0: { text: "NECK" }, 1: { text: "AND" }, 2: { text: "NECK" } } }, { p: 1, walls: FACE }],
+    "last-place-6": [{ p: 0, walls: T("LAST PLACE") }, { p: 1, walls: { all: { avatar: "adam" } } }],
+    "last-place-7": [{ p: 0, walls: T("BOTTOM") }, { p: 1, walls: FACE }],
+    "last-place-8": [{ p: 0, walls: T("LAST PLACE") }, { p: 1, walls: FACE }, { p: 2, walls: SHOT("close", "red") }],
+    "hurry-4": [{ p: 0, walls: T("TIME'S UP") }, { p: 1, phone: 1, walls: FACE }],
+    "hurry-5": [{ p: 0, walls: { all: { static: 1 } } }, { p: 1, walls: T("TRABANT") }],
+    "aside-1": [{ p: 0, walls: T("FREE ALBUM") }, { p: 1, walls: FACE }],
+    "aside-4": [{ p: 0, walls: T("1993") }, { p: 1, walls: FACE }],
+    "aside-6": [{ p: 1, walls: { all: { eq: 1 } } }, { p: 2, walls: FACE }],
+    "round-start-6": [{ p: 0, walls: { all: { bars: 1 } } }, { p: 1, walls: T("DUBLIN") }, { p: 2, walls: FACE }],
+    "next-round-5": [{ p: 1, walls: T("FAREWELL TOUR") }],
+    "next-round-6": [{ p: 0, walls: T("ANOTHER ROUND") }, { p: 1, walls: FACE }],
+    "song-5": [{ p: 0, walls: { all: { eq: 1 } } }],
+    "song-6": [{ p: 0, walls: { all: { eq: 1 } } }, { p: 1, walls: { all: { avatar: "edge" } } }, { p: 2, walls: FACE }],
+    "cover-4": [{ p: 0, walls: { all: { bars: 1 } } }, { p: 1, walls: { 0: { text: "FACES" }, 1: { text: "DESERTS" }, 2: { text: "BOY" } } }, { p: 2, walls: FACE }],
+    "cover-5": [{ p: 0, walls: { all: { bars: 1 } } }, { p: 1, walls: FACE }],
+    "who-said-4": [{ p: 0, walls: T("WHO SAID IT?") }, { p: 1, walls: FACE }],
+    "double-4": [{ p: 0, walls: T("DOUBLE POINTS") }, { p: 1, walls: FACE }],
+    "double-5": [{ p: 0, walls: T("2X") }, { p: 1, walls: FACE }, { p: 2, walls: { all: { applause: 1 } } }],
+    "winner-8": [{ p: 0, walls: T("WINNER") }, { p: 1, walls: { all: { cameras: 1 } } }, { p: 2, walls: FACE }],
+    "winner-9": [{ p: 0, walls: T("WINNER") }, { p: 1, walls: FACE }, { p: 2, walls: T("HUMBLE") }],
+    "tie-2": [{ p: 0, walls: T("A TIE") }, { p: 1, walls: FACE }],
+    "bet-won-3": [{ p: 0, walls: T("EVERYTHING") }, { p: 1, walls: FACE }],
+    "bet-lost-3": [{ p: 0, walls: { all: { static: 1 } } }, { p: 1, walls: FACE }],
+    "goodnight-5": [{ p: 0, walls: T("GOODNIGHT") }, { p: 1, walls: FACE }, { p: 2, walls: SHOT("eyes", "blue") }],
+    "goodnight-6": [{ p: 0, walls: T("THAT'S THE SHOW") }, { p: 1, walls: { all: { bars: 1 } } }, { p: 2, walls: { all: { static: 1 } } }],
+    "welcome-3": [{ p: 0, walls: T("WELCOME") }, { p: 1, walls: FACE }, { p: 2, walls: SHOT("eyes", "red") }],
+    "join-3": [{ p: 0, walls: T("HELLO") }, { p: 1, walls: FACE }, { p: 2, walls: T("GOLD") }],
+    "join-5": [{ p: 0, walls: T("HELLO") }, { p: 1, walls: FACE }],
+    "order-1": [{ p: 0, walls: T("HISTORY") }, { p: 1, walls: { 0: { text: "1" }, 1: { text: "2" }, 2: { text: "3" } } }, { p: 2, walls: FACE }],
+    "order-2": [{ p: 0, walls: T("ORDER") }, { p: 1, walls: FACE }, { p: 2, walls: { all: { static: 1 } } }],
+    "order-3": [{ p: 0, walls: T("OLDEST FIRST") }, { p: 1, walls: FACE }],
+  };
+  for (const k in MORE) GAGS[k] = [...(GAGS[k] || []), ...MORE[k]];
+
   const WALLS = [{ x: 52, y: 66, w: 72, h: 80 }, { x: 352, y: 46, w: 54, h: 54 }, { x: 374, y: 116, w: 56, h: 42 }];
   const TOWERS = [38, 134, 336, 440];
   const MONITORS = [[92, 224], [150, 229], [196, 232], [318, 230], [384, 222], [424, 229], [30, 150], [457, 186]];
@@ -159,6 +254,14 @@ window.MacPhisto = (() => {
           <path d="M0 0H2.6M0 0V2.6" stroke="#000" stroke-width=".7" stroke-opacity=".55"/></pattern>
         <filter id="${id("blue")}" color-interpolation-filters="sRGB">
           <feColorMatrix type="matrix" values=".16 .42 .08 0 .02  .2 .52 .1 0 .05  .25 .62 .14 0 .14  0 0 0 1 0"/></filter>
+        <filter id="${id("red")}" color-interpolation-filters="sRGB">
+          <feColorMatrix type="matrix" values=".36 .9 .2 0 .1  .06 .2 .05 0 0  .07 .22 .05 0 .02  0 0 0 1 0"/></filter>
+        <filter id="${id("amber")}" color-interpolation-filters="sRGB">
+          <feColorMatrix type="matrix" values=".32 .82 .16 0 .1  .2 .55 .1 0 .04  .03 .1 .02 0 0  0 0 0 1 0"/></filter>
+        <filter id="${id("green")}" color-interpolation-filters="sRGB">
+          <feColorMatrix type="matrix" values=".05 .14 .03 0 0  .26 .72 .15 0 .06  .07 .18 .04 0 .01  0 0 0 1 0"/></filter>
+        <filter id="${id("mono")}" color-interpolation-filters="sRGB">
+          <feColorMatrix type="matrix" values=".27 .64 .12 0 .02  .27 .64 .12 0 .02  .29 .68 .13 0 .04  0 0 0 1 0"/></filter>
         <filter id="${id("noise")}" x="0" y="0" width="100%" height="100%">
           <feTurbulence class="mp-turb" type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="1"/>
           <feColorMatrix type="matrix" values="0 0 0 .9 0  0 0 0 .95 0  0 0 0 1.1 .05  0 0 0 0 1"/></filter>
@@ -198,7 +301,7 @@ window.MacPhisto = (() => {
           ${Array.from({ length: 5 }, (_, i) => `<circle cx="${216 - i * 5}" cy="${266 + i * 8}" r="1" fill="#ff8b3d"/><circle cx="${264 + i * 5}" cy="${266 + i * 8}" r="1" fill="#ff8b3d"/>`).join("")}</g>
         ${MONITORS.map(([x, y]) => `<g class="mp-monitor"><rect x="${x - 7}" y="${y - 10}" width="14" height="10" fill="#1b1b22"/><rect class="mp-glass" x="${x - 6}" y="${y - 9}" width="12" height="8" fill="#b9cbf4"/></g>`).join("")}
         <ellipse cx="240" cy="239" rx="40" ry="7" fill="url(#${id("pool")})"/>
-        <g class="mp-man" transform="translate(240 238)">
+        <g class="mp-man" id="${id("man")}" transform="translate(240 238)">
           <g class="mp-body">
             <path fill="#2a1c08" d="M-15.5-7H-1V0H-15.5ZM1-7H15.5V0H1Z"/>
             <path fill="url(#${id("lame")})" d="M-15-17H-1.2L-1-7H-15.5ZM1.2-17H15L15.5-7H1Z"/>
@@ -286,15 +389,85 @@ window.MacPhisto = (() => {
 
     // ---- video walls
     let wallState = [null, null, null];
+    const MONO = "IBM Plex Mono, ui-monospace, monospace";
+    // Text as big as it fits on wall w: tries every line length and keeps the one with the biggest letters
+    function textInto(g, w, text, fill = "#e2ecff") {
+      const cx = w.x + w.w / 2, cy = w.y + w.h / 2, words = text.split(" ");
+      let rows = [text], fs = 0;
+      for (let maxChars = 1; maxChars <= text.length; maxChars++) {
+        const r = [];
+        for (const word of words) {
+          if (r.length && (r[r.length - 1] + " " + word).length <= maxChars) r[r.length - 1] += " " + word;
+          else r.push(word);
+        }
+        const longest = Math.max(...r.map(x => x.length));
+        const f = Math.min(w.h / (r.length * 1.15), (w.w * 0.9) / (longest * 0.62));
+        if (f > fs) { fs = f; rows = r; }
+      }
+      rows.forEach((r, k) => {
+        const t = el("text", { x: cx, y: cy + (k - (rows.length - 1) / 2) * fs * 1.08, "text-anchor": "middle", "dominant-baseline": "central",
+          fill, "font-size": fs.toFixed(1), "font-family": MONO, "font-weight": 600 }, g);
+        t.textContent = r;
+      });
+    }
+    // The live cameras: the big wall mostly holds the close-up; the small ones go through eyes, lips,
+    // the full figure and the close-up, each in a different tint. cutN moves on at every cut.
+    let cutN = 0, smallN = 0;
+    function director(i) {
+      const n = cutN + (i ? smallN : 0), A = ["eyes", "lips", "wide", "close"];
+      const shot = i === 0 ? (n % 4 === 3 ? "wide" : "close") : A[(n + (i === 1 ? 0 : 2)) % 4];
+      const tint = i === 0 ? (n % 3 === 2 ? "red" : "blue") : TINTS[(2 * n + 2 * i) % TINTS.length];
+      return { face: 1, shot, tint, live: i === 0 };
+    }
     function wallSet(i, spec) {
       const w = WALLS[i], g = walls[i], cx = w.x + w.w / 2, cy = w.y + w.h / 2;
+      if (spec && spec.face && !spec.shot) spec = director(i);   // "back to his face": whatever the cameras are on now
       wallState[i] = spec;
       g.innerHTML = "";
       if (!spec) return;
       if (spec.face || spec.eyes) {
-        const k = spec.eyes ? w.w / 9 : w.h / 22;
-        el("use", { href: `#${id("head")}`, filter: `url(#${id("blue")})`,
-          transform: `translate(${cx} ${spec.eyes ? cy + 3 * k : cy + 1.5 * k}) scale(${k})` }, g);
+        const shot = spec.eyes ? "eyes" : spec.shot, tint = spec.tint || "blue", f = `url(#${id(tint)})`;
+        el("rect", { x: w.x, y: w.y, width: w.w, height: w.h, fill: TINT_BG[tint] }, g);
+        if (shot === "wide") {   // the whole man, as he is on stage (a live copy)
+          const k = (w.h * 0.86) / 134;
+          el("use", { href: `#${id("man")}`, filter: f, transform: `translate(${cx} ${w.y + w.h * 0.96}) scale(${k.toFixed(3)}) translate(-240 -238)` }, g);
+        } else {
+          const k = shot === "eyes" ? w.w / 9 : shot === "lips" ? w.w / 8 : w.h / 22;
+          const y = shot === "eyes" ? cy + 3 * k : shot === "lips" ? cy - 6 * k : cy + 1.5 * k;
+          el("use", { href: `#${id("head")}`, filter: f, transform: `translate(${cx} ${y}) scale(${k})` }, g);
+        }
+        if (spec.live) {   // the broadcast's LIVE bug, top left
+          const b = el("g", { transform: `translate(${w.x + 3} ${w.y + 3})` }, g);
+          el("rect", { width: 17, height: 6.5, rx: 1, fill: "#d0121f" }, b);
+          el("circle", { class: "mp-live-dot", cx: 3.3, cy: 3.25, r: 1.3, fill: "#fff" }, b);
+          el("text", { x: 5.6, y: 3.45, "dominant-baseline": "central", fill: "#fff", "font-size": 4.3, "font-family": MONO, "font-weight": 700 }, b).textContent = "LIVE";
+        }
+      } else if (spec.bars) {   // colour bars, as when a channel isn't on air
+        const cols = ["#c0c0c0", "#c0c000", "#00c0c0", "#00c000", "#c000c0", "#c00000", "#0000c0"], bw = w.w / 7;
+        cols.forEach((c, k) => el("rect", { x: w.x + k * bw, y: w.y, width: bw + 0.2, height: w.h * 0.68, fill: c }, g));
+        ["#0000c0", "#131313", "#c000c0", "#131313", "#00c0c0", "#131313", "#c0c0c0"].forEach((c, k) =>
+          el("rect", { x: w.x + k * bw, y: w.y + w.h * 0.68, width: bw + 0.2, height: w.h * 0.08, fill: c }, g));
+        el("rect", { x: w.x, y: w.y + w.h * 0.76, width: w.w, height: w.h * 0.24, fill: "#0a0a12" }, g);
+        el("rect", { x: w.x + w.w * 0.08, y: w.y + w.h * 0.8, width: w.w * 0.2, height: w.h * 0.16, fill: "#f2f2f2" }, g);
+        if (spec.caption) {
+          const band = { x: w.x, y: w.y + w.h * 0.3, w: w.w, h: w.h * 0.22 };
+          el("rect", { x: band.x, y: band.y, width: band.w, height: band.h, fill: "#000", opacity: 0.85 }, g);
+          textInto(g, { x: band.x + 2, y: band.y + 1, w: band.w - 4, h: band.h - 2 }, spec.caption);
+        }
+      } else if (spec.applause) {   // the studio sign, lit and blinking
+        el("rect", { x: w.x, y: w.y, width: w.w, height: w.h, fill: "#140304" }, g);
+        const sign = { x: w.x + w.w * 0.06, y: cy - w.h * 0.17, w: w.w * 0.88, h: w.h * 0.34 };
+        const s2 = el("g", { class: "mp-blink" }, g);
+        el("rect", { x: sign.x, y: sign.y, width: sign.w, height: sign.h, rx: 2, fill: "#3a0508", stroke: "#ff3b30", "stroke-width": 1 }, s2);
+        textInto(s2, { x: sign.x + 2, y: sign.y + 1, w: sign.w - 4, h: sign.h - 2 }, "APPLAUSE", "#ff5a4a");
+        spec.at = performance.now();
+      } else if (spec.cutup) {   // the words take turns, one at a time
+        spec.els = spec.cutup.map(word => {
+          const gw = el("g", { style: "display:none" }, g);
+          textInto(gw, w, word);
+          return gw;
+        });
+        spec.at = performance.now(); spec.shown = -1;
       } else if (spec.believe) {
         // BELIEVE, then everything but L-I-E fades away
         const fs = Math.min(w.h * 0.42, (w.w * 0.9) / (7 * 0.62));
@@ -308,24 +481,7 @@ window.MacPhisto = (() => {
         });
         spec.fade = { els: fade, at: performance.now() };   // the frame loop fades them
       } else if (spec.text != null) {
-        // Try every line length and keep the layout that gives the biggest letters on this wall
-        const words = spec.text.split(" ");
-        let rows = [spec.text], fs = 0;
-        for (let maxChars = 1; maxChars <= spec.text.length; maxChars++) {
-          const r = [];
-          for (const word of words) {
-            if (r.length && (r[r.length - 1] + " " + word).length <= maxChars) r[r.length - 1] += " " + word;
-            else r.push(word);
-          }
-          const longest = Math.max(...r.map(x => x.length));
-          const f = Math.min(w.h / (r.length * 1.15), (w.w * 0.9) / (longest * 0.62));
-          if (f > fs) { fs = f; rows = r; }
-        }
-        rows.forEach((r, k) => {
-          const t = el("text", { x: cx, y: cy + (k - (rows.length - 1) / 2) * fs * 1.08, "text-anchor": "middle", "dominant-baseline": "central",
-            fill: "#e2ecff", "font-size": fs.toFixed(1), "font-family": "IBM Plex Mono, ui-monospace, monospace", "font-weight": 600 }, g);
-          t.textContent = r;
-        });
+        textInto(g, w, spec.text);
       } else if (spec.avatar) {
         const m = window.U2M && window.U2M.byId(spec.avatar);
         if (!m) return;
@@ -344,6 +500,20 @@ window.MacPhisto = (() => {
         for (let b = 0; b < 8; b++) el("rect", { class: "mp-eqbar", x: w.x + 4 + b * (w.w - 8) / 8, y: cy, width: (w.w - 8) / 8 - 2, height: 1, fill: "#e2ecff" }, g);
       }
     }
+    // A cut: a flick of static, then the new picture
+    function cut(i, spec) {
+      if (REDUCE) return wallSet(i, spec);
+      wallSet(i, { static: 1, then: spec, until: performance.now() + 110 });
+    }
+    // On a new phrase (or every few seconds on the small walls) the cameras change on every wall showing him
+    const showingHim = i => { const st = wallState[i]; return !!st && (!!st.face || !!(st.then && st.then.face)); };
+    let nextSmallCut = 0;
+    function recut(now, all) {
+      if (all) cutN++; else smallN++;
+      for (let i = all ? 0 : 1; i < WALLS.length; i++) if (showingHim(i)) cut(i, director(i));
+      glass.forEach(gl => gl.setAttribute("fill", ["#b9cbf4", "#ff6a5c", "#ffd36a", "#86f0a8", "#ffffff", "#7fa6ff"][(Math.random() * 6) | 0]));
+      nextSmallCut = now + 2300 + Math.random() * 1200;
+    }
     function wallsApply(spec) {
       const copy = x => (x && typeof x === "object" ? { ...x } : x);   // each wall keeps its own state (e.g. the BELIEVE fade)
       if (spec.all !== undefined) for (let i = 0; i < WALLS.length; i++) wallSet(i, copy(spec.all));
@@ -359,7 +529,12 @@ window.MacPhisto = (() => {
         const pool = SLOGANS.filter(x => !showing.includes(x));
         const r = Math.random();
         if (r < 0.12) { wallSet(i, { static: 1 }); wallNext[i] = now + 500 + Math.random() * 900; continue; }
-        if (r < 0.2) { wallSet(i, null); wallNext[i] = now + 800 + Math.random() * 1800; continue; }
+        if (r < 0.18) { wallSet(i, null); wallNext[i] = now + 800 + Math.random() * 1800; continue; }
+        if (r < 0.23 && !wallState.some(st => st && st.bars)) { wallSet(i, { bars: 1 }); wallNext[i] = now + 1800 + Math.random() * 1500; continue; }
+        if (r < 0.31 && !wallState.some(st => st && st.cutup)) {
+          const words = CUTUPS[(Math.random() * CUTUPS.length) | 0];
+          wallSet(i, { cutup: words }); wallNext[i] = now + words.length * 420 * 2; continue;
+        }
         const pick = pool[(Math.random() * pool.length) | 0];
         wallSet(i, pick === "BELIEVE" ? { believe: 1 } : { text: pick });
         wallNext[i] = now + (pick === "BELIEVE" ? 6500 : 3500 + Math.random() * 5500);
@@ -406,6 +581,7 @@ window.MacPhisto = (() => {
       const line = lines[lineId];
       if (!line) return Promise.reject(new Error("No host line " + lineId));
       resetGags();
+      cutN = 0; smallN = 0; nextSmallCut = performance.now() + 2600;
       for (let i = 0; i < WALLS.length; i++) wallSet(i, { face: 1 });
       const gags = (GAGS[lineId] || []).map(g => ({ ...g, t: (line.phrases[g.p] ? line.phrases[g.p].t : 0) + (g.at || 0) }))
         .sort((a, b) => a.t - b.t);
@@ -415,18 +591,21 @@ window.MacPhisto = (() => {
         const me = cur = { id: lineId, line, gags, next: 0, phrase: -1, resolve, started: false };
         const done = () => { if (cur === me) finish(); };
         audio.onplaying = () => { if (cur === me) me.started = true; };   // subtitles and gags wait for the sound
-        audio.onended = done;
+        audio.onended = () => { if (cur === me) finish(true); };
         audio.onerror = done;
         audio.play().catch(done);
       });
     }
-    function finish() {
+    // ended: he got to the end of the line (not cut short). Now and then the studio asks for applause.
+    function finish(ended = false) {
       if (!cur) return;
       audio.pause();
       const r = cur.resolve, played = cur.started;
       cur = null;
       showSub("");
       resetGags();
+      glass.forEach(gl => gl.setAttribute("fill", "#b9cbf4"));
+      if (ended && Math.random() < 0.3 && !wallState.some(st => st && st.applause)) wallSet(1 + ((Math.random() * 2) | 0), { applause: 1 });
       wallNext.fill(wallState.some(st => st && !st.face) ? performance.now() + 1800 : 0);   // let a last slogan be read
       r(played);   // true if any of it was heard
     }
@@ -451,7 +630,8 @@ window.MacPhisto = (() => {
         const ps = cur.line.phrases;
         let p = -1;
         for (let i = 0; i < ps.length; i++) if (at + 0.05 >= ps[i].t) p = i;
-        if (p !== cur.phrase) { cur.phrase = p; showSub(p >= 0 ? ps[p].text : ""); }
+        if (p !== cur.phrase) { cur.phrase = p; showSub(p >= 0 ? ps[p].text : ""); if (p > 0) recut(now, true); }
+        else if (now > nextSmallCut) recut(now, false);
         while (cur.next < cur.gags.length && at >= cur.gags[cur.next].t) {
           const g = cur.gags[cur.next++];
           if (g.walls) wallsApply(g.walls);
@@ -501,6 +681,16 @@ window.MacPhisto = (() => {
         const g = glass[(Math.random() * glass.length) | 0];
         g.setAttribute("opacity", (0.55 + Math.random() * 0.45).toFixed(2));
       }
+      wallState.forEach((st, i) => { if (st && st.then && now >= st.until) wallSet(i, st.then); });   // a cut's static is over
+      const on = ((now / 500) | 0) % 2 === 0;
+      svg.querySelectorAll(".mp-live-dot").forEach(d => d.setAttribute("opacity", on ? 1 : 0.2));
+      wallState.forEach(st => {
+        if (st && st.applause) walls[wallState.indexOf(st)].querySelector(".mp-blink")?.setAttribute("opacity", REDUCE || ((now - st.at) / 380 | 0) % 2 === 0 ? 1 : 0.3);
+        if (st && st.cutup) {
+          const k = ((now - st.at) / 420 | 0) % st.els.length;
+          if (k !== st.shown) { st.els.forEach((e, j) => e.style.display = j === k ? "" : "none"); st.shown = k; }
+        }
+      });
       const seed = (now / 60) | 0;
       if (seed !== lastSeed && wallState.some(st => st && st.static)) { lastSeed = seed; turb.setAttribute("seed", seed); }
       wallState.forEach(st => {
