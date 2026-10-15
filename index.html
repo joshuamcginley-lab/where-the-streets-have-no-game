@@ -916,49 +916,60 @@
   // Anything he says can be skipped: Enter on the TV, or the VIP's phone.
   // What he can say at each moment. Lines not recorded yet (not in host-lines.js) are simply skipped,
   // so a new take starts playing as soon as its MP3 and README row are added.
+  // Each list is in order of preference: the best line first. MacPhisto plays what this TV has heard
+  // least (over all nights), and among those, usually the first; so a first night hears the best ones.
   const LINES = {
-    welcome: ["welcome-1", "welcome-2"],
-    join: ["join-1", "join-2"],
+    welcome: ["welcome-1", "welcome-2", "welcome-3"],
+    join: ["join-1", "join-4", "join-2", "join-3", "join-5"],
     full: ["lobby-full-1"],
-    round1: ["start-4", "round-start-1", "round-start-4", "round-start-5"],
-    round2: ["next-round-4"],
-    roundN: ["round-start-2", "round-start-3", "next-round-2"],
-    song: ["song-1", "song-3", "song-4"],
-    cover: ["cover-1", "cover-2", "cover-3"],
-    lastq: ["last-question-2", "last-question-3", "last-q-3"],
-    streak: m => [`streak-${m}-1`, "streak-any-1", "streak-any-2"],
-    lead: ["lead-change-1", "lead-change-2", "lead-change-3", "lead-change-4", "lead-change-5"],
-    broken: ["streak-broken-1", "streak-broken-2", "streak-broken-3"],
-    allRight: ["all-right-3", "all-right-4", "all-right-5"],
-    hurry: ["hurry-1"],
-    nobody: ["nobody-right-2", "nobody-right-5", "nobody-right-6"],
-    nobodyGroup: ["nobody-right-1"],   // "Not ONE of you": needs company
-    close: ["close-2"],
-    lastPlace: ["last-place-1", "last-place-2", "last-place-3", "last-place-4", "last-place-5"],
-    phone: ["phone-1"],
-    winner: ["winner-1", "winner-2", "winner-3", "winner-5", "winner-6", "winner-7"],
-    tie: ["close-2", "tie-1"],
-    goodnight: ["goodnight-1", "goodnight-4"],
-    double: ["double-1", "double-2", "double-3"],   // never says "last": mid-tournament it isn't
-    whoSaid: ["who-said-1", "who-said-2"],
-    wager: ["wager-1", "wager-2", "wager-3"],
-    betWon: ["bet-won-1", "bet-won-2"],
-    betLost: ["bet-lost-1", "bet-lost-2"],
+    round1: ["start-4", "round-start-5", "round-start-4", "round-start-6", "round-start-1"],
+    round2: ["next-round-4", "round-two-1"],
+    roundN: ["next-round-5", "next-round-2", "next-round-6", "round-start-3", "round-start-2"],
+    song: ["song-3", "song-6", "song-4", "song-5", "song-1"],
+    cover: ["cover-3", "cover-4", "cover-2", "cover-1", "cover-5"],
+    lastq: ["last-question-3", "last-q-3", "last-question-2"],
+    streak: m => ["streak-any-6", `streak-${m}-2`, "streak-any-1", "streak-any-3", `streak-${m}-1`, "streak-any-4", "streak-any-2", "streak-any-5"],
+    lead: ["lead-change-9", "lead-change-3", "lead-change-2", "lead-change-7", "lead-change-5", "lead-change-4", "lead-change-1", "lead-change-6", "lead-change-8"],
+    broken: ["streak-broken-2", "streak-broken-5", "streak-broken-3", "streak-broken-1", "streak-broken-6", "streak-broken-4"],
+    allRight: ["all-right-4", "all-right-7", "all-right-3", "all-right-5", "all-right-6", "all-right-8"],
+    hurry: ["hurry-3", "hurry-1", "hurry-4", "hurry-5"],
+    nobody: ["nobody-right-5", "nobody-right-2", "nobody-right-8", "nobody-right-6", "nobody-right-7"],
+    nobodyGroup: ["nobody-right-9", "nobody-right-1"],   // "Not ONE of you": needs company
+    sameWrong: ["same-wrong-1", "same-wrong-2"],   // everyone answered, all with the same wrong answer
+    loneRight: ["lone-right-1", "lone-right-3", "lone-right-2"],   // only one player right
+    buzzer: ["buzzer-2", "buzzer-1"],   // right in the last second
+    close: ["close-3", "close-2", "close-4"],
+    lastPlace: ["last-place-2", "last-place-6", "last-place-5", "last-place-1", "last-place-8", "last-place-3", "last-place-4", "last-place-7"],
+    aside: ["aside-1", "aside-2", "phone-1", "aside-5", "aside-6", "aside-3", "aside-4", "aside-7"],   // a quiet reveal
+    winner: ["winner-6", "winner-1", "winner-8", "winner-3", "winner-7", "winner-9", "winner-2", "winner-5"],
+    tie: ["tie-1", "tie-2", "close-2"],
+    goodnight: ["goodnight-4", "goodnight-1", "goodnight-5", "goodnight-6"],
+    double: ["double-3", "double-1", "double-4", "double-2", "double-5"],   // never says "last": mid-tournament it isn't
+    whoSaid: ["who-said-2", "who-said-3", "who-said-1", "who-said-4"],
+    wager: ["wager-2", "wager-1", "wager-3"],
+    betWon: ["bet-won-2", "bet-won-1", "bet-won-3"],
+    betLost: ["bet-lost-1", "bet-lost-3", "bet-lost-2"],
     tourBreak: leg => [`tour-break-${leg}-1`, `tour-break-${leg}-2`],   // after round 1 or 2: what's next
-    tourWinner: ["tour-winner-1", "tour-winner-2"],
+    tourWinner: ["tour-winner-2", "tour-winner-1"],
   };
 
   const Host = (() => {
     const box = document.createElement("div");
     const mp = window.MacPhisto && window.HOST_LINES ? MacPhisto.mount(box) : null;
     const said = new Set();   // lines heard tonight, so he doesn't repeat himself
+    const HEARD = "wtshng-heard";   // how often this TV has played each line, over all nights
+    let heard = {};
+    try { heard = JSON.parse(localStorage.getItem(HEARD)) || {}; } catch {}
     let queued = null, token = 0;
     const has = id => !!(mp && HOST_LINES[id]);
-    // One of ids, preferring lines not heard tonight. fresh: only lines not heard tonight.
+    // One of ids (best first), preferring lines not heard tonight. fresh: only lines not heard tonight.
+    // Of those, the ones this TV has played least; of those, usually the best, sometimes the next best.
     function pick(ids, fresh = false) {
       const ok = ids.filter(has), unheard = ok.filter(id => !said.has(id));
       const pool = unheard.length || fresh ? unheard : ok;
-      return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
+      if (!pool.length) return null;
+      const least = Math.min(...pool.map(id => heard[id] || 0)), top = pool.filter(id => (heard[id] || 0) === least);
+      return top[top.length > 1 && Math.random() < .25 ? 1 : 0];
     }
     // Resolves when he finishes or is cut off. duck: turn the song down under him.
     function say(id, { duck = false } = {}) {
@@ -967,7 +978,11 @@
       const t = ++token;
       if (duck) Player.fade(0, 400);   // nothing under his voice
       const safety = setTimeout(() => t === token && mp.stop(), (HOST_LINES[id].dur + 4) * 1000);
-      return mp.say(id).then(played => { if (!played) said.delete(id); }, () => said.delete(id)).finally(() => {   // a blocked line can be tried again
+      return mp.say(id).then(played => {
+        if (!played) return said.delete(id);   // a blocked line can be tried again
+        heard[id] = (heard[id] || 0) + 1;
+        try { localStorage.setItem(HEARD, JSON.stringify(heard)); } catch {}
+      }, () => said.delete(id)).finally(() => {
         clearTimeout(safety);
         if (t !== token) return;
         const q = queued; queued = null;
@@ -1158,10 +1173,14 @@
     if (ps.some(p => !p.ok && (was.streak.get(p.pid) || 0) >= 3)) return pick(1, LINES.broken);
     if (multi && ps.every(p => p.ok)) return pick(.6, LINES.allRight);
     if (!ps.some(p => p.answer)) return pick(.8, LINES.hurry);
-    if (!ps.some(p => p.ok)) return pick(.6, multi ? [...LINES.nobody, ...LINES.nobodyGroup] : LINES.nobody);
+    const answered = ps.filter(p => p.answer);
+    if (answered.length > 1 && !ps.some(p => p.ok) && answered.every(p => p.answer.k === answered[0].answer.k)) return pick(.8, LINES.sameWrong);
+    if (!ps.some(p => p.ok)) return pick(.6, multi ? [...LINES.nobodyGroup, ...LINES.nobody] : LINES.nobody);
+    if (multi && ps.filter(p => p.ok).length === 1) { const r = pick(ps.length > 2 ? .5 : .25, LINES.loneRight); if (r) return r; }
+    if (ps.some(p => p.ok && S.endsAt - p.answer.at < 1500)) { const r = pick(.6, LINES.buzzer); if (r) return r; }
     if (multi && S.i >= 4 && by[0].score - by[1].score <= 75) return pick(.5, LINES.close);
     if (multi && S.i >= 5 && by[0].score - by[by.length - 1].score >= 450) return pick(.45, LINES.lastPlace);
-    return pick(.15, LINES.phone, true);
+    return pick(.15, LINES.aside, true);
   }
 
   function reveal() {

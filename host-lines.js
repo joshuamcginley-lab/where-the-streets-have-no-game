@@ -531,7 +531,7 @@ window.HOST_LINES = {
   "env": "00004985321000000000000001888bg86ec87545655432100000000000000000000000000030000000000000000000000000000000000000001dr672000158000efbccfeedb1000422000000000"
  },
  "phone-1": {
-  "moment": "Phone gag (a lull)",
+  "moment": "Aside (a quiet reveal)",
   "dur": 8.93,
   "phrases": [
    {
@@ -1777,5 +1777,1265 @@ window.HOST_LINES = {
   ],
   "fps": 25,
   "env": "00000dvztfb54001212131000000000000000002500000148hdgg9c9001chnfcca51024410020036878430000000"
+ },
+ "streak-any-3": {
+  "moment": "Four in a row (anyone)",
+  "dur": 7.97,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Four in a row."
+   },
+   {
+    "t": 1.78,
+    "text": "Careful. That's how it starts."
+   },
+   {
+    "t": 4.48,
+    "text": "First the sunglasses... then the stadiums."
+   }
+  ],
+  "fps": 25,
+  "env": "000000008hiefgfbchebhjknnmdbcdb720000000000000005eolb00034652000000000011000018gdb100000hnpkid9000000000000000000009ced10009g200bghfdb9deb9400078640000000000000217c979666a400008952000000000000000000"
+ },
+ "streak-any-4": {
+  "moment": "Four in a row (anyone)",
+  "dur": 5.88,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Four in a row."
+   },
+   {
+    "t": 2.02,
+    "text": "Someone's been doing their homework."
+   },
+   {
+    "t": 4.22,
+    "text": "Or someone else's."
+   }
+  ],
+  "fps": 25,
+  "env": "00000czztqlid7107jeffe96a9c92200000000000000000000000cqnfga4530067cc4dcffeedbc954ddd6631011000000000000006cghc75320009a88633337ee50002100000000000"
+ },
+ "streak-any-5": {
+  "moment": "Four in a row (anyone)",
+  "dur": 4.91,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Four in a row."
+   },
+   {
+    "t": 1.94,
+    "text": "Achtung, everyone. We have a contender."
+   }
+  ],
+  "fps": 25,
+  "env": "000000000afkmjc57554352249cmnkja100000000000000000epl3300bvtkbffgb3aea7age567a10000000125313a26706e7602fc67788100000000000"
+ },
+ "streak-any-6": {
+  "moment": "Four in a row (anyone)",
+  "dur": 6.84,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Four. In a row."
+   },
+   {
+    "t": 2.4,
+    "text": "Don't let it go to your head."
+   },
+   {
+    "t": 4.38,
+    "text": "It went to mine. It's still there."
+   }
+  ],
+  "fps": 25,
+  "env": "000000hpk5200000000000000000mmnliegjgc87411100000000000000320330bp9216dc39500dfce223764430019a511000000000000000410aklc2049dgfmmle8669a60000000011000006ged76bb98531000000"
+ },
+ "streak-larry-2": {
+  "moment": "Larry on a streak",
+  "dur": 9.8,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Larry. Four in a row."
+   },
+   {
+    "t": 3.04,
+    "text": "Steady as ever."
+   },
+   {
+    "t": 4.48,
+    "text": "He started the band with a note on a school noticeboard, you know. Look what he's done now."
+   }
+  ],
+  "fps": 25,
+  "env": "000005aglg87521002100000000000000000004dkigjgdgifdgijieaaa700000000000000000000069f8bkigd73db93168a500000000000000ch100crnm80l5bua0jhd978d63d88kjijnli029aca000101gkdbccddeb02a4000065320011110248600000000000000bm60004c1cd2002hjeihdcaa86320000000"
+ },
+ "streak-edge-2": {
+  "moment": "The Edge on a streak",
+  "dur": 8.99,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "The Edge. Four in a row."
+   },
+   {
+    "t": 2.96,
+    "text": "Precise, clever... and wearing a hat."
+   },
+   {
+    "t": 6.94,
+    "text": "Some things never change."
+   }
+  ],
+  "fps": 25,
+  "env": "000005cuh526fd84201002231000000000000000005afdfgfbdfaafdc9522210000000000000037100000gqpjfec4000000000000001001cflm0368acd5000000000000465128bcgbb675321025a61000000000000000000aovvl50foommlkd109fcd8873ka081631200000000000000"
+ },
+ "streak-adam-2": {
+  "moment": "Adam on a streak",
+  "dur": 7.63,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Adam. Four in a row."
+   },
+   {
+    "t": 2.66,
+    "text": "The bass player, winning."
+   },
+   {
+    "t": 4.96,
+    "text": "Don't tell the others. They'll want a meeting."
+   }
+  ],
+  "fps": 25,
+  "env": "0001qri5420000000000000000000000bhqojkifigehjlkmjfeff6200000000000002jf500hlqre00001765446bdd000003556dig952138930000000000000gcf400524d926ba99700000000000000000afb19n86474867a32000000000000"
+ },
+ "streak-bono-2": {
+  "moment": "Bono on a streak",
+  "dur": 6.84,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "The singer. Four in a row."
+   },
+   {
+    "t": 2.68,
+    "text": "Try not to make a speech about it."
+   },
+   {
+    "t": 5.02,
+    "text": "He will, of course."
+   }
+  ],
+  "fps": 25,
+  "env": "002eh20009ska70000000000000000000005tohnikjecfegic92100000000000000025a1jis9a87201345530410000004hf60010101223000463000000000000imrf8ikij942200000144000307c50000000000000"
+ },
+ "lead-change-6": {
+  "moment": "Lead change",
+  "dur": 6.77,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A new leader."
+   },
+   {
+    "t": 1.7,
+    "text": "Enjoy the view. Everyone's looking at you now."
+   },
+   {
+    "t": 5.26,
+    "text": "Including me."
+   }
+  ],
+  "fps": 25,
+  "env": "0000rpnnqpsrjef864453032122200000000000000001bhd47eorrn6d9206cehfa51100000000000002d3frcbcf609df02a9b62058cjjfe95112125620000000000005na2b910gjf6cbaa9abba86650000000000"
+ },
+ "lead-change-7": {
+  "moment": "Lead change",
+  "dur": 6.19,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "We have a new leader."
+   },
+   {
+    "t": 2.42,
+    "text": "The old one is taking it very well."
+   },
+   {
+    "t": 5.24,
+    "text": "Outwardly."
+   }
+  ],
+  "fps": 25,
+  "env": "0002fxoa569jhgd420204gggc88fhiidbda7ebb2110000000000000000000003nj7jjgik44334435780000id7028bc5122001ada8755556897610100000000000003zzj2000230000201000000"
+ },
+ "lead-change-8": {
+  "moment": "Lead change",
+  "dur": 5.88,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Change at the top."
+   },
+   {
+    "t": 1.88,
+    "text": "Everything you know is wrong... including the scores."
+   }
+  ],
+  "fps": 25,
+  "env": "0000374zzwujg8da00800100033200000000000000000000ita1bja00abcdehgfeeifd98554107701346aa6521000000000000000008je0500nn9763312000006b9420000000000000"
+ },
+ "lead-change-9": {
+  "moment": "Lead change",
+  "dur": 6.43,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A new leader."
+   },
+   {
+    "t": 1.76,
+    "text": "Every revolution ends with somebody new on the balcony."
+   },
+   {
+    "t": 5.48,
+    "text": "Wave."
+   }
+  ],
+  "fps": 25,
+  "env": "000cpssrovvukd7221110001122000000000000000001tzp516cb95a971998dd3147b86b7db302b2000000aab937135345777764566520787400045635100000000000000adgfd952000000000000000"
+ },
+ "streak-broken-4": {
+  "moment": "Streak broken",
+  "dur": 5.8,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "And the streak is over."
+   },
+   {
+    "t": 2.08,
+    "text": "It was lovely while it lasted."
+   },
+   {
+    "t": 4.48,
+    "text": "Most things are."
+   }
+  ],
+  "fps": 25,
+  "env": "000arqfbba0003703gkmc04kd19c7641043474000000000000000h910394003b8begtt701356446777540247775200038700000000000000bdagkg10005dedc71badca7311000000"
+ },
+ "streak-broken-5": {
+  "moment": "Streak broken",
+  "dur": 6.53,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "There goes the streak."
+   },
+   {
+    "t": 2.32,
+    "text": "Don't worry. Every great run ends with a disappointing album."
+   }
+  ],
+  "fps": 25,
+  "env": "00002048chn2chhe5001600010159a97102022100000000000000000000020eif5002553234300000000000000jyz9bwsb27lul4038lrled63cabb93005157201910450027783034555664067431000000"
+ },
+ "streak-broken-6": {
+  "moment": "Streak broken",
+  "dur": 7.08,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Streak over."
+   },
+   {
+    "t": 1.74,
+    "text": "Even the Edge hits a wrong note. Very occasionally."
+   },
+   {
+    "t": 5.84,
+    "text": "He'll deny it."
+   }
+  ],
+  "fps": 25,
+  "env": "0000000001eqqb26cdc8301234430000000000000000jkh06gnjekd00000fjec96344100a00007788655534643310003000000000000577vztc6443040782000011000300000000000000vzzvg38a4576555444300000000"
+ },
+ "all-right-6": {
+  "moment": "Everyone got it right",
+  "dur": 7.89,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Everyone got it."
+   },
+   {
+    "t": 1.82,
+    "text": "How unusually democratic."
+   },
+   {
+    "t": 4.38,
+    "text": "I much prefer a monarchy. With me in it."
+   }
+  ],
+  "fps": 25,
+  "env": "0000fzzc3896333544107832001100000000000000000000eag0bbmcdcb646dhhc4013549b738if9c40007850000000000000000000007hpottuzzm40660088004a9889feadfeb620010000000000000000000aeic306jjkmlljd411300000000000"
+ },
+ "all-right-7": {
+  "moment": "Everyone got it right",
+  "dur": 8.28,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "All correct."
+   },
+   {
+    "t": 1.7,
+    "text": "Clearly that one was too easy."
+   },
+   {
+    "t": 4.32,
+    "text": "I'll speak to the management. I am the management."
+   }
+  ],
+  "fps": 25,
+  "env": "000009tzrpg1231d8ac40000100100000000000000002336kmjc6145424eea30032124410000521cf9754331001241000000000000000avzw50000yp20553ekhg87320020000000000000000000000006micc0006ollgc94220000078965222000021000000000"
+ },
+ "all-right-8": {
+  "moment": "Everyone got it right",
+  "dur": 6.84,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Every one of you."
+   },
+   {
+    "t": 2.08,
+    "text": "One answer. One love."
+   },
+   {
+    "t": 4.8,
+    "text": "I feel slightly unwell."
+   }
+  ],
+  "fps": 25,
+  "env": "000qzv82105ddcc6334ahja530000000000000000000000000005ewzznh64400000000000000000000000048bihjgc8553100000000000000000000005933335ed8a40000000049800088588675589632220000000"
+ },
+ "nobody-right-7": {
+  "moment": "Nobody got it right",
+  "dur": 5.72,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Nobody."
+   },
+   {
+    "t": 1.66,
+    "text": "Not to worry. Ignorance is very popular this season."
+   }
+  ],
+  "fps": 25,
+  "env": "00000digjfh9312012230000000000000000000000ob5sh100008212332345400000000000003mvb57gkmohb200gld554312sxun8233000e900043541042000088600343000000"
+ },
+ "nobody-right-8": {
+  "moment": "Nobody got it right",
+  "dur": 6.43,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Not one of you."
+   },
+   {
+    "t": 1.96,
+    "text": "I couldn't have planned it better."
+   },
+   {
+    "t": 4.14,
+    "text": "And believe me, I tried."
+   }
+  ],
+  "fps": 25,
+  "env": "00009eksog34003877igc522000211100000000000000000574500e8li0jf4820002adgebb4g92100g86004522000000000000011qzlc5kgfhfhhonf40felled46400000278b50100dehe33000000000"
+ },
+ "nobody-right-9": {
+  "moment": "Nobody got it right",
+  "dur": 4.83,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Nobody got it."
+   },
+   {
+    "t": 1.96,
+    "text": "Somewhere, a trivia book is weeping."
+   }
+  ],
+  "fps": 25,
+  "env": "0008ejlptut53c42530263100000000000000000000000000004prropsqlieec30000000014002211kg1684420363001430000034000000000000000"
+ },
+ "same-wrong-1": {
+  "moment": "Everyone picked the same wrong answer",
+  "dur": 6.27,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "All of you. The same wrong answer."
+   },
+   {
+    "t": 3.4,
+    "text": "That's not a mistake. That's a movement."
+   }
+  ],
+  "fps": 25,
+  "env": "000pzzzob9400332123100000000000000220000006diifa98ab78b875531000000000000000000000000002l930003aab0643400000236460000000000000166008bedcaelk7003100000000007"
+ },
+ "same-wrong-2": {
+  "moment": "Everyone picked the same wrong answer",
+  "dur": 8.83,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Every one of you picked the same answer."
+   },
+   {
+    "t": 3.46,
+    "text": "And every one of you was wrong."
+   },
+   {
+    "t": 6.88,
+    "text": "I do admire the teamwork."
+   }
+  ],
+  "fps": 25,
+  "env": "00000jtj548jljc876akvod9200234794003800000140000009acba56200552000000000000000000000000264676120009hh62000dggcaabengd83003335645530048db2059bced982100000000000000000000000bhgt8101bjegff69ienyynkd195000agfc500023300000000"
+ },
+ "lone-right-1": {
+  "moment": "Only one player right",
+  "dur": 7.24,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Only one of you."
+   },
+   {
+    "t": 1.76,
+    "text": "A lonely genius."
+   },
+   {
+    "t": 3.82,
+    "text": "I was one once. Then I got an audience."
+   }
+  ],
+  "fps": 25,
+  "env": "000crysqpqtd99lpf9510022332100000000000000000dkc5b967cecbb99ae820038644323200000000000000000016oskiiptc01acc7754446ba740000000000000000078vsog468a84547bb2cj90fkfd8a6351000000000000"
+ },
+ "lone-right-2": {
+  "moment": "Only one player right",
+  "dur": 5.25,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "One right answer."
+   },
+   {
+    "t": 2.18,
+    "text": "The rest of you... watched more TV."
+   }
+  ],
+  "fps": 25,
+  "env": "000367izzlcdba8654mhf9400000a530000000000000000000000000135dszg0006g43cffffd987100000000000016b0000005baa90004ab8059a6310000000000"
+ },
+ "lone-right-3": {
+  "moment": "Only one player right",
+  "dur": 4.28,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Just the one."
+   },
+   {
+    "t": 1.9,
+    "text": "Somebody's been reading the sleeve notes."
+   }
+  ],
+  "fps": 25,
+  "env": "0000202ah810005hd5775321001300000000000000000000002jdji9lb377300aca77afhc7d9948000003bdbfa07dcchf000000000"
+ },
+ "buzzer-1": {
+  "moment": "Right in the last second",
+  "dur": 5.49,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Just in time."
+   },
+   {
+    "t": 1.88,
+    "text": "Very rock and roll. Never early for anything."
+   }
+  ],
+  "fps": 25,
+  "env": "0001004cd700008cbd80179bb61010020000000000000000104kcdd7232135860006333238b6210100000000000006foxehvc6evwrgkma0af7004a778500000000000000"
+ },
+ "buzzer-2": {
+  "moment": "Right in the last second",
+  "dur": 7.39,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "At the very last second."
+   },
+   {
+    "t": 2.72,
+    "text": "I do admire a dramatic entrance."
+   },
+   {
+    "t": 5.8,
+    "text": "I made a career of them."
+   }
+  ],
+  "fps": 25,
+  "env": "000b6000a421002gmkihjhgabb9a9a95000000000112000000000000000000000006bbda3001ejjcb51aefjlkmh8645686227ecdcceb7100100587500000000000000000000000001gzp9gcdih6f3127ha8bgfegc852002656200000"
+ },
+ "close-3": {
+  "moment": "Close race",
+  "dur": 6.53,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "It's close."
+   },
+   {
+    "t": 1.78,
+    "text": "Two hearts... beating as one."
+   },
+   {
+    "t": 4.58,
+    "text": "One of them is about to stop."
+   }
+  ],
+  "fps": 25,
+  "env": "0000j10000002000gnjj6100000000000000000000000422lzuja5efd7500000000000000000004aia35iadg800164521010000000000000037bbnryob00989b9b40f36gg700401000003hd83000000000"
+ },
+ "close-4": {
+  "moment": "Close race",
+  "dur": 8.59,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A close race."
+   },
+   {
+    "t": 1.96,
+    "text": "Somebody is about to be very gracious in defeat."
+   },
+   {
+    "t": 5.64,
+    "text": "Everybody says that. Nobody means it."
+   }
+  ],
+  "fps": 25,
+  "env": "00f3009200nnj6100005gf81000000000000000000000000000fzllpiff7678fhf43h3egga00470lvl52114idb9a861038ejhh63410200027a465000089300000000000000000bzp40530043001000433200053410000000000008hmuzrg1343423776aa85000012000000"
+ },
+ "last-place-6": {
+  "moment": "Last place",
+  "dur": 4.83,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Last place."
+   },
+   {
+    "t": 1.68,
+    "text": "Never mind. Every band needs a bass player."
+   }
+  ],
+  "fps": 25,
+  "env": "000002cfhc52000000222221000000000000000000000nlg254310234530000000000000001jw66qq71omlkghgijh32b506igb500003543343000000"
+ },
+ "last-place-7": {
+  "moment": "Last place",
+  "dur": 7.71,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Bottom of the table."
+   },
+   {
+    "t": 2.0,
+    "text": "The first shall be last..."
+   },
+   {
+    "t": 4.54,
+    "text": "and the last, I'm afraid, are still last."
+   }
+  ],
+  "fps": 25,
+  "env": "000004844zzr629ba740014023799258754000000000000000008500000ijgb410000003343bd902877577a8410000000000000000000009301uznoafdealssqia7100005db9aa001cjhgfc92000000000360000006fb9522312000000000000"
+ },
+ "last-place-8": {
+  "moment": "Last place",
+  "dur": 7.24,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Last place."
+   },
+   {
+    "t": 1.76,
+    "text": "I started at the bottom, you know."
+   },
+   {
+    "t": 4.02,
+    "text": "Then I fell further. Much more fun."
+   }
+  ],
+  "fps": 25,
+  "env": "00009hlzzzd5000000233000000000000000000000000de210002dfpi0781k5079200fjf0052122212125850000000000000338wxiffedgc1175ad4001cddc30000fhd600010000000000000089op00303a24100154201300000"
+ },
+ "hurry-3": {
+  "moment": "Time running out",
+  "dur": 6.53,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "No answers at all."
+   },
+   {
+    "t": 2.16,
+    "text": "I'm told silence is golden."
+   },
+   {
+    "t": 4.62,
+    "text": "It isn't. I checked."
+   }
+  ],
+  "fps": 25,
+  "env": "000035bhkpkgfghd6004c41b702ab88620000000000000000000331kl20a0400nnkha400000ahlhc7766002b60007acda71200120000000000001kx5jq9001000000000000003082056195100000000000"
+ },
+ "hurry-4": {
+  "moment": "Time running out",
+  "dur": 5.33,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Time's up. Not a single answer."
+   },
+   {
+    "t": 3.22,
+    "text": "Were you all on the telephone?"
+   }
+  ],
+  "fps": 25,
+  "env": "0000hzzvkk5szzt20023100000000035610410000003876423543003431000000000000000000000003acdcchh85404abacba89dba00000795100000011445100000"
+ },
+ "hurry-5": {
+  "moment": "Time running out",
+  "dur": 3.87,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Nothing?"
+   },
+   {
+    "t": 1.5,
+    "text": "Even a Trabant gets there eventually."
+   }
+  ],
+  "fps": 25,
+  "env": "00004578ed00dlic630000000000000000001098k71ab99064adj60bfswb80102560000889863258b710000011300000"
+ },
+ "aside-1": {
+  "moment": "Aside (a quiet reveal)",
+  "dur": 7.39,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "I once put an album in everyone's library."
+   },
+   {
+    "t": 3.44,
+    "text": "Without asking."
+   },
+   {
+    "t": 4.96,
+    "text": "Some say it was my finest work."
+   }
+  ],
+  "fps": 25,
+  "env": "0027gc1002ig7000109dddeb002hoc9a0352243300001dg0012502641000027ea7000000000000000000001dqoefjffa19fgg90000122111000000000000000glcad000ec9569cb105d600iefe00001oqihie90007ebb82000000000"
+ },
+ "aside-2": {
+  "moment": "Aside (a quiet reveal)",
+  "dur": 8.28,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "They always said I'd end up playing Las Vegas."
+   },
+   {
+    "t": 3.42,
+    "text": "I did. The band came too."
+   },
+   {
+    "t": 6.0,
+    "text": "They brought a very large ball."
+   }
+  ],
+  "fps": 25,
+  "env": "00001agheabb6cce200003dbb7gd87269bccg500325aced46aa9400008aa61885000000000000000000004ijb2hptoo73410000000000004c2gqpooe82007a8950008bc962000000000000000879309deiebb6433314ihjfba988abdaa610000bb964000000000"
+ },
+ "aside-3": {
+  "moment": "Aside (a quiet reveal)",
+  "dur": 9.56,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "I was once trapped inside a giant lemon."
+   },
+   {
+    "t": 3.32,
+    "text": "In front of a whole stadium."
+   },
+   {
+    "t": 5.76,
+    "text": "You learn who your friends are. None of them, as it happens."
+   }
+  ],
+  "fps": 25,
+  "env": "0000gfd8c70118hd500000228jc00024850017771850000127456652000254566210000000000000000005g600003bd917046321004bca972000000055ad8152000010000000000006abcdadedizntpioljc0005lifhfh32964320100000000000000hrzznk4003000000001300001140049a700000000"
+ },
+ "aside-4": {
+  "moment": "Aside (a quiet reveal)",
+  "dur": 7.47,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "People ask if I miss the nineties."
+   },
+   {
+    "t": 2.92,
+    "text": "I don't. I'm still in them."
+   },
+   {
+    "t": 5.3,
+    "text": "Nobody has told me otherwise."
+   }
+  ],
+  "fps": 25,
+  "env": "00005he0clfhjnmf1006i03lmngilpm100009eggieegb3000000000000000000000000001fb42042223850000000000004c600003okecebe9a51222000000000000188bbee90c2cffda700040aejf50feeede80c303302000000000000"
+ },
+ "aside-5": {
+  "moment": "Aside (a quiet reveal)",
+  "dur": 7.71,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "I used to ring the White House every night."
+   },
+   {
+    "t": 2.92,
+    "text": "Nobody ever picked up."
+   },
+   {
+    "t": 4.96,
+    "text": "Now I ring my agent. Same result."
+   }
+  ],
+  "fps": 25,
+  "env": "0003ckpzya002ehcgmhhdc965fjha20112430000025000334332100000000000000000000006nc93561420000d900100001000002220000000000000000009bejjknumhnrklnlih44eef90000000000000000000002779aa9258875000000000"
+ },
+ "aside-6": {
+  "moment": "Aside (a quiet reveal)",
+  "dur": 6.43,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Between you and me..."
+   },
+   {
+    "t": 1.92,
+    "text": "the devil doesn't have the best tunes."
+   },
+   {
+    "t": 4.48,
+    "text": "He has the best publicist."
+   }
+  ],
+  "fps": 25,
+  "env": "000510832ilideccejjlkbccafokb3001320000000000000038b52dlsg7hml94fmk0di99afd007800e930000051100000000000000000000000dh70idq7318d408nf70000006lj345100002200000000"
+ },
+ "aside-7": {
+  "moment": "Aside (a quiet reveal)",
+  "dur": 7.39,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "I've been on television since 1992."
+   },
+   {
+    "t": 3.58,
+    "text": "I've never once watched it."
+   },
+   {
+    "t": 5.7,
+    "text": "That's the secret, you know."
+   }
+  ],
+  "fps": 25,
+  "env": "0006jl500kvllqng6103hupob3941248cb4008a5000adcff611baa887620230000039210000000000000001232he300079cdb08786439a7210000063300000011000000000000052agg20000b2000mzf010e80010537532226700000"
+ },
+ "round-start-6": {
+  "moment": "Round start (first round)",
+  "dur": 8.67,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Good evening."
+   },
+   {
+    "t": 1.44,
+    "text": "Tonight's questions are about a little band from Dublin."
+   },
+   {
+    "t": 5.3,
+    "text": "You may have heard of them. They made sure of it."
+   }
+  ],
+  "fps": 25,
+  "env": "000051gqefilr40321000000000000000000000gftqe7001033esa101023234562abehh3enlf18bd7c90be6008klc989a410046530006ba10010000000000000000004bbbdbbaadhqj400dniga36000000000000000000000119dmba421001423232bcb72000000000000000"
+ },
+ "round-two-1": {
+  "moment": "Round 2 start (before the count-in)",
+  "dur": 7.31,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Round two."
+   },
+   {
+    "t": 1.86,
+    "text": "The second album is always the hardest."
+   },
+   {
+    "t": 5.24,
+    "text": "Ask anyone who made October."
+   }
+  ],
+  "fps": 25,
+  "env": "0001aoyzxoccb300210bc410000000000000000000000000480005mk26hf8969b4199873240000004c95201100000455312320000000000000000000000000000004bba3008jrotl97aaa91b7ad9a785000204adb2111100000000"
+ },
+ "next-round-5": {
+  "moment": "Round start (later rounds)",
+  "dur": 5.8,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Back again."
+   },
+   {
+    "t": 1.56,
+    "text": "Like a farewell tour. You never quite believe the last one."
+   }
+  ],
+  "fps": 25,
+  "env": "000742nykd0063048676654400000000000000000hvkf34d4000003psnomeegilke100054565510000000000000058a9b2d9001000lzk5000a95566100887acc7100004587520000"
+ },
+ "next-round-6": {
+  "moment": "Round start (later rounds)",
+  "dur": 7.31,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Another round."
+   },
+   {
+    "t": 1.78,
+    "text": "Some of you are improving."
+   },
+   {
+    "t": 4.1,
+    "text": "I won't say who. It would only encourage you."
+   }
+  ],
+  "fps": 25,
+  "env": "000hlkmwt3fje9cc74000000000000000000000000000008fab7b404572456489ba8971000bgfh903010000000000000000020cqb10bjbg810009b86633de84036100000000000002e59k8vwtkmnkcda0603ea7330000000000000"
+ },
+ "song-5": {
+  "moment": "Song clip question",
+  "dur": 4.91,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Listen."
+   },
+   {
+    "t": 1.22,
+    "text": "Name it before the chorus."
+   },
+   {
+    "t": 3.12,
+    "text": "Anyone can do it after."
+   }
+  ],
+  "fps": 25,
+  "env": "0000056100130000000000000000008ebjoog9i5009a0007a990901a03521000000000000000002jzqzs94557443e81b9641559b700000114200000000"
+ },
+ "song-6": {
+  "moment": "Song clip question",
+  "dur": 6.43,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A little music."
+   },
+   {
+    "t": 1.82,
+    "text": "The guitarist is the one in the hat."
+   },
+   {
+    "t": 4.22,
+    "text": "That narrows it down to nothing."
+   }
+  ],
+  "fps": 25,
+  "env": "000008013323000000010100000001000000000000000002h0g90bfmfjhb42100004600be47cdb956785556a0000000000000000006ciga08befbecac8079220fgiljmf0dqonkmkg0002320320000000"
+ },
+ "cover-4": {
+  "moment": "Album cover question",
+  "dur": 7.81,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "An album cover."
+   },
+   {
+    "t": 1.82,
+    "text": "Faces, deserts, a small boy."
+   },
+   {
+    "t": 5.12,
+    "text": "They did tend to repeat themselves."
+   }
+  ],
+  "fps": 25,
+  "env": "000npm60brrnj40433415033001112000000000000000000cpzr7006ed83100000000000bfeb0bc5000000000000000210001888883046421000000000000000009ehk9200hmkd0000200ikrqnbb0ijne0031ejb00255200023300100000000000"
+ },
+ "cover-5": {
+  "moment": "Album cover question",
+  "dur": 4.91,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A picture."
+   },
+   {
+    "t": 1.36,
+    "text": "Worth a thousand words. Most of them were mine."
+   }
+  ],
+  "fps": 25,
+  "env": "001g20021j60003100011000000000000003benhb019000000eklole16kmhcbb9554520000000000000000008lzz8004610668aa9bdd9b974445100000"
+ },
+ "who-said-3": {
+  "moment": "Who said it?",
+  "dur": 9.64,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "One of us said this."
+   },
+   {
+    "t": 2.0,
+    "text": "The Fly, the mirror man, the singer... or me."
+   },
+   {
+    "t": 6.56,
+    "text": "We shared a dressing room. It was awful."
+   }
+  ],
+  "fps": 25,
+  "env": "000016agnxoh80530000017200012310000000000000000000013000004bjpwphfc86554410000012567blilhhkedcc994532100000000000006hfb88875410000000000005bgfaa9612364000000000000007fk99bafnmj6fb237oth0007862221000000000000004930140000001a75300000000000000"
+ },
+ "who-said-4": {
+  "moment": "Who said it?",
+  "dur": 7.16,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A quotation."
+   },
+   {
+    "t": 1.62,
+    "text": "Choose carefully. Some of us were in character."
+   },
+   {
+    "t": 5.56,
+    "text": "Some of us never left."
+   }
+  ],
+  "fps": 25,
+  "env": "001r0121rq806aqjb4771120000000000000000000142kmmg4000100ecfb00032321000000000000000000dtknun2664100006dc7547602009b7430001200000000000000000013xhnn903530008c992777769630000000000"
+ },
+ "double-4": {
+  "moment": "Double points",
+  "dur": 5.15,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Double points."
+   },
+   {
+    "t": 1.68,
+    "text": "The comeback starts here."
+   },
+   {
+    "t": 3.84,
+    "text": "Or it doesn't."
+   }
+  ],
+  "fps": 25,
+  "env": "0002430mzu81830000321000000000000000000000004500a53qnlocfce90000006giif60000dfeeb8985000000000000ig9764240000189c205410000000000"
+ },
+ "double-5": {
+  "moment": "Double points",
+  "dur": 7.24,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "This one counts twice."
+   },
+   {
+    "t": 2.54,
+    "text": "Like a live album."
+   },
+   {
+    "t": 4.34,
+    "text": "Same songs... twice the applause."
+   }
+  ],
+  "fps": 25,
+  "env": "0000a99yj0010djiehed1301cdb60000001100386300000000000000000000008a9560687766699aca40431100000000000000000000000alspfe900evzusoffdc6000000000000010039ec70000ede3009ec774220000000000"
+ },
+ "winner-8": {
+  "moment": "Final winner",
+  "dur": 5.25,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "And our winner."
+   },
+   {
+    "t": 1.96,
+    "text": "Remember this moment."
+   },
+   {
+    "t": 3.84,
+    "text": "Nobody else will."
+   }
+  ],
+  "fps": 25,
+  "env": "000fionhebd308hgfdcb95218e9100000000000000000000009pmrpovpkk9a920710007653332200010000000000000059469li3ai5dbc9gda0000033325200000"
+ },
+ "winner-9": {
+  "moment": "Final winner",
+  "dur": 5.96,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A winner!"
+   },
+   {
+    "t": 1.72,
+    "text": "Now comes the hard part."
+   },
+   {
+    "t": 3.86,
+    "text": "Pretending to be humble."
+   }
+  ],
+  "fps": 25,
+  "env": "006uvzle7887dwzo4krg7200000000000000000000016beikf8400024520025200055630000000000000000000000000000001000003bcb6120001200100652000058832000000000000"
+ },
+ "tie-2": {
+  "moment": "Final: a tie",
+  "dur": 7.71,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A tie."
+   },
+   {
+    "t": 1.5,
+    "text": "Two winners... or two people who didn't quite win."
+   },
+   {
+    "t": 6.2,
+    "text": "I prefer the second."
+   }
+  ],
+  "fps": 25,
+  "env": "000h1010038hec620000000000000000000000041gsnzlcaa8569ceb40000000000000000039fhheecb8000000020kn40bto04kjd7ae4009e07a30000000bd400010000000000000000000000009hhc01ka008kkd1650008b600100000000000"
+ },
+ "bet-won-3": {
+  "moment": "Bet everything and won",
+  "dur": 6.92,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Everything on the line... and it paid."
+   },
+   {
+    "t": 3.92,
+    "text": "Don't do that again. You'll give me hope."
+   }
+  ],
+  "fps": 25,
+  "env": "000lzn4gwl00djbdhhccdfddd5541010000100000000000000000000226bcc30031egge71100000000000000000000000001600rt45003ab62a8344204aba6a84000000000000003agb2eg4aillb24jlgi7000000000"
+ },
+ "bet-lost-3": {
+  "moment": "Bet everything and lost",
+  "dur": 6.11,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "All of it. Gone."
+   },
+   {
+    "t": 2.34,
+    "text": "Easy come..."
+   },
+   {
+    "t": 3.68,
+    "text": "easy go. Mostly to me."
+   }
+  ],
+  "fps": 25,
+  "env": "004zzwngc201100000000000000000004d431000000000000000000000006bgka29ne020loopkdd9acf80000000002243104cf83khjdeb6777300000000002hosk0003640009789400000000"
+ },
+ "goodnight-5": {
+  "moment": "Goodnight",
+  "dur": 6.53,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Goodnight, then."
+   },
+   {
+    "t": 1.54,
+    "text": "Same time next year? I'll still be here."
+   },
+   {
+    "t": 4.66,
+    "text": "I'm always still here."
+   }
+  ],
+  "fps": 25,
+  "env": "0000dxegnyl8200159c97610000000000000000006ikff0gunccgi900006njga86000000000016b9900009eeb2eikfefabb976100000000000002nd6a500058da864000100000054121002210000000000"
+ },
+ "goodnight-6": {
+  "moment": "Goodnight",
+  "dur": 5.49,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "That's the show."
+   },
+   {
+    "t": 1.74,
+    "text": "I'll leave the televisions on."
+   },
+   {
+    "t": 3.84,
+    "text": "Somebody should watch them."
+   }
+  ],
+  "fps": 25,
+  "env": "00036ore0000ak788botvrmge93100000000000000032jkblga5cd600350100hdb5042002550233425600000000000000006gkiicb043221016113359202300300000000"
+ },
+ "welcome-3": {
+  "moment": "New game",
+  "dur": 8.44,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Ah. The first to arrive."
+   },
+   {
+    "t": 3.3,
+    "text": "Very keen."
+   },
+   {
+    "t": 4.86,
+    "text": "I like keen. Keen is easy to tempt."
+   }
+  ],
+  "fps": 25,
+  "env": "000bfgeja310000000000000009f10000vxqk800000300307mnpnhjjgc742000000000000000000044644jomka453004109heb640300000000000000005cbcfdfjhga0200021075221000000000000000000010kigeab8b800008qwm309600300103b8600000000000"
+ },
+ "join-3": {
+  "moment": "A player joins",
+  "dur": 7.89,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Ah. Another player."
+   },
+   {
+    "t": 2.5,
+    "text": "Do come in. Wipe your feet."
+   },
+   {
+    "t": 4.98,
+    "text": "I've just had the floor done. In gold."
+   }
+  ],
+  "fps": 25,
+  "env": "00002elf8533000000000000005bffdjk73950001322111210000000000000007srj25zmvwlfgb7421000000000000ezt702i9000820000000000000000021ge2107lg0003kc30720004cghhf1321113000000000000bmnf20bienf9610000000000"
+ },
+ "join-4": {
+  "moment": "A player joins",
+  "dur": 7.31,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Welcome."
+   },
+   {
+    "t": 1.22,
+    "text": "Sign here... and here... and here."
+   },
+   {
+    "t": 4.64,
+    "text": "Don't read it. Nobody reads it."
+   }
+  ],
+  "fps": 25,
+  "env": "0006kzzt7023310000000000000000000lzzolld7ijb62000000000000000005jlfc108dfc97643000000000000385510002200000000000000000e9cg500012423010000000000000003a67ckmc0dd26230222000000000000000"
+ },
+ "join-5": {
+  "moment": "A player joins",
+  "dur": 6.61,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Ah... you made it."
+   },
+   {
+    "t": 2.5,
+    "text": "Find a seat. Not that one."
+   },
+   {
+    "t": 5.12,
+    "text": "That one's mine."
+   }
+  ],
+  "fps": 25,
+  "env": "0000afkd74320000000000048bdde9hbf11000000000000000000000000000000cpjoa68700002863000000000000000000avzz60jth5001100000000000000000dkd4068633300068779a73100000000000"
  }
 };

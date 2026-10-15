@@ -8,13 +8,17 @@ audio/host/_raw/<name>.mp3 (re-time it, then copy it into audio/host/).
 Names given on the command line limit it to those lines; existing raw takes are skipped
 unless --again is given. The API key comes from ELEVENLABS_API_KEY (or a proxy that adds it).
 
+    python3 tools/eleven.py --level audio/host/script-batch-7.md [name ...]
+
+copies the raw takes into audio/host/ as mono 192k MP3s, at the same loudness as the rest.
+
     python3 tools/eleven.py --align audio/host/script-batch-7.md [name ...]
 
 transcribes the finished takes in audio/host/ and saves when each word starts in
 audio/host/align/<name>.json, which tools/host-lines.py uses to time the subtitles
 (v4 takes pause too briefly between phrases for the silences to show where they fall).
 """
-import json, os, re, sys, urllib.request, uuid
+import json, os, re, subprocess, sys, urllib.request, uuid
 
 VOICE = "y0SYydk17lMbUIUvSf3N"  # AK - British Posh Well-Spoken Old Man
 MODEL = "eleven_v4"
@@ -40,6 +44,18 @@ def align(name):
     json.dump(words, open(f"audio/host/align/{name}.json", "w"))
     print(f"{name}: {' '.join(w for w, _ in words)}")
 
+def level(name):
+    src, out = f"audio/host/_raw/{name}.mp3", f"audio/host/{name}.mp3"
+    log = subprocess.run(["ffmpeg", "-nostats", "-i", src, "-af", "ebur128", "-f", "null", "-"], capture_output=True, text=True).stderr
+    lufs = float(re.findall(r"I:\s+(-?[\d.]+) LUFS", log)[-1])
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", src, "-af", f"volume={-27.2 - lufs:.1f}dB",
+                    "-ar", "44100", "-ac", "1", "-b:a", "192k", out], check=True)
+    print(f"{name}: {lufs} LUFS, {-27.2 - lufs:+.1f} dB")
+
+if "--level" in sys.argv:
+    for name, _ in lines:
+        if not only or name in only: level(name)
+    sys.exit()
 if "--align" in sys.argv:
     for name, _ in lines:
         if not only or name in only: align(name)

@@ -4,7 +4,7 @@ Voice lines for the planned MacPhisto host. Not wired into the game yet; preview
 
 After adding a take here and a row to the table below, run `python3 tools/host-lines.py` to rebuild `host-lines.js` (the subtitle timings and the loudness his lips follow).
 
-- Voice: ElevenLabs library voice "AK - British Posh Well-Spoken Old Man" on Eleven v4. Batches 1–6 were generated on the website; batch 7 on came through the API on a paid plan: `python3 tools/eleven.py audio/host/script-batch-7.md` makes raw takes in `_raw/` (level them to about −27.5 LUFS, mono 192k, into this folder), then `python3 tools/eleven.py --align audio/host/script-batch-7.md` saves word timings in `align/`, which time the subtitles. No cloning; Bono/U2/MacPhisto are never named in prompts.
+- Voice: ElevenLabs library voice "AK - British Posh Well-Spoken Old Man" on Eleven v4. Batches 1–6 were generated on the website; batch 7 on came through the API on a paid plan: `python3 tools/eleven.py audio/host/script-batch-7.md` makes raw takes in `_raw/`, `--level` copies them here at the same loudness as the rest, then `python3 tools/eleven.py --align audio/host/script-batch-7.md` saves word timings in `align/`, which time the subtitles. No cloning; Bono/U2/MacPhisto are never named in prompts.
 - Treatment: each take is cut at its natural pauses and re-spaced to MacPhisto's measured timing
   (about 0.9 s between phrases, 1.2 s after a big line, 2–4 s where a crowd would react). No EQ or echo.
 
@@ -32,7 +32,7 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | winner-2.mp3 | Final winner | We have a WINNER! / Oh... I'm so proud. / Of course... I let you win. |
 | winner-3.mp3 | Final winner | Bravo! / You're nearly as rich and famous as me now. / Nearly. |
 | next-round-2.mp3 | Between rounds | Another round... / Just one more. / That's what they all say. |
-| phone-1.mp3 | Phone gag (a lull) | Round about now... I usually make a telephone call. / Shall I? / ...Engaged. |
+| phone-1.mp3 | Aside (a quiet reveal) | Round about now... I usually make a telephone call. / Shall I? / ...Engaged. |
 | goodnight-1.mp3 | Goodnight | Well... that's the show. / You've been wonderful. / Now... where's my taxi? |
 | join-1.mp3 | A player joins | Ah... a new friend! / When you're famous... people want your NUMBER. / Here's mine. / Six... six... six. / Call anytime. I'm always up. |
 | lobby-full-1.mp3 | All four characters taken | Oh... the whole band is here! / Reggie the Dog... / the cat that got the CREAM... / the handsome one... / and the singer. What a silly mug. |
@@ -88,3 +88,69 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | who-said-1.mp3 | Who said it? | Now... who said it? / The Fly, the singer, or me. / We're very hard to tell apart. Especially for us. |
 | who-said-2.mp3 | Who said it? | A quotation. Who said it? / Careful... one of us lies for a living. / Possibly all of us. |
 | all-right-5.mp3 | Everyone got it right | All of you. / Mysterious ways, I suppose. |
+| streak-any-3.mp3 | Four in a row (anyone) | Four in a row. / Careful. That's how it starts. / First the sunglasses... then the stadiums. |
+| streak-any-4.mp3 | Four in a row (anyone) | Four in a row. / Someone's been doing their homework. / Or someone else's. |
+| streak-any-5.mp3 | Four in a row (anyone) | Four in a row. / Achtung, everyone. We have a contender. |
+| streak-any-6.mp3 | Four in a row (anyone) | Four. In a row. / Don't let it go to your head. / It went to mine. It's still there. |
+| streak-larry-2.mp3 | Larry on a streak | Larry. Four in a row. / Steady as ever. / He started the band with a note on a school noticeboard, you know. Look what he's done now. |
+| streak-edge-2.mp3 | The Edge on a streak | The Edge. Four in a row. / Precise, clever... and wearing a hat. / Some things never change. |
+| streak-adam-2.mp3 | Adam on a streak | Adam. Four in a row. / The bass player, winning. / Don't tell the others. They'll want a meeting. |
+| streak-bono-2.mp3 | Bono on a streak | The singer. Four in a row. / Try not to make a speech about it. / He will, of course. |
+| lead-change-6.mp3 | Lead change | A new leader. / Enjoy the view. Everyone's looking at you now. / Including me. |
+| lead-change-7.mp3 | Lead change | We have a new leader. / The old one is taking it very well. / Outwardly. |
+| lead-change-8.mp3 | Lead change | Change at the top. / Everything you know is wrong... including the scores. |
+| lead-change-9.mp3 | Lead change | A new leader. / Every revolution ends with somebody new on the balcony. / Wave. |
+| streak-broken-4.mp3 | Streak broken | And the streak is over. / It was lovely while it lasted. / Most things are. |
+| streak-broken-5.mp3 | Streak broken | There goes the streak. / Don't worry. Every great run ends with a disappointing album. |
+| streak-broken-6.mp3 | Streak broken | Streak over. / Even the Edge hits a wrong note. Very occasionally. / He'll deny it. |
+| all-right-6.mp3 | Everyone got it right | Everyone got it. / How unusually democratic. / I much prefer a monarchy. With me in it. |
+| all-right-7.mp3 | Everyone got it right | All correct. / Clearly that one was too easy. / I'll speak to the management. I am the management. |
+| all-right-8.mp3 | Everyone got it right | Every one of you. / One answer. One love. / I feel slightly unwell. |
+| nobody-right-7.mp3 | Nobody got it right | Nobody. / Not to worry. Ignorance is very popular this season. |
+| nobody-right-8.mp3 | Nobody got it right | Not one of you. / I couldn't have planned it better. / And believe me, I tried. |
+| nobody-right-9.mp3 | Nobody got it right | Nobody got it. / Somewhere, a trivia book is weeping. |
+| same-wrong-1.mp3 | Everyone picked the same wrong answer | All of you. The same wrong answer. / That's not a mistake. That's a movement. |
+| same-wrong-2.mp3 | Everyone picked the same wrong answer | Every one of you picked the same answer. / And every one of you was wrong. / I do admire the teamwork. |
+| lone-right-1.mp3 | Only one player right | Only one of you. / A lonely genius. / I was one once. Then I got an audience. |
+| lone-right-2.mp3 | Only one player right | One right answer. / The rest of you... watched more TV. |
+| lone-right-3.mp3 | Only one player right | Just the one. / Somebody's been reading the sleeve notes. |
+| buzzer-1.mp3 | Right in the last second | Just in time. / Very rock and roll. Never early for anything. |
+| buzzer-2.mp3 | Right in the last second | At the very last second. / I do admire a dramatic entrance. / I made a career of them. |
+| close-3.mp3 | Close race | It's close. / Two hearts... beating as one. / One of them is about to stop. |
+| close-4.mp3 | Close race | A close race. / Somebody is about to be very gracious in defeat. / Everybody says that. Nobody means it. |
+| last-place-6.mp3 | Last place | Last place. / Never mind. Every band needs a bass player. |
+| last-place-7.mp3 | Last place | Bottom of the table. / The first shall be last... / and the last, I'm afraid, are still last. |
+| last-place-8.mp3 | Last place | Last place. / I started at the bottom, you know. / Then I fell further. Much more fun. |
+| hurry-3.mp3 | Time running out | No answers at all. / I'm told silence is golden. / It isn't. I checked. |
+| hurry-4.mp3 | Time running out | Time's up. Not a single answer. / Were you all on the telephone? |
+| hurry-5.mp3 | Time running out | Nothing? / Even a Trabant gets there eventually. |
+| aside-1.mp3 | Aside (a quiet reveal) | I once put an album in everyone's library. / Without asking. / Some say it was my finest work. |
+| aside-2.mp3 | Aside (a quiet reveal) | They always said I'd end up playing Las Vegas. / I did. The band came too. / They brought a very large ball. |
+| aside-3.mp3 | Aside (a quiet reveal) | I was once trapped inside a giant lemon. / In front of a whole stadium. / You learn who your friends are. None of them, as it happens. |
+| aside-4.mp3 | Aside (a quiet reveal) | People ask if I miss the nineties. / I don't. I'm still in them. / Nobody has told me otherwise. |
+| aside-5.mp3 | Aside (a quiet reveal) | I used to ring the White House every night. / Nobody ever picked up. / Now I ring my agent. Same result. |
+| aside-6.mp3 | Aside (a quiet reveal) | Between you and me... / the devil doesn't have the best tunes. / He has the best publicist. |
+| aside-7.mp3 | Aside (a quiet reveal) | I've been on television since 1992. / I've never once watched it. / That's the secret, you know. |
+| round-start-6.mp3 | Round start (first round) | Good evening. / Tonight's questions are about a little band from Dublin. / You may have heard of them. They made sure of it. |
+| round-two-1.mp3 | Round 2 start (before the count-in) | Round two. / The second album is always the hardest. / Ask anyone who made October. |
+| next-round-5.mp3 | Round start (later rounds) | Back again. / Like a farewell tour. You never quite believe the last one. |
+| next-round-6.mp3 | Round start (later rounds) | Another round. / Some of you are improving. / I won't say who. It would only encourage you. |
+| song-5.mp3 | Song clip question | Listen. / Name it before the chorus. / Anyone can do it after. |
+| song-6.mp3 | Song clip question | A little music. / The guitarist is the one in the hat. / That narrows it down to nothing. |
+| cover-4.mp3 | Album cover question | An album cover. / Faces, deserts, a small boy. / They did tend to repeat themselves. |
+| cover-5.mp3 | Album cover question | A picture. / Worth a thousand words. Most of them were mine. |
+| who-said-3.mp3 | Who said it? | One of us said this. / The Fly, the mirror man, the singer... or me. / We shared a dressing room. It was awful. |
+| who-said-4.mp3 | Who said it? | A quotation. / Choose carefully. Some of us were in character. / Some of us never left. |
+| double-4.mp3 | Double points | Double points. / The comeback starts here. / Or it doesn't. |
+| double-5.mp3 | Double points | This one counts twice. / Like a live album. / Same songs... twice the applause. |
+| winner-8.mp3 | Final winner | And our winner. / Remember this moment. / Nobody else will. |
+| winner-9.mp3 | Final winner | A winner! / Now comes the hard part. / Pretending to be humble. |
+| tie-2.mp3 | Final: a tie | A tie. / Two winners... or two people who didn't quite win. / I prefer the second. |
+| bet-won-3.mp3 | Bet everything and won | Everything on the line... and it paid. / Don't do that again. You'll give me hope. |
+| bet-lost-3.mp3 | Bet everything and lost | All of it. Gone. / Easy come... / easy go. Mostly to me. |
+| goodnight-5.mp3 | Goodnight | Goodnight, then. / Same time next year? I'll still be here. / I'm always still here. |
+| goodnight-6.mp3 | Goodnight | That's the show. / I'll leave the televisions on. / Somebody should watch them. |
+| welcome-3.mp3 | New game | Ah. The first to arrive. / Very keen. / I like keen. Keen is easy to tempt. |
+| join-3.mp3 | A player joins | Ah. Another player. / Do come in. Wipe your feet. / I've just had the floor done. In gold. |
+| join-4.mp3 | A player joins | Welcome. / Sign here... and here... and here. / Don't read it. Nobody reads it. |
+| join-5.mp3 | A player joins | Ah... you made it. / Find a seat. Not that one. / That one's mine. |
