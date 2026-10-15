@@ -196,6 +196,37 @@ window.MacPhisto = (() => {
     "order-2": [{ p: 0, walls: T("ORDER") }, { p: 1, walls: FACE }, { p: 2, walls: { all: { static: 1 } } }],
     "order-3": [{ p: 0, walls: T("OLDEST FIRST") }, { p: 1, walls: FACE }],
   };
+  Object.assign(MORE, {   // batch 10
+    "aside-8": [{ p: 0, walls: T("10,000 PIZZAS") }, { p: 1, walls: FACE }],
+    "aside-11": [{ p: 2, walls: SHOT("eyes", "red") }],
+    "aside-12": [{ p: 0, walls: T("GOLD") }, { p: 1, walls: FACE }],
+    "aside-14": [{ p: 0, walls: T("SPHERE") }, { p: 1, walls: FACE }],
+    "streak-any-11": [{ p: 0, walls: T("4 IN A ROW") }, { p: 1, walls: T("ELEVATION") }],
+    "lead-change-12": [{ p: 1, walls: T("EVEN BETTER THAN THE REAL THING") }, { p: 2, walls: FACE }],
+    "lead-change-14": [{ p: 1, walls: T("MUTINY") }, { p: 2, walls: FACE }],
+    "streak-broken-7": [{ p: 0, walls: { all: { static: 1 } } }, { p: 1, walls: FACE }, { p: 2, walls: T("LEMON") }],
+    "streak-broken-10": [{ p: 1, walls: FACE }, { p: 2, walls: { all: { avatar: "edge" } } }],
+    "all-right-9": [{ p: 1, walls: T("FULL HOUSE") }, { p: 2, walls: FACE }],
+    "nobody-right-3": [{ p: 1, walls: { all: { static: 1 } } }, { p: 2, walls: FACE }],
+    "nobody-right-11": [{ p: 0, walls: T("0") }, { p: 1, walls: FACE }],
+    "same-wrong-4": [{ p: 1, walls: T("WRONG") }, { p: 2, walls: FACE }],
+    "close-6": [{ p: 1, walls: T("TRABANT") }, { p: 2, walls: FACE }],
+    "double-8": [{ p: 0, walls: T("DOUBLE OR NOTHING") }, { p: 1, walls: FACE }],
+    "winner-16": [{ p: 0, walls: T("VICTORY") }, { p: 1, walls: FACE }, { p: 2, walls: T("15:00") }],
+    "round-start-8": [{ p: 0, walls: T("ZOO TV") }, { p: 1, walls: FACE }],
+    "goodnight-3": [{ p: 2, walls: SHOT("eyes", "blue") }],
+    "join-6": [{ p: 1, walls: T("SIGN HERE") }],
+    "order-6": [{ p: 0, walls: { all: { cutup: ["1980", "1991", "2000", "2023"] } } }, { p: 1, walls: FACE }],
+    "song-7": [{ p: 0, walls: { all: { eq: 1 } } }],
+    "song-10": [{ p: 0, walls: { all: { eq: 1 } } }],
+    "cover-7": [{ p: 1, walls: { all: { bars: 1 } } }, { p: 2, walls: FACE }],
+    "who-said-7": [{ p: 1, walls: { 0: { text: "THE SUIT" }, 1: { text: "THE SHADES" }, 2: { text: "THE SINGER" } } }, { p: 2, walls: FACE }],
+    "tie-3": [{ p: 0, walls: T("A TIE") }, { p: 1, walls: FACE }],
+    "bet-lost-4": [{ p: 1, walls: { all: { static: 1 } } }, { p: 2, walls: FACE }],
+    "bet-won-5": [{ p: 0, walls: T("2X") }, { p: 1, walls: FACE }],
+    "wager-4": [{ p: 0, walls: T("PLACE YOUR BETS") }, { p: 1, walls: FACE }],
+    "tour-winner-3": [{ p: 0, walls: T("CHAMPION") }, { p: 1, walls: FACE }],
+  });
   for (const k in MORE) GAGS[k] = [...(GAGS[k] || []), ...MORE[k]];
 
   const WALLS = [{ x: 52, y: 66, w: 72, h: 80 }, { x: 352, y: 46, w: 54, h: 54 }, { x: 374, y: 116, w: 56, h: 42 }];

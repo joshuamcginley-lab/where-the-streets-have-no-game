@@ -400,7 +400,7 @@
 </style>
 </head>
 <body>
-<div class="ver" aria-hidden="true">v79 · Oct 15</div>
+<div class="ver" aria-hidden="true">v80 · Oct 15</div>
 <header class="cover"><button type="button" class="title" id="btn-home" title="Back to the start screen">Everything You Know Is Wrong</button></header>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <div class="fx" id="fx" aria-hidden="true"></div>
@@ -1047,39 +1047,39 @@
   // Each list is in order of preference: the best line first. MacPhisto plays what this TV has heard
   // least (over all nights), and among those, usually the first; so a first night hears the best ones.
   const LINES = {
-    welcome: ["welcome-1", "welcome-2", "welcome-3"],
-    join: ["join-1", "join-4", "join-2", "join-3", "join-5"],
+    welcome: ["welcome-1", "welcome-5", "welcome-2", "welcome-4", "welcome-3", "welcome-6"],
+    join: ["join-1", "join-4", "join-6", "join-2", "join-9", "join-3", "join-7", "join-8", "join-5", "join-10"],
     full: ["lobby-full-1"],
-    round1: ["start-4", "round-start-5", "round-start-4", "round-start-6", "round-start-1"],
-    round2: ["next-round-4", "round-two-1"],
-    roundN: ["next-round-5", "next-round-2", "next-round-6", "round-start-3", "round-start-2"],
-    song: ["song-3", "song-6", "song-4", "song-5", "song-1"],
-    cover: ["cover-3", "cover-4", "cover-2", "cover-1", "cover-5"],
+    round1: ["start-4", "round-start-5", "round-start-7", "round-start-4", "round-start-6", "round-start-8", "round-start-1", "round-start-9"],
+    round2: ["next-round-4", "round-two-1", "round-two-4", "round-two-2", "round-two-5", "round-two-3"],
+    roundN: ["next-round-5", "next-round-7", "next-round-2", "next-round-1", "next-round-9", "next-round-6", "next-round-8", "next-round-10", "round-start-3", "next-round-3", "next-round-11", "round-start-2"],
+    song: ["song-3", "song-6", "song-8", "song-4", "song-7", "song-9", "song-5", "song-10", "song-1", "song-11", "song-2", "song-12"],
+    cover: ["cover-3", "cover-4", "cover-11", "cover-7", "cover-2", "cover-8", "cover-1", "cover-9", "cover-10", "cover-5", "cover-6"],
     lastq: ["last-question-3", "last-q-3", "last-question-2"],
-    streak: m => ["streak-any-6", `streak-${m}-2`, "streak-any-1", "streak-any-3", `streak-${m}-1`, "streak-any-4", "streak-any-2", "streak-any-5"],
-    lead: ["lead-change-9", "lead-change-3", "lead-change-2", "lead-change-7", "lead-change-5", "lead-change-4", "lead-change-1", "lead-change-6", "lead-change-8"],
-    broken: ["streak-broken-2", "streak-broken-5", "streak-broken-3", "streak-broken-1", "streak-broken-6", "streak-broken-4"],
-    allRight: ["all-right-4", "all-right-7", "all-right-3", "all-right-5", "all-right-6", "all-right-8"],
-    hurry: ["hurry-3", "hurry-1", "hurry-4", "hurry-5"],
-    nobody: ["nobody-right-5", "nobody-right-2", "nobody-right-8", "nobody-right-6", "nobody-right-7"],
-    nobodyGroup: ["nobody-right-9", "nobody-right-1"],   // "Not ONE of you": needs company
-    sameWrong: ["same-wrong-1", "same-wrong-2"],   // everyone answered, all with the same wrong answer
-    loneRight: ["lone-right-1", "lone-right-3", "lone-right-2"],   // only one player right
-    buzzer: ["buzzer-2", "buzzer-1"],   // right in the last second
-    close: ["close-3", "close-2", "close-4"],
-    lastPlace: ["last-place-2", "last-place-6", "last-place-5", "last-place-1", "last-place-8", "last-place-3", "last-place-4", "last-place-7"],
-    aside: ["aside-1", "aside-2", "phone-1", "aside-5", "aside-6", "aside-3", "aside-4", "aside-7"],   // a quiet reveal
-    winner: ["winner-6", "winner-1", "winner-8", "winner-3", "winner-7", "winner-9", "winner-2", "winner-5"],
-    tie: ["tie-1", "tie-2", "close-2"],
-    goodnight: ["goodnight-4", "goodnight-1", "goodnight-5", "goodnight-6"],
-    double: ["double-3", "double-1", "double-4", "double-2", "double-5"],   // never says "last": mid-tournament it isn't
-    whoSaid: ["who-said-2", "who-said-3", "who-said-1", "who-said-4"],
-    order: ["order-1", "order-2", "order-3"],   // before a put-them-in-order question
-    wager: ["wager-2", "wager-1", "wager-3"],
-    betWon: ["bet-won-2", "bet-won-1", "bet-won-3"],
-    betLost: ["bet-lost-1", "bet-lost-3", "bet-lost-2"],
-    tourBreak: leg => [`tour-break-${leg}-1`, `tour-break-${leg}-2`],   // after round 1 or 2: what's next
-    tourWinner: ["tour-winner-2", "tour-winner-1"],
+    streak: m => ["streak-any-6", `streak-${m}-2`, "streak-any-10", "streak-any-1", "streak-any-3", "streak-any-7", `streak-${m}-1`, "streak-any-4", "streak-any-9", "streak-any-2", "streak-any-8", "streak-any-11", "streak-any-5"],
+    lead: ["lead-change-9", "lead-change-3", "lead-change-14", "lead-change-2", "lead-change-7", "lead-change-11", "lead-change-5", "lead-change-12", "lead-change-4", "lead-change-1", "lead-change-10", "lead-change-13", "lead-change-6", "lead-change-8"],
+    broken: ["streak-broken-2", "streak-broken-5", "streak-broken-7", "streak-broken-3", "streak-broken-10", "streak-broken-1", "streak-broken-9", "streak-broken-6", "streak-broken-8", "streak-broken-4"],
+    allRight: ["all-right-4", "all-right-7", "all-right-9", "all-right-3", "all-right-11", "all-right-5", "all-right-2", "all-right-6", "all-right-1", "all-right-10", "all-right-8"],
+    hurry: ["hurry-3", "hurry-6", "hurry-1", "hurry-2", "hurry-4", "hurry-5"],
+    nobody: ["nobody-right-5", "nobody-right-3", "nobody-right-2", "nobody-right-8", "nobody-right-4", "nobody-right-6", "nobody-right-10", "nobody-right-11", "nobody-right-7"],
+    nobodyGroup: ["nobody-right-9", "nobody-right-12", "nobody-right-1"],   // "Not ONE of you": needs company
+    sameWrong: ["same-wrong-1", "same-wrong-5", "same-wrong-2", "same-wrong-3", "same-wrong-4"],   // everyone answered, all with the same wrong answer
+    loneRight: ["lone-right-1", "lone-right-4", "lone-right-3", "lone-right-5", "lone-right-6", "lone-right-2", "lone-right-7"],   // only one player right
+    buzzer: ["buzzer-2", "buzzer-5", "buzzer-1", "buzzer-3", "buzzer-4"],   // right in the last second
+    close: ["close-3", "close-6", "close-2", "close-1", "close-4", "close-5", "close-7"],
+    lastPlace: ["last-place-2", "last-place-6", "last-place-11", "last-place-5", "last-place-1", "last-place-8", "last-place-9", "last-place-3", "last-place-10", "last-place-4", "last-place-7"],
+    aside: ["aside-1", "aside-2", "aside-11", "phone-1", "aside-5", "aside-14", "aside-6", "aside-8", "aside-3", "aside-15", "aside-4", "aside-10", "aside-12", "aside-7", "aside-9", "aside-13"],   // a quiet reveal
+    winner: ["winner-6", "winner-1", "winner-11", "winner-8", "winner-3", "winner-12", "winner-7", "winner-15", "winner-9", "winner-16", "winner-2", "winner-14", "winner-5", "winner-4", "winner-10", "winner-13"],
+    tie: ["tie-1", "tie-2", "tie-3", "tie-4", "close-2"],
+    goodnight: ["goodnight-4", "goodnight-1", "goodnight-3", "goodnight-5", "goodnight-6", "goodnight-7", "goodnight-2", "goodnight-8"],
+    double: ["double-3", "double-1", "double-8", "double-4", "double-10", "double-2", "double-11", "double-12", "double-5", "double-6", "double-9", "double-7"],   // never says "last": mid-tournament it isn't
+    whoSaid: ["who-said-2", "who-said-7", "who-said-3", "who-said-1", "who-said-5", "who-said-8", "who-said-4", "who-said-6"],
+    order: ["order-1", "order-6", "order-4", "order-2", "order-9", "order-3", "order-7", "order-10", "order-5", "order-8"],   // before a put-them-in-order question
+    wager: ["wager-2", "wager-1", "wager-6", "wager-3", "wager-4", "wager-5"],
+    betWon: ["bet-won-2", "bet-won-1", "bet-won-6", "bet-won-3", "bet-won-4", "bet-won-5"],
+    betLost: ["bet-lost-1", "bet-lost-4", "bet-lost-3", "bet-lost-5", "bet-lost-2", "bet-lost-6"],
+    tourBreak: leg => [1, 2, 3, 4].map(n => `tour-break-${leg}-${n}`),   // after round 1 or 2: what's next
+    tourWinner: ["tour-winner-2", "tour-winner-1", "tour-winner-4", "tour-winner-3", "tour-winner-5"],
   };
 
   // MacPhisto reading the questions (question-voice.js): each becomes a host line "q-<id>" with no subtitles

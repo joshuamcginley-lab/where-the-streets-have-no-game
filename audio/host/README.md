@@ -157,3 +157,137 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | order-1.mp3 | Put them in order | A little history lesson. / Put them in order. Oldest first. / I remember all of it. I was there. Mostly. |
 | order-2.mp3 | Put them in order | Now... a little order. / Not my strong suit, I'm afraid. / Chaos is more my line of work. |
 | order-3.mp3 | Put them in order | In order, please. Oldest first. / Take your time. / Time is the one thing I have plenty of. |
+| order-4.mp3 | Put them in order | Put them in order. / History is just things happening in the wrong order. / You're here to fix that. |
+| order-5.mp3 | Put them in order | Oldest first. / Like a family photograph. / The oldest are always at the back, complaining. |
+| order-6.mp3 | Put them in order | A little timeline. / I was at all of it. / I just can't remember which order I left. |
+| order-7.mp3 | Put them in order | Put these in order. / I'd help, but I've been around since the beginning. / It all blurs. |
+| order-8.mp3 | Put them in order | Earliest first. / Take it slowly. / Some of the best things happened before you were paying attention. |
+| order-9.mp3 | Put them in order | Sort them out. / Someone has to. / It certainly won't be me. |
+| order-10.mp3 | Put them in order | Four moments in time. / Line them up. / Then we'll see who was really listening. |
+| song-2.mp3 | Song clip question | A song. / Close your eyes. / Not for long. It's timed. |
+| song-7.mp3 | Song clip question | Music, maestro. / I won't sing along. / My lawyers have advised against it. |
+| song-8.mp3 | Song clip question | Listen closely. / I'd tell you what it is, but that would be cheating. / And I only cheat at cards. |
+| song-9.mp3 | Song clip question | A little music. / Some of you will know it in a second. / The rest of you will pretend. |
+| song-10.mp3 | Song clip question | Shh. / The good bit's coming. / Or it isn't. Thirty seconds is a short life. |
+| song-11.mp3 | Song clip question | Name this one. / Hum along if it helps. / It won't. |
+| song-12.mp3 | Song clip question | From the archive. / Dusted off... / just for you. |
+| cover-6.mp3 | Album cover question | Look closely. / Somebody spent weeks on this photograph. / You have twenty seconds. |
+| cover-7.mp3 | Album cover question | A picture. / Zoom in, zoom out. / Just like my career. |
+| cover-8.mp3 | Album cover question | An album cover. / Grainy, moody, serious. / They never once smiled for the camera. |
+| cover-9.mp3 | Album cover question | Name the album. / It's on the tip of your tongue. / Which is where it'll stay. |
+| cover-10.mp3 | Album cover question | A little detail. / The whole picture's coming. / Patience. Or guess. Guessing is faster. |
+| cover-11.mp3 | Album cover question | Recognise it? / I had it on my wall once. / Then I had my own face put there instead. |
+| double-6.mp3 | Double points | Double points. / Now it gets interesting. |
+| double-7.mp3 | Double points | This one's worth twice as much. / Spend it wisely. |
+| double-8.mp3 | Double points | Double or nothing. / Well... double or a little less. / I'm not a monster. |
+| double-9.mp3 | Double points | Double points. / The leader is nervous. / Everyone else, start believing. |
+| double-10.mp3 | Double points | Twice the points on this one. / I've seen bigger leads disappear. / Usually mine. |
+| double-11.mp3 | Double points | Double points. / Like a second encore. / Nobody needs it. Everybody wants it. |
+| double-12.mp3 | Double points | This one counts double. / No pressure. / Lots of pressure. |
+| winner-4.mp3 | Final winner | Our winner! / Take a bow. / Not too low. People will think you've dropped something. |
+| winner-10.mp3 | Final winner | The winner. / Enjoy it tonight. / Tomorrow, everyone will want a rematch. |
+| winner-11.mp3 | Final winner | Champion! / I'd shake your hand... / but you'd count your fingers afterwards. |
+| winner-12.mp3 | Final winner | A winner. / I'd give you the keys to the city. / I sold them in 1993. |
+| winner-13.mp3 | Final winner | Ladies and gentlemen, your winner! / Somebody play something triumphant. / Not too loud. The neighbours. |
+| winner-14.mp3 | Final winner | And the winner is... / exactly who I said it would be. / I didn't say it out loud, of course. |
+| winner-15.mp3 | Final winner | Our champion. / They'll write songs about this. / Short ones. |
+| winner-16.mp3 | Final winner | Victory! / Fame at last. / Fifteen minutes, starting now. |
+| round-two-2.mp3 | Round 2 start (before the count-in) | Round two. / The first round was a warm-up. / That's what the losers are saying, anyway. |
+| round-two-3.mp3 | Round 2 start (before the count-in) | Round two. / Same game, new chances. / Same faces, unfortunately. |
+| round-two-4.mp3 | Round 2 start (before the count-in) | Round two. / Let's see who peaked too early. |
+| round-two-5.mp3 | Round 2 start (before the count-in) | Round two. / Somebody count us in. / In any language you like. |
+| next-round-1.mp3 | Round start (later rounds) | Another round. / Like a tour that won't end. / I'd know. I've been on one since 1992. |
+| next-round-3.mp3 | Round start (later rounds) | Back for more? / Good. / I've nowhere else to be. Las Vegas can wait. |
+| next-round-7.mp3 | Round start (later rounds) | One more round. / The night is young. / I am not. |
+| next-round-8.mp3 | Round start (later rounds) | Another round. / The scores carry over. / So do the grudges. |
+| next-round-9.mp3 | Round start (later rounds) | Round again. / You're like a band on a reunion tour. / Older, wiser, still arguing. |
+| next-round-10.mp3 | Round start (later rounds) | Encore! / Nobody asked for one. / That's never stopped anyone. |
+| next-round-11.mp3 | Round start (later rounds) | Here we go again. / Places, everyone. / And smile. You're on television. |
+| round-start-7.mp3 | Round start (first round) | Good evening, and welcome to my little quiz. / The rules are simple. / I make them. You follow them. |
+| round-start-8.mp3 | Round start (first round) | Welcome to ZOO TV. / Tonight, trivia. / Tomorrow, the world. |
+| round-start-9.mp3 | Round start (first round) | Shall we begin? / Phones ready. / Brains... optional. |
+| who-said-5.mp3 | Who said it? | Who said it? / One of us is very quotable. / It's me. Usually. |
+| who-said-6.mp3 | Who said it? | A quotation. / Somebody said this out loud, in public. / Guess who. |
+| who-said-7.mp3 | Who said it? | Who said it? / The suit, the shades, the singer, or me. / Look for the most expensive sentence. |
+| who-said-8.mp3 | Who said it? | Another quote. / We all said things in the nineties. / Some of us meant them. |
+| welcome-4.mp3 | New game | Welcome! / Do come in. / Everyone gets in. Not everyone leaves with their dignity. |
+| welcome-5.mp3 | New game | Ah... company. / I was beginning to think I'd been cancelled. / Again. |
+| welcome-6.mp3 | New game | Welcome to the show. / Sit anywhere. / The good seats were sold in 1993. |
+| join-6.mp3 | A player joins | Another one. / Sign in, please. Your soul will do as a deposit. |
+| join-7.mp3 | A player joins | Ah. A late arrival. / Fashionably late. I approve. |
+| join-8.mp3 | A player joins | Welcome aboard. / Mind the Trabants. / They're not as secure as they look. |
+| join-9.mp3 | A player joins | Hello. / Pick a band member. / Any one. They're all replaceable. Except the singer. |
+| join-10.mp3 | A player joins | Another contestant. / The more the merrier. / The more the louder. |
+| goodnight-2.mp3 | Goodnight | That's all for tonight. / Thank you, thank you. / Do tip your host on the way out. |
+| goodnight-3.mp3 | Goodnight | Goodnight. / Go home. / Leave a light on. I'm afraid of the dark. Ironic, I know. |
+| goodnight-7.mp3 | Goodnight | And that's the show. / Same time next week? / I'll keep your seats warm. Very warm. |
+| goodnight-8.mp3 | Goodnight | Goodnight, everybody. / Drive safely. / Or take a Trabant, and drive slowly. |
+| streak-any-7.mp3 | Four in a row (anyone) | Four in a row. / Steady now. / Pride comes before... well, you know the song. |
+| streak-any-8.mp3 | Four in a row (anyone) | Four in a row. / Somebody's on fire. / An unforgettable one, I hope. |
+| streak-any-9.mp3 | Four in a row (anyone) | Four. / Someone's showing off. / Good. Somebody should. |
+| streak-any-10.mp3 | Four in a row (anyone) | Four in a row! / I'd ask for your secret... / but I'd rather buy it. |
+| streak-any-11.mp3 | Four in a row (anyone) | Four in a row. / Elevation, I believe they call it. |
+| lead-change-10.mp3 | Lead change | A new leader. / Long live the king. / Or whoever this is. |
+| lead-change-11.mp3 | Lead change | The lead changes hands. / It does that. / Hands are so unreliable. |
+| lead-change-12.mp3 | Lead change | A new leader. / Even better than the last one. / Not quite the real thing yet. |
+| lead-change-13.mp3 | Lead change | New face at the top. / Get used to the view. / Briefly. |
+| lead-change-14.mp3 | Lead change | The leader changes. / Mutiny. / I do love a mutiny. |
+| streak-broken-7.mp3 | Streak broken | Streak over. / Gravity always wins. / Ask the lemon. |
+| streak-broken-8.mp3 | Streak broken | And there it goes. / Easy come. / Easy, easy go. |
+| streak-broken-9.mp3 | Streak broken | The streak ends. / It was getting a bit much, frankly. |
+| streak-broken-10.mp3 | Streak broken | Broken. / Like a guitar string mid-solo. / The Edge would carry on. Will you? |
+| all-right-1.mp3 | Everyone got it right | All of you. / I'll have to make them harder. / Much harder. |
+| all-right-2.mp3 | Everyone got it right | Everybody got it. / Well. It's nice to be agreed with. / It so rarely happens. |
+| all-right-9.mp3 | Everyone got it right | All correct. / A full house. / I usually charge for those. |
+| all-right-10.mp3 | Everyone got it right | All right. All of you. / Insufferable. |
+| all-right-11.mp3 | Everyone got it right | Every single one of you. / Someone check under the table for a fan club newsletter. |
+| nobody-right-3.mp3 | Nobody got it right | Nobody. / Silence. / My favourite sound. |
+| nobody-right-4.mp3 | Nobody got it right | Not one. / Don't look at me. / I knew the answer. I just like watching. |
+| nobody-right-10.mp3 | Nobody got it right | Nobody got that. / Good. / Some things should stay a mystery. |
+| nobody-right-11.mp3 | Nobody got it right | Zero. / A nice round number. / Like your scores, soon. |
+| nobody-right-12.mp3 | Nobody got it right | None of you. / A room full of experts... / and not one right answer. Lovely. |
+| same-wrong-3.mp3 | Everyone picked the same wrong answer | You all picked the same one. / And it was wrong. / Solidarity is so touching. |
+| same-wrong-4.mp3 | Everyone picked the same wrong answer | Unanimous. / Unanimously wrong. / That takes real teamwork. |
+| same-wrong-5.mp3 | Everyone picked the same wrong answer | All the same answer. / Somebody whispered. / Somebody whispered badly. |
+| lone-right-4.mp3 | Only one player right | One right answer. / Smug, aren't we? / I like that in a person. |
+| lone-right-5.mp3 | Only one player right | Just one of you. / The others are pretending they knew. / They didn't. |
+| lone-right-6.mp3 | Only one player right | Only one. / A voice in the wilderness. / Or the desert, if we're being dramatic about it. |
+| lone-right-7.mp3 | Only one player right | Just you. / Everyone else, look at them. / That's what winning looks like. Briefly. |
+| buzzer-3.mp3 | Right in the last second | Just in time. / The clock was rooting for you. |
+| buzzer-4.mp3 | Right in the last second | With a second to spare. / Cutting it fine. / I admire anyone who leaves it to the last minute. |
+| buzzer-5.mp3 | Right in the last second | At the buzzer. / Show-off. |
+| close-1.mp3 | Close race | Very close. / Hold your nerve. / Or don't. It's more fun for me. |
+| close-5.mp3 | Close race | Neck and neck. / Somebody blink. |
+| close-6.mp3 | Close race | It's tight at the top. / Tighter than a Trabant. / With four people in it. |
+| close-7.mp3 | Close race | Close. / Close enough to argue about later. |
+| last-place-9.mp3 | Last place | Last place. / Somebody has to be. / Thank you for your service. |
+| last-place-10.mp3 | Last place | Bottom of the table. / The view's terrible. / But the company's lovely. |
+| last-place-11.mp3 | Last place | Last place. / Don't worry. Underdogs make the best documentaries. |
+| hurry-2.mp3 | Time running out | Nothing at all? / I've seen livelier crowds at a sound check. |
+| hurry-6.mp3 | Time running out | Time's up. / No answers. / I'll take that as a protest. |
+| aside-8.mp3 | Aside (a quiet reveal) | I once ordered ten thousand pizzas to a concert. / About a hundred arrived. / I still haven't paid. |
+| aside-9.mp3 | Aside (a quiet reveal) | I gave up the horns for Lent once. / It lasted about an hour. |
+| aside-10.mp3 | Aside (a quiet reveal) | Do you know the secret of a long career? / Never leave. / They can't miss you if you're still here. |
+| aside-11.mp3 | Aside (a quiet reveal) | People ask what I do for a living. / I host. / Mostly souls. |
+| aside-12.mp3 | Aside (a quiet reveal) | I collect gold records. / And the people who made them. / Mostly the second. |
+| aside-13.mp3 | Aside (a quiet reveal) | I miss telephone boxes. / Somewhere private to call the President. |
+| aside-14.mp3 | Aside (a quiet reveal) | They wanted me for the Sphere, you know. / I said it wasn't big enough. |
+| aside-15.mp3 | Aside (a quiet reveal) | My agent says I should be more humble. / So I fired him. / Humbly. |
+| tour-break-1-3.mp3 | Tournament: between rounds | End of round one. / Next, the deep cuts. Songs only the faithful know. / Let's find out how faithful you are. |
+| tour-break-1-4.mp3 | Tournament: between rounds | Round one is done. / Now for the B-sides of life. |
+| tour-break-2-3.mp3 | Tournament: between rounds | Two down. / One round left, and a bet at the end. / Save something for the wager. |
+| tour-break-2-4.mp3 | Tournament: between rounds | Nearly there. / One last round, then I take your money. / Figuratively. Mostly. |
+| tour-winner-3.mp3 | Tournament champion | Champion of the tournament! / Three rounds, one name. / Engrave it somewhere small. |
+| tour-winner-4.mp3 | Tournament champion | The tournament is yours. / Take the crown. / Don't get too attached. I want it back. |
+| tour-winner-5.mp3 | Tournament champion | Tournament champion! / You've earned the right to be insufferable. / Until next week. |
+| wager-4.mp3 | Final wager | Place your bets. / Faith or fortune. / I'll take either. |
+| wager-5.mp3 | Final wager | The final wager. / Everything you have, or nothing. / Or something in between, for the cautious. |
+| wager-6.mp3 | Final wager | Last question. A little bet first. / I've always liked a gamble. / Especially other people's. |
+| bet-won-4.mp3 | Bet everything and won | All in, and right. / Fortune favours the reckless. |
+| bet-won-5.mp3 | Bet everything and won | Everything, and it came back double. / I'm almost proud. |
+| bet-won-6.mp3 | Bet everything and won | All of it, and right. / Don't let it go to your head. / Or do. It's more entertaining. |
+| bet-lost-4.mp3 | Bet everything and lost | All of it. / Gone. / Like tears in the rain. Or points in a quiz. |
+| bet-lost-5.mp3 | Bet everything and lost | Everything, on the wrong answer. / Bold. / Wrong, but bold. |
+| bet-lost-6.mp3 | Bet everything and lost | All in... / all gone. / I'll put it with the others. |
+| tie-3.mp3 | Final: a tie | A tie. / How very diplomatic. / I hate diplomacy. |
+| tie-4.mp3 | Final: a tie | Dead level. / Two winners. / Or no winners. Depends on your mood. |
