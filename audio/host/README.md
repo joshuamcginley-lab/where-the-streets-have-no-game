@@ -25,3 +25,8 @@ Voice lines for the planned MacPhisto host. Not wired into the game yet.
 | song-1.mp3 | Song clip question | Listen carefully... / I wrote this one, you know. / Well... I was in the room. |
 | last-place-1.mp3 | Last place | Oh dear... someone's at the bottom. / Don't worry. / I've been down there. It's very WARM. |
 | last-place-2.mp3 | Last place | Last place... / I'll put in a good word for you. / Downstairs. |
+| cover-1.mp3 | Album cover question | A little picture for you. / I'm in all of them, you know. / Somewhere. |
+| last-question-2.mp3 | Last question | One more... / Then I'm calling a taxi. / I'm awfully tired. |
+| winner-2.mp3 | Final winner | We have a WINNER! / Oh... I'm so proud. / Of course... I let you win. |
+| winner-3.mp3 | Final winner | Bravo! / You're nearly as rich and famous as me now. / Nearly. |
+| next-round-2.mp3 | Between rounds | Another round... / Just one more. / That's what they all say. |

@@ -186,7 +186,7 @@ Paste each block into ElevenLabs as one generation (voice: AK - British Posh Wel
 
 ```
 [delighted] Bravo!
-[proud] You're nearly as famous as me now.
+[proud] You're nearly as rich and famous as me now.
 [sighs] Nearly.
 ```
 
