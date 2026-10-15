@@ -32,3 +32,7 @@ Voice lines for the planned MacPhisto host. Not wired into the game yet.
 | next-round-2.mp3 | Between rounds | Another round... / Just one more. / That's what they all say. |
 | phone-1.mp3 | Phone gag (a lull) | Round about now... I usually make a telephone call. / Shall I? / ...Engaged. |
 | goodnight-1.mp3 | Goodnight | Well... that's the show. / You've been wonderful. / Now... where's my taxi? |
+| join-1.mp3 | A player joins | Ah... a new friend! / When you're famous... people want your NUMBER. / Here's mine. / Six... six... six. / Call anytime. I'm always up. |
+| lobby-full-1.mp3 | All four characters taken | Oh... the whole band is here! / Reggie the Dog... / the cat that got the CREAM... / the handsome one... / and the singer. What a silly mug. |
+| all-right-3.mp3 | Everyone got it right | Ooh... VERY revealing! / All of you? / Somebody's been cheating... I like that. |
+| nobody-right-2.mp3 | Nobody got it right | Everything you know... is WRONG! / I did warn you. / It was on all the televisions. |
