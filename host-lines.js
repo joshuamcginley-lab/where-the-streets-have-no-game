@@ -1029,5 +1029,133 @@ window.HOST_LINES = {
   ],
   "fps": 25,
   "env": "00007jzzzzse511031e800004cp200000000000005onzzj35ga004cb630985332100000000000000000000000000000ahf100000001016tc1025000000000000000000000001zm81000cbcb3012ddb920144689am90000000000000000000000000000007glg00hof10000i85002000f7000000000032000000000000"
+ },
+ "round-start-4": {
+  "moment": "Round start (first round)",
+  "dur": 13.06,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Ladies and gentlemen..."
+   },
+   {
+    "t": 2.38,
+    "text": "I have a VISION!"
+   },
+   {
+    "t": 5.07,
+    "text": "Television!"
+   },
+   {
+    "t": 6.92,
+    "text": "Well... it worked in 1992."
+   },
+   {
+    "t": 10.54,
+    "text": "Off with the horns... on with the quiz!"
+   }
+  ],
+  "fps": 25,
+  "env": "0014cazztzx4opqmj74twzzg35ab40001kzm70004100000000000000000kzzzzvwrzngbezzzzi84b1izv786100pzzw99je50000000000000000000000000000100zzsfsyd5zwf27md710000000000000000000000000026bbbcb750000000000000210049bb000aababdae30c978aa96077000787523441000000000000000000000000lzq302g60wiawzrywg458700000000fzzz5349a21o224epj500000000000000"
+ },
+ "round-start-5": {
+  "moment": "Round start (first round)",
+  "dur": 10.87,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A little advice before we start."
+   },
+   {
+    "t": 2.78,
+    "text": "Watch more TV."
+   },
+   {
+    "t": 5.01,
+    "text": "Believe everything."
+   },
+   {
+    "t": 7.13,
+    "text": "And remember..."
+   },
+   {
+    "t": 8.65,
+    "text": "everything you know is WRONG."
+   }
+  ],
+  "fps": 25,
+  "env": "0001d117eb557b10018ga000000310000000000001330000000000000000000000000023czzu20551dzzzzzxp0129qlj41b73100000000000000000000000d98988ed7999a700000007d8000000000000000000000000000008d0mieif68glj9d9gc73200000000000000000mxn5ezn0bsggemnkhosqjfd87100001a92010236agla21000000000"
+ },
+ "next-round-4": {
+  "moment": "Round 2 start (before the count-in)",
+  "dur": 7.86,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Another round!"
+   },
+   {
+    "t": 2.01,
+    "text": "Somebody count us in..."
+   },
+   {
+    "t": 4.2,
+    "text": "in Spanish, preferably."
+   },
+   {
+    "t": 6.44,
+    "text": "And BADLY."
+   }
+  ],
+  "fps": 25,
+  "env": "000ezc4422vzz9zweszzzpkd830000000000000000000000000000010v95b4ah4ji606meddd0bki00abb8b7545d000000000000005c57000000ejjb320055540037ea00420200000000000000000000008mosfck4900000kqbrool01778336a00000"
+ },
+ "welcome-2": {
+  "moment": "New game",
+  "dur": 8.57,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Achtung, baby!"
+   },
+   {
+    "t": 3.04,
+    "text": "Welcome to my little show."
+   },
+   {
+    "t": 5.94,
+    "text": "Do sit down."
+   },
+   {
+    "t": 7.29,
+    "text": "Mind the Trabants."
+   }
+  ],
+  "fps": 25,
+  "env": "000144744220000000000cxvxng900nvzefnmalxsmtbnqpdbc70000000000000000000000000025izzzj43jwa4335601gb5ge6653346dw4dhd50217hd6100000000000000000000000006cb5100100000000000000000000000000494agh956f04bi2cgba764000000000"
+ },
+ "join-2": {
+  "moment": "A player joins",
+  "dur": 8.57,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Hello, hello!"
+   },
+   {
+    "t": 2.47,
+    "text": "Ah... another one."
+   },
+   {
+    "t": 5.1,
+    "text": "I knew you'd come."
+   },
+   {
+    "t": 7.13,
+    "text": "They always do."
+   }
+  ],
+  "fps": 25,
+  "env": "000000sztivvpkmgwq0vwi7ljiaceacca7522000000000000000000000000025534653210000000000000048a7669a901e810000000000000000000000000000158jcgfeffkmfa72997010106543221000000000000000000004a8102ba9ac99700009cc77641000000000"
  }
 };

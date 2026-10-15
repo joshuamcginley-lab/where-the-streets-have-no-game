@@ -887,7 +887,8 @@
     join: ["join-1", "join-2"],
     full: ["lobby-full-1"],
     round1: ["start-4", "round-start-1", "round-start-4", "round-start-5"],
-    roundN: ["round-start-2", "round-start-3", "next-round-1", "next-round-2", "next-round-3", "next-round-4"],
+    round2: ["next-round-4"],
+    roundN: ["round-start-2", "round-start-3", "next-round-1", "next-round-2", "next-round-3"],
     song: ["song-1", "song-2", "song-3"],
     cover: ["cover-1", "cover-2", "cover-3"],
     lastq: ["last-question-1", "last-question-2", "last-q-1", "last-q-3"],
@@ -992,7 +993,9 @@
     Host.stop();
     // MacPhisto opens the round, then the count-in
     const label = `Round ${S.round} · ${MODES.find(m => m.id === S.mode).name}`;
-    hostBeat(S.round === 1 ? LINES.round1 : LINES.roundN, label, countIn);
+    // Round 2 gets "count us in... in Spanish... and BADLY" (once a night), right before the Vertigo count-in
+    const opener = S.round === 1 ? LINES.round1 : S.round === 2 && Host.pick(LINES.round2, true) ? LINES.round2 : LINES.roundN;
+    hostBeat(opener, label, countIn);
   }
 
   function countIn() {

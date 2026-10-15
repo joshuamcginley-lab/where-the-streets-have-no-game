@@ -52,3 +52,8 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | winner-6.mp3 | Final winner | Our champion! / When I was young, there were reports of egomania. / So I became EVERYTHING they said. / I see you've done the same. |
 | last-place-4.mp3 | Last place | Bottom of the table... / Sometimes you can't make it on your own. / Fortunately... I can. |
 | winner-7.mp3 | Final winner | Oh, it's a BEAUTIFUL day! / Magnificent... simply magnificent. / I'll take ten percent, of course. |
+| round-start-4.mp3 | Round start (first round) | Ladies and gentlemen... I have a VISION! / Television! / Well... it worked in 1992. / Off with the horns... on with the quiz! |
+| round-start-5.mp3 | Round start (first round) | A little advice before we start. / Watch more TV. / Believe everything. / And remember... everything you know is WRONG. |
+| next-round-4.mp3 | Round 2 start (before the count-in) | Another round! / Somebody count us in... / in Spanish, preferably. / And BADLY. |
+| welcome-2.mp3 | New game | Achtung, baby! / Welcome to my little show. / Do sit down. Mind the Trabants. |
+| join-2.mp3 | A player joins | Hello, hello! / Ah... another one. / I knew you'd come. / They always do. |
