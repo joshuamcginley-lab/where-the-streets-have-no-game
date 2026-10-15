@@ -36,3 +36,7 @@ Voice lines for the planned MacPhisto host. Not wired into the game yet.
 | lobby-full-1.mp3 | All four characters taken | Oh... the whole band is here! / Reggie the Dog... / the cat that got the CREAM... / the handsome one... / and the singer. What a silly mug. |
 | all-right-3.mp3 | Everyone got it right | Ooh... VERY revealing! / All of you? / Somebody's been cheating... I like that. |
 | nobody-right-2.mp3 | Nobody got it right | Everything you know... is WRONG! / I did warn you. / It was on all the televisions. |
+| start-4.mp3 | Game start | People of the living room! / When I came among you... you were squabbling like CHILDREN. / Now you're all hooked up to one cable... as close together as stations on a dial. |
+| last-q-3.mp3 | Last question | My time among you... is almost at an END. / But don't fear... / I'll be WATCHING you. / I leave behind video cameras... for each of you. |
+| last-place-3.mp3 | Last place | To whoever is in last place... / I give you... / DECIBELS. / You're welcome. |
+| winner-5.mp3 | Final winner | Congratulations! / So now you can dream... of being as wealthy and GLAMOROUS as me. |
