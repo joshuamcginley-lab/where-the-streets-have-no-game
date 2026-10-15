@@ -8,7 +8,6 @@ A U2 trivia party game in the style of Jackbox. The TV shows the questions; ever
 - **Album covers.** Casual and Deep Cuts rounds also include one "Name the album" question: the TV zooms in on a detail of a U2 cover and slowly pulls back. The list is in `covers.js` (artwork streamed from Apple). Passengers' *Original Soundtracks 1* only turns up in Deep Cuts.
 - **Tournament.** Three rounds in a row with scores carried: Casual Fan, a deep-cut Name That Song, then Deep Cuts. Its very last question is the **final wager**: everyone bets part of their score from their phone (anyone under 200 can still bet 200), right wins the bet, wrong loses it. Every other round ends with the last question worth **double points**.
 - **Who said it?** Quote questions where the answer is always The Fly, MacPhisto, Mirror Ball Man or Bono in an interview.
-- **Lobby soundscape.** While people join, the TV plays a synthesised stadium-before-the-show: a crowd murmur, the PA's hum and hiss, the odd distant cheer. It fades out when the game starts.
 - **Rounds of 10 questions**, 4 choices each, 20 seconds per question. Faster answers and streaks score more. After each round, pick the next round's mode and keep going: scores carry over. Click the title band to start a new game.
 - **No repeats.** The TV remembers which questions and clips it has used (in that browser, across nights) and won't repeat one until it has been through the whole pool for that mode.
 - **Solo:** click a character on the TV screen to play right there with a mouse or keys 1–4. No phone needed.

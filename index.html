@@ -981,65 +981,6 @@
   }
   function skipHost() { if (S.phase === "host") Host.stop(); }
 
-  // ---------- the lobby soundscape: a stadium before the show. A crowd murmuring, the PA's mains hum
-  // and hiss, and a distant cheer now and then. All synthesised (nothing to license). It fades out when
-  // the game starts and dips whenever MacPhisto talks.
-  const Ambience = (() => {
-    const VOL = .32;
-    let out = null, buf = null, target = -1, cheerAt = 0;
-    function noise(c) {
-      const n = c.createBufferSource();
-      n.buffer = buf; n.loop = true;
-      n.start(c.currentTime, Math.random() * buf.duration);
-      return n;
-    }
-    function build() {
-      const c = Sound.ctx, len = c.sampleRate * 4;
-      buf = c.createBuffer(1, len, c.sampleRate);
-      const d = buf.getChannelData(0);
-      let b0 = 0, b1 = 0, b2 = 0;   // pink-ish noise: softer, more like a room than white noise
-      for (let i = 0; i < len; i++) {
-        const w = Math.random() * 2 - 1;
-        b0 = .99765 * b0 + w * .099046; b1 = .963 * b1 + w * .2965164; b2 = .57 * b2 + w * 1.0526913;
-        d[i] = (b0 + b1 + b2 + w * .1848) * .11;
-      }
-      out = c.createGain(); out.gain.value = 0; out.connect(c.destination);
-      // the crowd: voices in three bands whose loudness wanders on its own slow clock
-      [[380, 1.1, .07], [850, 1.4, .11], [1800, 2, .16]].forEach(([f, q, rate]) => {
-        const bp = c.createBiquadFilter(), g = c.createGain(), lfo = c.createOscillator(), depth = c.createGain();
-        bp.type = "bandpass"; bp.frequency.value = f; bp.Q.value = q;
-        g.gain.value = .45; lfo.frequency.value = rate; depth.gain.value = .22;
-        lfo.connect(depth).connect(g.gain); lfo.start();
-        noise(c).connect(bp).connect(g).connect(out);
-      });
-      // the PA: a 50 Hz mains hum with a couple of harmonics, and a faint hiss
-      [[50, .035], [100, .018], [150, .008]].forEach(([f, v]) => {
-        const o = c.createOscillator(), g = c.createGain();
-        o.frequency.value = f; g.gain.value = v; o.connect(g).connect(out); o.start();
-      });
-      const hp = c.createBiquadFilter(), hg = c.createGain();
-      hp.type = "highpass"; hp.frequency.value = 6000; hg.gain.value = .05;
-      noise(c).connect(hp).connect(hg).connect(out);
-    }
-    function cheer() {   // a far-off swell, as if the other side of the stadium spotted a roadie
-      const c = Sound.ctx, t = c.currentTime, bp = c.createBiquadFilter(), g = c.createGain(), n = noise(c);
-      bp.type = "bandpass"; bp.frequency.value = 1200 + Math.random() * 800; bp.Q.value = .7;
-      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.35 + Math.random() * .25, t + 1.2); g.gain.linearRampToValueAtTime(0, t + 4);
-      n.connect(bp).connect(g).connect(out); n.stop(t + 4.1);
-    }
-    function update() {
-      if (!Sound.live) return;
-      try {
-        if (!out) build();
-        const want = S.phase === "lobby" ? (Host.speaking ? .3 : 1) * VOL : 0;
-        if (want !== target) { target = want; out.gain.setTargetAtTime(want, Sound.ctx.currentTime, want ? .8 : .35); }
-        const now = performance.now();
-        if (S.phase === "lobby" && now > cheerAt) { if (cheerAt) cheer(); cheerAt = now + 9000 + Math.random() * 14000; }
-      } catch {}
-    }
-    return { update };
-  })();
-
   // Preview links can change, so refresh them from Apple when the TV loads.
   (async () => {
     try {
@@ -1610,7 +1551,6 @@
       }
     });
     Confetti.draw(dt);
-    Ambience.update();
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
