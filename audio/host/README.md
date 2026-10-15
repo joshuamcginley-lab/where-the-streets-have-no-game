@@ -13,3 +13,4 @@ Voice lines for the planned MacPhisto host. Not wired into the game yet.
 | streak-larry-1.mp3 | Larry on a streak | Larry! FOUR in a row! / Is he a personal friend of mine? / He is... NOW. / Shall I give him a telephone call? / Shall I? / ...He's put me on hold. |
 | streak-bono-1.mp3 | Bono on a streak | Bono! FOUR in a row! / (rest as Larry) |
 | streak-adam-1.mp3 | Adam on a streak | Adam! FOUR in a row! / (rest as Larry) |
+| streak-edge-1.mp3 | The Edge on a streak | Edge! FOUR in a row! / (rest as Larry) |
