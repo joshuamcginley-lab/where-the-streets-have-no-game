@@ -29,3 +29,7 @@ without a network. Playwright can drive a full game this way.
   answers must be believable (real songs, people, places from U2's world, never jokes).
   Only add facts you are sure of.
 - Characters are in `members.js`. Photos are optional: `img/<id>.jpg`.
+- **Every question must have a MacPhisto reading.** Whenever questions are added or edited (in `questions.js`,
+  including the `ORDER` prompts), run `python3 tools/question-voice.py` in the same change. It makes the missing
+  readings through the ElevenLabs API (`audio/q/<id>.mp3`), deletes ones no question uses any more, and rebuilds
+  `question-voice.js`. Commit all three. It costs roughly 0.45 ElevenLabs credits per character of question text.

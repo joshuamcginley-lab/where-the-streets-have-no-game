@@ -585,7 +585,7 @@ window.MacPhisto = (() => {
       for (let i = 0; i < WALLS.length; i++) wallSet(i, { face: 1 });
       const gags = (GAGS[lineId] || []).map(g => ({ ...g, t: (line.phrases[g.p] ? line.phrases[g.p].t : 0) + (g.at || 0) }))
         .sort((a, b) => a.t - b.t);
-      audio.src = base + lineId + ".mp3";
+      audio.src = line.src || base + lineId + ".mp3";   // a line can live elsewhere (the question readings do)
       return new Promise(resolve => {
         // Only this line's own events may end it: a stopped line's play() can reject later.
         const me = cur = { id: lineId, line, gags, next: 0, phrase: -1, resolve, started: false };

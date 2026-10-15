@@ -434,8 +434,8 @@
   // ---------- timers
   function frame() {
     if (C.v?.phase === "question" && $("bar")) {
-      const left = Math.max(0, C.deadline - Date.now());
-      $("bar").style.transform = `scaleX(${left / ((C.v.q.secs || 20) * 1000)})`;
+      const full = (C.v.q.secs || 20) * 1000, left = Math.max(0, Math.min(full, C.deadline - Date.now()));   // full while MacPhisto reads
+      $("bar").style.transform = `scaleX(${left / full})`;
       $("bar").parentElement.classList.toggle("low", left < 5000);
       $("secs").textContent = Math.ceil(left / 1000) + "s";
     }

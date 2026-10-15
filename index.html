@@ -403,6 +403,7 @@
 <script src="covers.js"></script>
 <script src="net.js"></script>
 <script src="host-lines.js"></script>
+<script src="question-voice.js"></script>
 <script src="macphisto.js"></script>
 <script>
 (() => {
@@ -871,10 +872,17 @@
     recent: new Set(),   // everything dealt since the TV page loaded: never repeated tonight
     // Take n items from list that haven't been used in this pool. When too few are left, deal all of
     // those first, top up with ones not seen tonight, and start the pool's memory over from there.
-    take(pool, list, n, id) {
-      const seen = new Set(this.data[pool] || []);
+    // Read the memory again first: another TV window may have dealt (and saved) since this one loaded.
+    load() { try { this.data = JSON.parse(localStorage.getItem(this.key)) || {}; } catch {} },
+    take(pool, list, n, id, kind = () => "") {
+      this.load();
+      const seen = new Set([...(this.data[pool] || []), ...[...this.recent].filter(k => k.startsWith(pool + ":")).map(k => k.slice(pool.length + 1))]);
       const fresh = shuffle(list.filter(x => !seen.has(id(x))));
-      let picked = fresh.slice(0, n), restart = false;
+      // Variety: no two of the same kind of question (say, two "Which album features…") in one deal while others are left
+      const kinds = new Set(), varied = [];
+      for (const x of fresh) if (varied.length < n && (!kind(x) || !kinds.has(kind(x)))) { varied.push(x); kinds.add(kind(x)); }
+      for (const x of fresh) if (varied.length < n && !varied.includes(x)) varied.push(x);
+      let picked = varied, restart = false;
       if (picked.length < n) {
         restart = true;
         const rest = shuffle(list.filter(x => seen.has(id(x))));
@@ -887,6 +895,9 @@
       return picked;
     },
   };
+
+  // The kind of question, from how it starts ("which album features", "emoji time", "odd one out"…)
+  const questionKind = q => q.q.toLowerCase().replace(/[^a-z ]/g, " ").split(/\s+/).filter(Boolean).slice(0, 3).join(" ");
 
   function buildDeck(mode) {
     if ((mode === "songs" || mode === "deep-songs") && !SONGS.length) mode = mode === "songs" ? "casual" : "deep";   // song list didn't load
@@ -907,7 +918,7 @@
     if (covers.length) extras.push([coverAt, () => coverQuestion(Used.take("cover-" + mode, covers, 1, x => x.id)[0])]);
     if (ORDER?.some(o => o.modes.includes(mode))) extras.push([orderAt, () => orderQuestion(mode)]);
     // Only deal (and mark as used) the trivia questions that will actually be asked
-    const deck = Used.take(mode, Q.filter(q => q.m === mode), ROUND - extras.length, q => q.q);
+    const deck = Used.take(mode, Q.filter(q => q.m === mode), ROUND - extras.length, q => q.q, questionKind);
     extras.sort((a, b) => a[0] - b[0]).forEach(([at, make]) => deck.splice(at, 0, make()));
     return deck;
   }
@@ -983,6 +994,12 @@
     tourWinner: ["tour-winner-2", "tour-winner-1"],
   };
 
+  // MacPhisto reading the questions (question-voice.js): each becomes a host line "q-<id>" with no subtitles
+  const QV = window.QUESTION_VOICE || {};
+  if (window.HOST_LINES) for (const [text, v] of Object.entries(QV))
+    HOST_LINES["q-" + v.id] = { moment: "Question", dur: v.dur, fps: 25, env: v.env, phrases: [], src: `audio/q/${v.id}.mp3`, text };
+  const readingOf = q => (q && !q.song && QV[q.q] ? "q-" + QV[q.q].id : null);
+
   const Host = (() => {
     const box = document.createElement("div");
     const mp = window.MacPhisto && window.HOST_LINES ? MacPhisto.mount(box) : null;
@@ -1010,6 +1027,7 @@
       const safety = setTimeout(() => t === token && mp.stop(), (HOST_LINES[id].dur + 4) * 1000);
       return mp.say(id).then(played => {
         if (!played) return said.delete(id);   // a blocked line can be tried again
+        if (id.startsWith("q-")) return;   // question readings aren't in the rotation
         heard[id] = (heard[id] || 0) + 1;
         try { localStorage.setItem(HEARD, JSON.stringify(heard)); } catch {}
       }, () => said.delete(id)).finally(() => {
@@ -1119,9 +1137,14 @@
     S.players.forEach(p => { p.answer = null; p.gain = 0; p.ok = false; p.placed = 0; });
     S.qSecs = q.order ? ORDER_SECS : SECS;   // sorting four things takes longer than picking one
     couchSeq = [];
-    S.endsAt = Date.now() + S.qSecs * 1000;
+    // MacPhisto reads the question out (not a song: the clip is the question); the clock starts when he's done.
+    // Answers count from the start, so anyone who knows it while he's still talking gets full speed points.
+    const reading = Host.ready && readingOf(q), readMs = reading ? Math.round(Host.dur(reading) * 1000) + 300 : 0;
+    S.readingUntil = Date.now() + readMs;
+    S.endsAt = Date.now() + readMs + S.qSecs * 1000;
     clearTimeout(qTimer);
-    qTimer = setTimeout(reveal, S.qSecs * 1000 + 200);
+    qTimer = setTimeout(reveal, readMs + S.qSecs * 1000 + 200);
+    if (reading) Host.say(reading);
     sync();
   }
 
@@ -1237,9 +1260,21 @@
     return pick(.15, LINES.aside, true);
   }
 
+  // Enter while he's reading: stop him and start the clock now
+  function skipReading() {
+    if (S.phase !== "question" || Date.now() >= S.readingUntil) return;
+    Host.stop();
+    S.readingUntil = Date.now();
+    S.endsAt = Date.now() + S.qSecs * 1000;
+    clearTimeout(qTimer);
+    qTimer = setTimeout(reveal, S.qSecs * 1000 + 200);
+    sync();
+  }
+
   function reveal() {
     if (S.phase !== "question") return;
     clearTimeout(qTimer);
+    if (Host.speaking) Host.stop();   // everyone answered while he was still reading the question
     const q = S.deck[S.i], right = q.order ? -1 : q.opts.indexOf(q.a);
     const was = { leader: leader(), streak: new Map(S.players.map(p => [p.pid, p.streak])) };
     const fin = finaleNow();
@@ -1652,7 +1687,7 @@
     const dt = Math.min(.1, Math.max(0, (t - last) / 1000)); last = t;
     const now = Date.now();
     if (S.phase === "question" && $("bar")) {
-      const left = Math.max(0, S.endsAt - now), sec = Math.ceil(left / 1000), low = left < 5000;
+      const left = Math.max(0, Math.min(S.qSecs * 1000, S.endsAt - now)), sec = Math.ceil(left / 1000), low = left < 5000;   // full while he reads
       $("bar").style.transform = `scaleX(${left / (S.qSecs * 1000)})`;
       $("num").textContent = sec;
       $("timer").classList.toggle("low", low);
@@ -1714,6 +1749,7 @@
     } else if (k === "enter" && document.activeElement?.tagName !== "BUTTON") {
       if (S.phase === "lobby") startGame();
       else if (S.phase === "host") skipHost();
+      else if (S.phase === "question") skipReading();
       else if (S.phase === "reveal") nextQuestion();
       else if (S.phase === "final" && Date.now() - S.finalAt > 4000) { if (Host.speaking) Host.stop(); else nextRound(); }   // let the winner have their moment
     }

@@ -1,3 +1,4 @@
 # Temporary working copies made by background agents
 .claude/worktrees/
 audio/host/_raw/
+audio/q/*.raw.mp3
