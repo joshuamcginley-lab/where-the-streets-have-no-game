@@ -10,9 +10,12 @@ https://where-the-streets-have-no-game.pages.dev/ about a minute after every pus
 The owner wants every change live. After finishing a change:
 
 1. Test it (below).
-2. Commit straight to `main` and `git push origin main`. Don't open a pull request
+2. Stamp the version: `tools/version.sh` (or install it once as the pre-commit hook:
+   `cp tools/version.sh .git/hooks/pre-commit`). It writes the build number and date into the
+   bottom corner of the TV and phone pages, so the owner can tell a cached page from the latest.
+   Then commit straight to `main` and `git push origin main`. Don't open a pull request
    or use a feature branch unless asked.
-3. Check the live site picked it up, e.g. `curl` a changed file from the pages.dev URL.
+3. Check the live site picked it up, e.g. `curl` the page and look for the new version number.
 
 Only push working code: whatever is on `main` is what players see.
 

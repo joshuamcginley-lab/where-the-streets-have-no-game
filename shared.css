@@ -109,3 +109,7 @@ button { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* The build number and date (tools/version.sh), bottom corner: if it isn't the latest, the page is a cached copy */
+.ver { position: fixed; right: max(.4rem, env(safe-area-inset-right, 0px)); bottom: max(.3rem, env(safe-area-inset-bottom, 0px)); z-index: 50;
+  font: 500 10px/1 "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .06em; color: #fff; opacity: .35; pointer-events: none; }
