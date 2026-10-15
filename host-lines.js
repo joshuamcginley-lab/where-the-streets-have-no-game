@@ -805,5 +805,113 @@ window.HOST_LINES = {
   ],
   "fps": 25,
   "env": "0003qzd9927ibzwm50cymezpof110200000000000000000000000000006ggbcbbabd87431223720048521013576320000000000000000000000ise420mzssshahg627635tvope50007764205a443000478acfpwsud30001330008b206966200000000"
+ },
+ "streak-any-1": {
+  "moment": "Four in a row (anyone)",
+  "dur": 7.11,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "FOUR in a row!"
+   },
+   {
+    "t": 2.58,
+    "text": "Even better than the real thing..."
+   },
+   {
+    "t": 5.3,
+    "text": "Which is me, of course."
+   }
+  ],
+  "fps": 25,
+  "env": "00000000lvkzqxzzmoklzuqe63gpqheihomkjf83000000000000000000000000013sm12b33100067a10ff2kl68gg44finp60000a888573121000000000000000000028fvi02ah500bbbhgb400000000000000000000000000"
+ },
+ "streak-any-2": {
+  "moment": "Four in a row (anyone)",
+  "dur": 7.99,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Four in a ROW!"
+   },
+   {
+    "t": 2.84,
+    "text": "Oh... I'm getting vertigo."
+   },
+   {
+    "t": 5.79,
+    "text": "Somebody fetch my smelling salts."
+   }
+  ],
+  "fps": 25,
+  "env": "0003322100000000000qkgnwzlmnapog647rzmimotxf9310000000000000000000000000am00cb000001110000007e10320fa109540009aba00850534ce20000000000000000000000000300851421016702d3044000005992432000010000000000000"
+ },
+ "lead-change-2": {
+  "moment": "Lead change",
+  "dur": 8.33,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A new leader!"
+   },
+   {
+    "t": 2.21,
+    "text": "Celebrity is a job, you know."
+   },
+   {
+    "t": 4.89,
+    "text": "The hours are dreadful."
+   },
+   {
+    "t": 7.02,
+    "text": "But the boots are free."
+   }
+  ],
+  "fps": 25,
+  "env": "07tuebdc9bkzzvvupqmtjjftzuog49100000000000000000000000000002349702910032210020000025433000100000000100000000000000000000001310017abb96430000000020000034540000000000000000000004f60019304efg0000dc00069753300000"
+ },
+ "lead-change-3": {
+  "moment": "Lead change",
+  "dur": 7.5,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Oh dear... the old leader..."
+   },
+   {
+    "t": 3.57,
+    "text": "Stuck in a MOMENT."
+   },
+   {
+    "t": 5.56,
+    "text": "Can't get out of it, I'm told."
+   }
+  ],
+  "fps": 25,
+  "env": "000038a8663100000134579a974420000000000000344469b9302ba89880354322000000000000000000000000000000261000435554676432220000000000000000000000030twlb31fvfvzkmhjf6hf605eebb109daa86400000000000"
+ },
+ "lead-change-4": {
+  "moment": "Lead change",
+  "dur": 11.78,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Top of the table!"
+   },
+   {
+    "t": 2.33,
+    "text": "Somebody's got to play the rock star."
+   },
+   {
+    "t": 5.56,
+    "text": "I used to say that... in leather trousers."
+   },
+   {
+    "t": 9.34,
+    "text": "Before the trousers won."
+   }
+  ],
+  "fps": 25,
+  "env": "00000mzzr30qze100er6000004zzyk34530000000000000000000000000000008hj794ji7iic40hnl9018202ceea3866agc87000019b8765330000000000000000000000000000c8ceaa400061003adb96caa30000000000004775578a73f6010974210000000000000000000000000000000000009a41000000000000100009a9055022025754100000000000000000000000"
  }
 };

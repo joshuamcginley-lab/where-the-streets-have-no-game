@@ -57,6 +57,7 @@ window.MacPhisto = (() => {
     "streak-any-2": [{ p: 0, walls: { all: { text: "4 IN A ROW" } } }, { p: 1, walls: { all: { static: 1 } } }, { p: 2, walls: { all: { face: 1 } } }],
     "lead-change-2": [{ p: 1, walls: { all: { text: "CELEBRITY IS A JOB" } } }, { p: 3, zoom: "boots" }],
     "lead-change-3": [{ p: 1, walls: { all: { text: "STUCK IN A MOMENT" } } }],
+    "lead-change-4": [{ p: 1, walls: { all: { text: "SOMEBODY'S GOT TO PLAY THE ROCK STAR" } } }, { p: 2, walls: { all: { face: 1 } } }, { p: 3, zoom: "boots" }],
     "streak-broken-2": [{ p: 2, walls: { all: { text: "DEATH IS A CAREER MOVE" } } }, { p: 3, walls: { all: { face: 1 } } }],
     "winner-7": [{ p: 0, walls: { all: { text: "BEAUTIFUL DAY" } } }, { p: 2, walls: { all: { face: 1 } } }],
     "round-start-4": [{ p: 1, walls: { all: { text: "TELEVISION" } } }, { p: 3, at: 0.3, horns: 1, walls: { all: { face: 1 } } }],

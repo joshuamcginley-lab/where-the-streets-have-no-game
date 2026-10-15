@@ -42,3 +42,8 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | last-q-3.mp3 | Last question | My time among you... is almost at an END. / But don't fear... / I'll be WATCHING you. / I leave behind video cameras... for each of you. |
 | last-place-3.mp3 | Last place | To whoever is in last place... / I give you... / DECIBELS. / You're welcome. |
 | winner-5.mp3 | Final winner | Congratulations! / So now you can dream... of being as wealthy and GLAMOROUS as me. |
+| streak-any-1.mp3 | Four in a row (anyone) | FOUR in a row! / Even better than the real thing... / Which is me, of course. |
+| streak-any-2.mp3 | Four in a row (anyone) | Four in a ROW! / Oh... I'm getting vertigo. / Somebody fetch my smelling salts. |
+| lead-change-2.mp3 | Lead change | A new leader! / Celebrity is a job, you know. / The hours are dreadful. / But the boots are free. |
+| lead-change-3.mp3 | Lead change | Oh dear... the old leader... / Stuck in a MOMENT. / Can't get out of it, I'm told. |
+| lead-change-4.mp3 | Lead change | Top of the table! / Somebody's got to play the rock star. / I used to say that... in leather trousers. / Before the trousers won. |
