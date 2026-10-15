@@ -17,3 +17,4 @@ Voice lines for the planned MacPhisto host. Not wired into the game yet.
 | lead-change-1.mp3 | Lead change | Oh, how the mighty FALL... don't they? / I should know. / I used to be GIGANTIC, you know... / Never mind! / On with the show! |
 | winner-1.mp3 | Final winner | Look what you've done... / ...to me. / You've won, young man... and I'm AWFULLY proud. / Of course... it was all MY idea. / Everything was my idea. |
 | welcome-1.mp3 | New game | Welcome, welcome! / Yes... it's really me. / You made me very famous... / and I've never quite forgiven you. |
+| round-start-2.mp3 | Round start | Oh... it's you lot again. / How lovely. / I've had my boots polished, you know. / Shall we see who's been paying attention? |
