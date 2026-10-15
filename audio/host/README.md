@@ -2,7 +2,7 @@
 
 Voice lines for the planned MacPhisto host. Not wired into the game yet; preview them on `/host` (host.html), where he performs them on a tiny ZOO TV stage (macphisto.js).
 
-After adding a take here and a row to the table below, run `python3 tools/host-lines.py` to rebuild `host-lines.js` (the subtitle timings).
+After adding a take here and a row to the table below, run `python3 tools/host-lines.py` to rebuild `host-lines.js` (the subtitle timings and the loudness his lips follow).
 
 - Voice: ElevenLabs library voice "AK - British Posh Well-Spoken Old Man" on Eleven v4 (generated on the website; the free plan can't use library voices through the API). No cloning; Bono/U2/MacPhisto are never named in prompts.
 - Treatment: each take is cut at its natural pauses and re-spaced to MacPhisto's measured timing
