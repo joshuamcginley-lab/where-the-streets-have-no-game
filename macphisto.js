@@ -10,7 +10,8 @@
 // Wall gags use the band's icons from members.js (window.U2M) when it's loaded.
 window.MacPhisto = (() => {
   const NS = "http://www.w3.org/2000/svg";
-  const SLOGANS = ["WATCH MORE TV", "EVERYTHING YOU KNOW IS WRONG", "BELIEVE", "CALL ME", "IGNORANCE IS BLISS", "ZOO TV"];
+  // The ZOO TV screen slogans. "BELIEVE" is special: all but L-I-E fade away.
+  const SLOGANS = ["TASTE IS THE ENEMY OF ART", "RELIGION IS A CLUB", "IGNORANCE IS BLISS", "REBELLION IS PACKAGED", "BELIEVE", "EVERYTHING YOU KNOW IS WRONG"];
 
   // What happens on stage during a line. p = the subtitle phrase it starts on.
   // walls: what the video walls show ("all" or wall 0/1/2): text, avatar, static, cameras, eyes, eq.
@@ -74,6 +75,10 @@ window.MacPhisto = (() => {
       <ellipse class="mp-mouth" rx="2.1" ry=".12" fill="#2a0507"/>
       <path class="mp-lipline" d="M-3 0Q0 .45 3 0" stroke="#7d0a1b" stroke-width=".35" fill="none"/></g>`;
 
+  // The ZOO TV logo: a Z, then the two O's as circles holding a T and a V.
+  const LOGO = `<path d="M1 1.5H12L1 16.5H12.5"/><circle cx="25" cy="9" r="8"/><path d="M21 5.5H29M25 5.5V13.5"/>
+    <circle cx="44" cy="9" r="8"/><path d="M40.2 5.2 44 13.2 47.8 5.2"/>`;
+
   function build(root) {
     const svg = el("svg", { viewBox: "0 0 480 300", class: "mp-svg", role: "img", "aria-label": "MacPhisto on a tiny ZOO TV stage" });
     const uid = "mp" + Math.random().toString(36).slice(2, 7);
@@ -97,6 +102,7 @@ window.MacPhisto = (() => {
         <filter id="${id("noise")}" x="0" y="0" width="100%" height="100%">
           <feTurbulence class="mp-turb" type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="1"/>
           <feColorMatrix type="matrix" values="0 0 0 .9 0  0 0 0 .95 0  0 0 0 1.1 .05  0 0 0 0 1"/></filter>
+        <filter id="${id("neon")}" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="1.6"/></filter>
         <g id="${id("head")}">${HEAD}</g>
         ${WALLS.map((w, i) => `<clipPath id="${id("clip" + i)}"><rect x="${w.x}" y="${w.y}" width="${w.w}" height="${w.h}"/></clipPath>`).join("")}
       </defs>
@@ -160,6 +166,11 @@ window.MacPhisto = (() => {
             </g>
             <use href="#${id("head")}" class="mp-headuse" transform="translate(0 -112)"/>
           </g>
+        </g>
+        <g class="mp-logo" transform="translate(20 33) scale(1.15)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <g stroke="#ff6a2a" stroke-width="3" opacity=".35" filter="url(#${id("neon")})">${LOGO}</g>
+          <g stroke="#ff7a3a" stroke-width="1.3">${LOGO}</g>
+          <g stroke="#ffd2b0" stroke-width=".4">${LOGO}</g>
         </g>
         <rect class="mp-flash" width="480" height="300" fill="#fff" opacity="0" pointer-events="none"/>
       </g>`;
@@ -228,6 +239,18 @@ window.MacPhisto = (() => {
         const k = spec.eyes ? w.w / 9 : w.h / 22;
         el("use", { href: `#${id("head")}`, filter: `url(#${id("blue")})`,
           transform: `translate(${cx} ${spec.eyes ? cy + 3 * k : cy + 1.5 * k}) scale(${k})` }, g);
+      } else if (spec.believe) {
+        // BELIEVE, then everything but L-I-E fades away
+        const fs = Math.min(w.h * 0.42, (w.w * 0.9) / (7 * 0.62));
+        const t = el("text", { x: cx, y: cy, "text-anchor": "middle", "dominant-baseline": "central", fill: "#e2ecff",
+          "font-size": fs.toFixed(1), "font-family": "IBM Plex Mono, ui-monospace, monospace", "font-weight": 600 }, g);
+        const fade = [];
+        [..."BELIEVE"].forEach((ch, k) => {
+          const ts = el("tspan", {}, t);
+          ts.textContent = ch;
+          if (k < 2 || k > 4) { ts.style.transition = "opacity 1.6s ease-in 1.4s"; fade.push(ts); }
+        });
+        requestAnimationFrame(() => requestAnimationFrame(() => fade.forEach(ts => (ts.style.opacity = 0))));
       } else if (spec.text != null) {
         const words = spec.text.split(" ");
         const maxChars = Math.max(4, Math.round(w.w / 7));
@@ -265,13 +288,20 @@ window.MacPhisto = (() => {
       if (spec.all !== undefined) for (let i = 0; i < WALLS.length; i++) wallSet(i, spec.all);
       for (let i = 0; i < WALLS.length; i++) if (spec[i] !== undefined) wallSet(i, spec[i]);
     }
-    let sloganAt = 0, sloganIdx = 0;
+    // Idle: each wall changes on its own random clock to a slogan no other wall is showing,
+    // now and then a burst of static or a blank screen.
+    const wallNext = WALLS.map(() => 0);
     function idleWalls(now) {
-      if (now < sloganAt) return;
-      sloganAt = now + 3800;
       for (let i = 0; i < WALLS.length; i++) {
-        sloganIdx = (sloganIdx + 1) % SLOGANS.length;
-        wallSet(i, Math.random() < 0.18 ? { static: 1 } : { text: SLOGANS[(sloganIdx + i * 2) % SLOGANS.length] });
+        if (now < wallNext[i]) continue;
+        const showing = wallState.map(st => st && (st.text || (st.believe && "BELIEVE")));
+        const pool = SLOGANS.filter(x => !showing.includes(x));
+        const r = Math.random();
+        if (r < 0.12) { wallSet(i, { static: 1 }); wallNext[i] = now + 500 + Math.random() * 900; continue; }
+        if (r < 0.2) { wallSet(i, null); wallNext[i] = now + 800 + Math.random() * 1800; continue; }
+        const pick = pool[(Math.random() * pool.length) | 0];
+        wallSet(i, pick === "BELIEVE" ? { believe: 1 } : { text: pick });
+        wallNext[i] = now + (pick === "BELIEVE" ? 6500 : 3500 + Math.random() * 5500);
       }
     }
 
@@ -321,7 +351,7 @@ window.MacPhisto = (() => {
       cur = null;
       showSub("");
       resetGags();
-      sloganAt = 0;
+      wallNext.fill(0);
       r();
     }
     function stop() {
