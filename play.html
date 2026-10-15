@@ -283,7 +283,7 @@
       `<button type="button" class="key ch${k + 1} ${picked === k ? "picked" : picked !== null ? "off" : ""}" data-k="${k}" ${picked !== null ? "disabled" : ""}><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
     return `<div class="qhead mono"><span>Q ${v.q.n}/${v.q.total}</span><span id="secs"></span></div>
       <div class="meter"><i id="bar"></i></div>
-      <p class="muted">${picked !== null ? "Locked in. Waiting for the others." : v.q.song ? "Listen to the TV. Which song is it?" : "The question is on the TV. Pick your answer."}</p>
+      <p class="muted">${picked !== null ? "Locked in. Waiting for the others." : v.q.song ? "Listen to the TV. Which song is it?" : v.q.cover ? "Look at the TV. Which album is it?" : "The question is on the TV. Pick your answer."}</p>
       <div class="pad">${keys}</div>`;
   }
 

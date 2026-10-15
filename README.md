@@ -5,6 +5,7 @@ A U2 trivia party game in the style of Jackbox. The TV shows the questions; ever
 - **1–4 players.** Each picks a character: Bono, The Edge, Adam Clayton, Larry Mullen Jr., MacPhisto or Mirror Ball Man. No two players can pick the same one.
 - **Three modes.** *Casual Fan* (the hits and the big moments), *Deep Cuts* (B-sides, studios, producers, tour lore) and *Name That Song* (a clip plays on the TV; name it). Casual and Deep Cuts games also include one song clip.
 - **Song clips** are Apple Music's 30-second previews, streamed from Apple (nothing is hosted here). The list is in `songs.js`. Click the TV screen once before playing so the browser allows sound.
+- **Album covers.** Casual and Deep Cuts rounds also include one "Name the album" question: the TV zooms in on a detail of a U2 cover and slowly pulls back. The list is in `covers.js` (artwork streamed from Apple). Passengers' *Original Soundtracks 1* only turns up in Deep Cuts.
 - **Rounds of 10 questions**, 4 choices each, 20 seconds per question. Faster answers and streaks score more. After each round, pick the next round's mode and keep going: scores carry over. Click the title band to start a new game.
 - **No repeats.** The TV remembers which questions and clips it has used (in that browser, across nights) and won't repeat one until it has been through the whole pool for that mode.
 - **Solo:** click a character on the TV screen to play right there with a mouse or keys 1–4. No phone needed.
