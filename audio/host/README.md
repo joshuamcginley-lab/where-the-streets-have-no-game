@@ -24,3 +24,4 @@ Voice lines for the planned MacPhisto host. Not wired into the game yet.
 | streak-broken-1.mp3 | Streak broken | Oh! The streak is BROKEN! / Fame is so fleeting... isn't it? / Except mine. |
 | song-1.mp3 | Song clip question | Listen carefully... / I wrote this one, you know. / Well... I was in the room. |
 | last-place-1.mp3 | Last place | Oh dear... someone's at the bottom. / Don't worry. / I've been down there. It's very WARM. |
+| last-place-2.mp3 | Last place | Last place... / I'll put in a good word for you. / Downstairs. |
