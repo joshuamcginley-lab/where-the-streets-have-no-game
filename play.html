@@ -212,8 +212,6 @@
     edge:       { lock: [50, 110, 32, 110, 18, 110, 10], right: [80, 110, 50, 110, 30, 110, 16] },   // a fading echo
     adam:       { lock: [90], right: [90, 90, 45, 70, 25] },                                         // a bass thump; the hat bouncing
     larry:      { lock: [16, 22, 16, 22, 16, 22, 16, 22, 60], right: [16, 22, 16, 22, 16, 22, 16, 22, 16, 22, 50, 60, 90] },   // drum roll
-    macphisto:  { lock: [220, 120, 70], right: [220, 120, 220, 320, 220, 120, 220] },                // ring-ring
-    mirrorball: { lock: [12, 45, 12, 70, 12, 35, 12], right: [12, 35, 12, 55, 12, 30, 12, 70, 12, 40, 12] },   // glitter
   };
   const buzzFor = (kind, fallback) => BUZZ[C.v?.me?.member]?.[kind] || fallback;
 
@@ -227,16 +225,18 @@
     const focusId = document.activeElement?.id;
     // Screens with entrance animations are only rebuilt when they change, so another
     // player's update doesn't replay them.
-    const key = C.status !== "live" ? C.status : v.phase === "question" || v.phase === "reveal" ? `${v.phase}:${v.q.n}` : v.phase === "final" ? `final:${v.fin.round}:${v.mode}:${v.vip}` : v.phase;
+    const key = C.status !== "live" ? C.status : v.phase === "question" || v.phase === "reveal" ? `${v.phase}:${v.q.n}`
+      : v.phase === "final" ? `final:${v.fin.round}:${v.mode}:${v.vip}` : v.phase === "host" ? `host:${v.host.key}:${v.vip}` : v.phase;
     const fresh = key !== C.shownKey;
     C.shownKey = key;
-    if (!fresh && (key.startsWith("reveal") || key === "final" || key === "countin")) return;
+    if (!fresh && (key.startsWith("reveal") || key.startsWith("final") || key.startsWith("host") || key === "countin")) return;
     s.classList.toggle("enter", fresh);
     s.classList.remove("calm");
     if (C.status === "form" || C.status === "error") s.innerHTML = formView();
     else if (C.status === "connecting") s.innerHTML = msgView("Connecting", `Finding room ${esc(C.code)}…`);
     else if (C.status === "lost") s.innerHTML = msgView("Reconnecting", "Lost the TV for a moment. Hang on, your seat is saved.");
     else if (v.phase === "lobby") s.innerHTML = lobbyView(v);
+    else if (v.phase === "host") s.innerHTML = hostView(v);
     else if (v.phase === "countin") s.innerHTML = countinView(v);
     else if (v.phase === "question") s.innerHTML = questionView(v);
     else if (v.phase === "reveal") s.innerHTML = revealView(v);
@@ -277,6 +277,13 @@
         ${v.waiting ? `<p class="muted">Waiting for ${v.waiting} player${v.waiting > 1 ? "s" : ""} to pick a character.</p>` : ""}
       </div>` : mine ? `<p class="muted" style="text-align:center">Mode: <b>${MODES.find(m => m.id === v.mode).name}</b>. The VIP starts the game.</p>` : "";
     return `${head}${mine ? vip : ""}<div class="chars">${chars}</div>${mine ? "" : vip}`;
+  }
+
+  // MacPhisto has the floor on the TV; the VIP can cut him short
+  function hostView(v) {
+    return `<div class="hero"><div class="label">${esc(v.host.label.toUpperCase())}</div><h2>MacPhisto has the floor</h2>
+        <p class="muted">Eyes on the TV.</p></div>
+      ${v.vip ? `<button type="button" class="btn ghost" id="btn-skip">Skip him</button>` : ""}`;
   }
 
   function countinView(v) {
@@ -360,6 +367,7 @@
     }
     else if (b.id === "btn-start") send({ t: "start" });
     else if (b.id === "btn-next") send({ t: "next" });
+    else if (b.id === "btn-skip") send({ t: "skip" });
     else if (b.id === "btn-again") send({ t: "again" });
     else if (b.id === "btn-lobby") send({ t: "lobby" });
   });

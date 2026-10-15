@@ -1,4 +1,4 @@
-// The playable characters: the four band members plus two of Bono's ZOO TV alter egos.
+// The playable characters: the four band members. (MacPhisto is the host now; see macphisto.js.)
 // Each player picks one; no two players can share.
 // To use photos instead of the drawn icons, put square images at the `photo`
 // paths below (e.g. img/bono.jpg). Missing files fall back to the icon.
@@ -35,16 +35,6 @@ window.U2M = (() => {
         '<rect x="24" y="36.5" width="5.5" height="2" rx="1"/><rect x="35" y="36.5" width="5.5" height="2" rx="1"/>' +
         '<path d="M26.5 44.5c3.4 2.6 7.6 2.6 11 0l.9 1.3c-4 3.4-8.8 3.4-12.8 0z"/></g>' +
         '<g class="sparkles"><path d="M54 4l1.9 5.1L61 11l-5.1 1.9L54 18l-1.9-5.1L47 11l5.1-1.9z"/><path d="M9 17l1.2 3 3 1.2-3 1.2L9 25.5l-1.2-3.1-3-1.2 3-1.2z"/></g>',
-    },
-    {
-      id: "macphisto", name: "MacPhisto", role: "Alter ego", color: "#d9a441", photo: "img/macphisto.jpg",
-      // devil horns
-      icon: '<circle cx="32" cy="40" r="17"/><path class="horns" d="M19 31C11 24 9 13 13 3c3 10 9 17 15 21zM45 31c8-7 10-18 6-28-3 10-9 17-15 21z"/><g style="fill:var(--mc)"><path d="M22 37l8 3-8 2zM42 37l-8 3 8 2z"/></g>',
-    },
-    {
-      id: "mirrorball", name: "Mirror Ball Man", role: "Alter ego", color: "#c4ccd6", photo: "img/mirrorball.jpg",
-      // the mirror ball
-      icon: '<defs><clipPath id="mb-clip"><circle cx="32" cy="36" r="24"/></clipPath></defs><rect x="30" y="1" width="4" height="9"/><circle cx="32" cy="36" r="24"/><g style="fill:var(--mc)" opacity=".75" clip-path="url(#mb-clip)"><path d="M8 30h48v3H8zM8 40h48v3H8zM12 21h40v3H12zM12 49h40v3H12z"/><path d="M31 12h3v48h-3zM21 14h3v44h-3zM41 14h3v44h-3z"/></g>',
     },
   ];
 

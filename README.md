@@ -2,13 +2,14 @@
 
 A U2 trivia party game in the style of Jackbox. The TV shows the questions; everyone answers on their phone.
 
-- **1–4 players.** Each picks a character: Bono, The Edge, Adam Clayton, Larry Mullen Jr., MacPhisto or Mirror Ball Man. No two players can pick the same one.
+- **1–4 players.** Each picks a band member: Bono, The Edge, Adam Clayton or Larry Mullen Jr. No two players can pick the same one.
 - **Three modes.** *Casual Fan* (the hits and the big moments), *Deep Cuts* (B-sides, studios, producers, tour lore) and *Name That Song* (a clip plays on the TV; name it). Casual and Deep Cuts games also include one song clip.
 - **Song clips** are Apple Music's 30-second previews, streamed from Apple (nothing is hosted here). The list is in `songs.js`. Click the TV screen once before playing so the browser allows sound.
 - **Album covers.** Casual and Deep Cuts rounds also include one "Name the album" question: the TV zooms in on a detail of a U2 cover and slowly pulls back. The list is in `covers.js` (artwork streamed from Apple). Passengers' *Original Soundtracks 1* only turns up in Deep Cuts.
 - **Rounds of 10 questions**, 4 choices each, 20 seconds per question. Faster answers and streaks score more. After each round, pick the next round's mode and keep going: scores carry over. Click the title band to start a new game.
 - **No repeats.** The TV remembers which questions and clips it has used (in that browser, across nights) and won't repeat one until it has been through the whole pool for that mode.
 - **Solo:** click a character on the TV screen to play right there with a mouse or keys 1–4. No phone needed.
+- **MacPhisto hosts.** He stands on a miniature ZOO TV stage (video walls, Trabants, the tour's slogans) and talks between questions, never over one: in the lobby, at the start of each round, before the song, album and last questions (once a night each), on some reveals (four in a row, a lead change, a broken streak, everyone or nobody right…), at the final scores, and to say goodnight. Press **Enter** on the TV (or **Skip him** on the VIP's phone) to cut him short. Preview every line at `/host`. The voice lines are in `audio/host/`.
 
 ## How to play
 
@@ -19,7 +20,7 @@ A U2 trivia party game in the style of Jackbox. The TV shows the questions; ever
 
 **Bono's count-in.** Before the first question the TV plays the opening of "Vertigo" (`audio/vertigo-intro.m4a`), with "UNOS · DOS · TRES · ¡CATORCE!" timed to Bono's voice and the band crashing in on the last word. If the clip can't play, a computer voice does the count-in instead. If you swap in a different clip, open `/sync` on the TV computer to tap along and re-time the words, then put the new numbers in `CLIP_AT` in `index.html`.
 
-TV keyboard shortcuts: **Enter** start or next, **1–4** answer for the on-screen player, **F** full screen. Sound is always on.
+TV keyboard shortcuts: **Enter** start, next, or skip MacPhisto, **1–4** answer for the on-screen player, **F** full screen. Sound is always on.
 
 ## Getting it on the TV
 
@@ -57,7 +58,7 @@ If the TV says phones can't connect (some corporate or school networks block Web
 ## Customising
 
 - **Questions** live in `questions.js`. Each has the question, the right answer, three believable wrong answers, and a fact shown after the reveal. A game draws 10 at random from the chosen mode.
-- **Character photos:** the characters use drawn icons. To use photos, add square images named `img/bono.jpg`, `img/edge.jpg`, `img/adam.jpg`, `img/larry.jpg`, `img/macphisto.jpg` and `img/mirrorball.jpg`. Any that exist replace the icon automatically. Only use photos you have the right to publish.
+- **Character photos:** the characters use drawn icons. To use photos, add square images named `img/bono.jpg`, `img/edge.jpg`, `img/adam.jpg` and `img/larry.jpg`. Any that exist replace the icon automatically. Only use photos you have the right to publish.
 
 ## Testing locally
 
@@ -75,7 +76,7 @@ Serve the folder with any static server, for example `python3 -m http.server 800
 | `index.html` | The TV screen (host) |
 | `play.html` | The phone controller |
 | `questions.js` | Question bank for both modes |
-| `members.js` | The six playable characters |
+| `members.js` | The four playable characters |
 | `net.js` | Connection layer (PeerJS, or local test mode) |
 | `host.html`, `macphisto.js`, `host-lines.js` | MacPhisto, the host, on his miniature ZOO TV stage (preview page; lines in `audio/host/`) |
 | `shared.css` | Shared colours and type |
