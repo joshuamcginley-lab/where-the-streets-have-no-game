@@ -339,6 +339,13 @@ window.MacPhisto = (() => {
       }
     }
 
+    // Show a message on every wall for a while (between lines, e.g. "PLACE YOUR BETS")
+    function hold(text, ms = 8000) {
+      if (cur) return;
+      for (let i = 0; i < WALLS.length; i++) wallSet(i, { text });
+      wallNext.fill(performance.now() + ms);
+    }
+
     // ---- poses and gags
     let hornsOffAt = -1, zoomTarget = 0, zoom = 0, flashAt = -1, phone = false;
     function setPhone(on) {
@@ -479,7 +486,7 @@ window.MacPhisto = (() => {
     let raf = requestAnimationFrame(frame);
 
     return {
-      say, stop, unlock,
+      say, stop, unlock, walls: hold,
       get speaking() { return !!cur; },
       lines: () => Object.keys(lines),
       destroy() { stop(); cancelAnimationFrame(raf); audio.removeAttribute("src"); audio.load(); svg.remove(); sub.remove(); },

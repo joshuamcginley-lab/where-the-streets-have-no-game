@@ -68,7 +68,7 @@
 
   .vipbox { --fw: 5px; --sw: 6px; border: var(--fw) solid transparent; background: linear-gradient(var(--bg), var(--bg)) padding-box, var(--stripes) border-box; padding: 12px; display: grid; gap: 12px; }
   .vipbox .label { color: var(--fg); }
-  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .seg { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .seg button { background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 10px 6px; cursor: pointer; font-weight: 600; font-size: 14px; line-height: 1.2; }
   .seg button[aria-pressed="true"] { border-color: var(--red); background: color-mix(in srgb, var(--red) 18%, transparent); }
 
@@ -237,10 +237,11 @@
     // Screens with entrance animations are only rebuilt when they change, so another
     // player's update doesn't replay them.
     const key = C.status !== "live" ? C.status : v.phase === "question" ? `question:${v.q.n}` : v.phase === "reveal" ? `reveal:${v.q.n}:${v.vip}`
-      : v.phase === "final" ? `final:${v.fin.round}:${v.mode}:${v.vip}` : v.phase === "host" ? `host:${v.host.key}:${v.vip}` : v.phase;
+      : v.phase === "final" ? `final:${v.fin.round}:${v.mode}:${v.vip}` : v.phase === "host" ? `host:${v.host.key}:${v.vip}`
+      : v.phase === "wager" ? `wager:${v.wager.mine}` : v.phase;
     const fresh = key !== C.shownKey;
     C.shownKey = key;
-    if (!fresh && (key.startsWith("reveal") || key.startsWith("final") || key.startsWith("host") || key === "countin")) return;
+    if (!fresh && (key.startsWith("reveal") || key.startsWith("final") || key.startsWith("host") || key.startsWith("wager") || key === "countin")) return;
     s.classList.toggle("enter", fresh);
     s.classList.remove("calm");
     if (C.status === "form" || C.status === "error") s.innerHTML = formView();
@@ -248,6 +249,7 @@
     else if (C.status === "lost") s.innerHTML = msgView("Reconnecting", "Lost the TV for a moment. Hang on, your seat is saved.");
     else if (v.phase === "lobby") s.innerHTML = lobbyView(v);
     else if (v.phase === "host") s.innerHTML = hostView(v);
+    else if (v.phase === "wager") s.innerHTML = wagerView(v);
     else if (v.phase === "countin") s.innerHTML = countinView(v);
     else if (v.phase === "question") s.innerHTML = questionView(v);
     else if (v.phase === "reveal") s.innerHTML = revealView(v);
@@ -297,6 +299,19 @@
       ${v.vip ? `<button type="button" class="btn ghost" id="btn-skip">Skip him</button>` : ""}`;
   }
 
+  // The final wager: bet part of your score on the last question
+  function wagerView(v) {
+    const w = v.wager;
+    if (w.mine !== null) return `<div class="hero"><div class="label">FINAL WAGER</div><h2>Bet placed</h2>
+        <div class="big">${w.mine}</div><p class="muted">Right and you win it. Wrong and you lose it. Eyes on the TV.</p></div>`;
+    const names = ["Nothing", "A little", "Half", "Everything"];
+    const keys = w.tiers.map((a, k) =>
+      `<button type="button" class="key ch${k + 1}" data-wager="${k}"><span class="ch">${k + 1}</span><span>${names[k]}${k ? ` · ${a}` : ""}</span></button>`).join("");
+    return `<div class="hero"><div class="label">FINAL WAGER</div><h2>Place your bet</h2>
+        <p class="muted">You have <b>${w.score}</b> points. Bet on the last question: right wins your bet, wrong loses it.</p></div>
+      <div class="pad">${keys}</div>`;
+  }
+
   function countinView(v) {
     // Same timing as the TV: quick UNOS-DOS-TRES, a beat, then CATORCE holds.
     const at = v.countAt || [0, .5, 1, 1.85], total = v.countMs || 4400, elapsed = (total - (v.countLeft ?? total)) / 1000;
@@ -311,6 +326,7 @@
       `<button type="button" class="key ch${k + 1} ${picked === k ? "picked" : picked !== null ? "off" : ""}" data-k="${k}" ${picked !== null ? "disabled" : ""}><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
     return `<div class="qhead mono"><span>Q ${v.q.n}/${v.q.total}</span><span id="secs"></span></div>
       <div class="meter"><i id="bar"></i></div>
+      ${v.q.finale ? `<p class="verdict ok" style="margin:0">${v.q.finale === "wager" ? `Final wager: ${v.q.wager || 0} on the line` : "Double points!"}</p>` : ""}
       <p class="muted">${picked !== null ? "Locked in. Waiting for the others." : v.q.song ? "Listen to the TV. Which song is it?" : v.q.cover ? "Look at the TV. Which album is it?" : "The question is on the TV. Pick your answer."}</p>
       <div class="pad">${keys}</div>`;
   }
@@ -320,7 +336,7 @@
     const keys = v.q.opts.map((o, k) =>
       `<button type="button" class="key ch${k + 1} ${k === r.right ? "right" : v.my === k ? "picked" : "off"}" disabled><span class="ch">${k + 1}</span><span>${esc(o)}</span></button>`).join("");
     const head = r.ok ? `<div class="verdict ok">Correct</div><div class="big">+${r.gain}</div>`
-      : `<div class="verdict no">${v.my === null ? "Too slow" : "Not quite"}</div>`;
+      : `<div class="verdict no">${v.my === null ? "Too slow" : "Not quite"}</div>${r.gain < 0 ? `<div class="big">−${-r.gain}</div>` : ""}`;
     return `<div class="hero">${head}
         <div class="stats"><span>Score <b>${v.me.score}</b></span><span>Place <b>${ordinal(r.place)}</b> of ${r.of}</span>${r.streak > 1 ? `<span>Streak <b>${r.streak}</b></span>` : ""}</div></div>
       ${v.vip ? `<button type="button" class="btn" id="btn-next">${v.q.n < v.q.total ? "Next question" : "Final scores"}</button>` : ""}
@@ -330,13 +346,17 @@
   function finalView(v) {
     const f = v.fin;
     return `<div class="hero">${avatar(v.me.member)}
-        <div class="label">${f.round > 1 ? `AFTER ROUND ${f.round} · ` : ""}${f.place === 1 ? "TONIGHT'S HEADLINER" : "STANDINGS"}</div>
+        <div class="label">${f.tour ? (f.tour.next ? `TOURNAMENT · AFTER ROUND ${f.tour.leg} OF 3` : f.place === 1 ? "TOURNAMENT CHAMPION" : "TOURNAMENT · FINAL STANDINGS")
+          : `${f.round > 1 ? `AFTER ROUND ${f.round} · ` : ""}${f.place === 1 ? "TONIGHT'S HEADLINER" : "STANDINGS"}`}</div>
         <div class="verdict ${f.place === 1 ? "ok" : ""}">${ordinal(f.place)} place</div>
         <div class="big">${f.score}</div>
         <div class="stats"><span>This round <b>+${f.gained}</b></span><span>Right <b>${f.correct}/${f.total}</b></span></div></div>
-      ${v.vip ? `<div class="vipbox"><span class="label">NEXT ROUND</span>
+      ${v.vip && f.tour?.next ? `<div class="vipbox"><span class="label">TOURNAMENT · NEXT UP: ${esc(f.tour.next.toUpperCase())}</span>
+          <button type="button" class="btn" id="btn-again">Start round ${f.tour.leg + 1} of 3</button>
+          <button type="button" class="btn ghost" id="btn-lobby">New game</button></div>`
+        : v.vip ? `<div class="vipbox"><span class="label">NEXT ROUND</span>
           <div class="seg">${MODES.map(m => `<button type="button" id="mode-${m.id}" data-mode="${m.id}" aria-pressed="${v.mode === m.id}">${m.name}</button>`).join("")}</div>
-          <button type="button" class="btn" id="btn-again">Start round ${f.round + 1}</button>
+          <button type="button" class="btn" id="btn-again">${v.mode === "tournament" ? "New tournament" : `Start round ${f.round + 1}`}</button>
           <button type="button" class="btn ghost" id="btn-lobby">New game</button></div>`
         : `<p class="muted" style="text-align:center">The VIP picks the next round.</p>`}`;
   }
@@ -379,6 +399,7 @@
     else if (b.id === "btn-start") send({ t: "start" });
     else if (b.id === "btn-next") send({ t: "next" });
     else if (b.id === "btn-skip") send({ t: "skip" });
+    else if (b.dataset.wager !== undefined && C.v?.phase === "wager" && C.v.wager.mine === null) { send({ t: "wager", k: Number(b.dataset.wager) }); buzz(buzzFor("lock", 25)); }
     else if (b.id === "btn-again") send({ t: "again" });
     else if (b.id === "btn-lobby") send({ t: "lobby" });
   });

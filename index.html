@@ -64,7 +64,7 @@
     font-style: normal; font-family: var(--font-stencil); color: var(--ink-on-signal);
     background: var(--red); padding: 0 .16em; margin-left: .04em; display: inline-block; transform: skewX(-10deg);
   }
-  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+  .modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; }
   .soundhint { color: var(--red); font-weight: 600; margin: 0; }
 
   /* name-that-song: bars that bounce while the clip plays */
@@ -155,6 +155,25 @@
   .play.hosting .ans { padding-block: .45rem; }
   .fact .host-slot:empty, .fact .host-slot[hidden] { display: none; }
   .final .host-col { width: 21rem; align-self: center; }
+
+  /* ---------- the finale: a wager before the last question, or double points ---------- */
+  .wager { display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 1rem; min-height: 0; }
+  .wager h1 { font-size: 5rem; animation: slam .6s cubic-bezier(.2,.9,.3,1.2) backwards; }
+  .wager .how { font-size: 1.35rem; color: var(--muted); margin: 0; max-width: 60ch; }
+  .wager-row { display: grid; grid-template-columns: 1fr 22rem; gap: 1.6rem; align-items: center; min-height: 0; }
+  .bets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; align-content: center; }
+  .bet { --mc: var(--muted); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .9rem; align-items: center; background: var(--screen);
+    border: 2px solid var(--line); border-radius: .45rem; padding: .8rem 1rem; }
+  .bet .av { width: 3.4rem; }
+  .bet b { display: block; font-size: 1.3rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bet div span { font: 600 .85rem var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .bet.in { border-color: var(--mc); }
+  .bet.in div span { color: var(--mc); }
+  .bet.in .av { animation: pop .45s cubic-bezier(.2,.9,.3,1.4); }
+  .wager-picks { display: flex; gap: .7rem; flex-wrap: wrap; align-items: center; }
+  .wager-picks .pick { font-size: 1.2rem; }
+  .hud .finale { font: 700 .9rem var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-on-signal);
+    background: var(--red); padding: .25rem .6rem; border-radius: .2rem; animation: pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
 
   /* ---------- count-in: the whole screen goes to racing stripes ---------- */
   .countin { position: fixed; inset: 0; z-index: 3; display: grid; place-items: center; --sw: 1.6rem; }
@@ -323,7 +342,8 @@
     /* A portrait screen (someone opened the TV page on a phone): stack. */
     html { font-size: clamp(11px, 2.4vw, 22px); }
     body { overflow: auto; }
-    .lobby, .final, .lobby-top { grid-template-columns: 1fr; }
+    .lobby, .final, .lobby-top, .wager-row { grid-template-columns: 1fr; }
+    .bets { grid-template-columns: 1fr; }
     .final .host-col { width: min(23rem, 100%); justify-self: center; }
     /* the page scrolls instead of squeezing everything into one screen */
     .tv { flex: none; }
@@ -367,7 +387,7 @@
 (() => {
   const { MODES, Q, RANKS } = U2;
   const { MEMBERS, byId, avatar, loadPhotos } = U2M;
-  const MAX = 4, ROUND = 10, SECS = 20, REVEAL_MS = 12000, COUNT_HOLD = 2.55, LOBBY_GRACE_MS = 60000, STALE_MS = 12000;
+  const MAX = 4, ROUND = 10, SECS = 20, REVEAL_MS = 12000, WAGER_SECS = 15, COUNT_HOLD = 2.55, LOBBY_GRACE_MS = 60000, STALE_MS = 12000;
   const CODE_CHARS = "BCDFGHJKLMNPQRSTVWXZ";
   const COUNT_WORDS = ["UNOS", "DOS", "TRES", "¡CATORCE!"];
   // When each word lands, in seconds. The gap before CATORCE is the joke, and CATORCE then
@@ -722,6 +742,7 @@
       if (m.t === "ping") return c.send({ t: "pong" });
       if (m.t === "pick") return pick(p, m.member);
       if (m.t === "answer") return submit(p, m.k);
+      if (m.t === "wager") return placeWager(p, m.k);
       if (p !== vip()) return;
       if (m.t === "mode" && (S.phase === "lobby" || S.phase === "final") && MODES.some(x => x.id === m.mode)) setMode(m.mode);
       else if (m.t === "start" && S.phase === "lobby") startGame();
@@ -828,8 +849,9 @@
   };
 
   function buildDeck(mode) {
-    if (mode === "songs" && !SONGS.length) mode = "casual";   // song list didn't load
+    if ((mode === "songs" || mode === "deep-songs") && !SONGS.length) mode = mode === "songs" ? "casual" : "deep";   // song list didn't load
     const songId = x => x.id;
+    if (mode === "deep-songs") return Used.take("song-deep", SONGS.filter(x => x.tier === "deep"), ROUND, songId).map(songQuestion);
     if (mode === "songs") {
       const hits = Used.take("song-hit", SONGS.filter(x => x.tier === "hit"), 6, songId);
       const deep = Used.take("song-deep", SONGS.filter(x => x.tier === "deep"), 4, songId);
@@ -942,7 +964,7 @@
       box.className = "host " + cls;
       if (box.parentNode !== slot) slot.appendChild(box);
     }
-    return { ready: !!mp, pick, say, sayNext, stop, place, unlock: () => mp?.unlock(), dur: id => (has(id) ? HOST_LINES[id].dur : 0), get speaking() { return !!mp?.speaking; } };
+    return { ready: !!mp, pick, say, sayNext, stop, place, unlock: () => mp?.unlock(), walls: (text, ms) => mp?.walls(text, ms), dur: id => (has(id) ? HOST_LINES[id].dur : 0), get speaking() { return !!mp?.speaking; } };
   })();
 
   // His own spot: the screen is his until the line ends (or someone skips), then then() carries on.
@@ -959,6 +981,65 @@
   }
   function skipHost() { if (S.phase === "host") Host.stop(); }
 
+  // ---------- the lobby soundscape: a stadium before the show. A crowd murmuring, the PA's mains hum
+  // and hiss, and a distant cheer now and then. All synthesised (nothing to license). It fades out when
+  // the game starts and dips whenever MacPhisto talks.
+  const Ambience = (() => {
+    const VOL = .32;
+    let out = null, buf = null, target = -1, cheerAt = 0;
+    function noise(c) {
+      const n = c.createBufferSource();
+      n.buffer = buf; n.loop = true;
+      n.start(c.currentTime, Math.random() * buf.duration);
+      return n;
+    }
+    function build() {
+      const c = Sound.ctx, len = c.sampleRate * 4;
+      buf = c.createBuffer(1, len, c.sampleRate);
+      const d = buf.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0;   // pink-ish noise: softer, more like a room than white noise
+      for (let i = 0; i < len; i++) {
+        const w = Math.random() * 2 - 1;
+        b0 = .99765 * b0 + w * .099046; b1 = .963 * b1 + w * .2965164; b2 = .57 * b2 + w * 1.0526913;
+        d[i] = (b0 + b1 + b2 + w * .1848) * .11;
+      }
+      out = c.createGain(); out.gain.value = 0; out.connect(c.destination);
+      // the crowd: voices in three bands whose loudness wanders on its own slow clock
+      [[380, 1.1, .07], [850, 1.4, .11], [1800, 2, .16]].forEach(([f, q, rate]) => {
+        const bp = c.createBiquadFilter(), g = c.createGain(), lfo = c.createOscillator(), depth = c.createGain();
+        bp.type = "bandpass"; bp.frequency.value = f; bp.Q.value = q;
+        g.gain.value = .45; lfo.frequency.value = rate; depth.gain.value = .22;
+        lfo.connect(depth).connect(g.gain); lfo.start();
+        noise(c).connect(bp).connect(g).connect(out);
+      });
+      // the PA: a 50 Hz mains hum with a couple of harmonics, and a faint hiss
+      [[50, .035], [100, .018], [150, .008]].forEach(([f, v]) => {
+        const o = c.createOscillator(), g = c.createGain();
+        o.frequency.value = f; g.gain.value = v; o.connect(g).connect(out); o.start();
+      });
+      const hp = c.createBiquadFilter(), hg = c.createGain();
+      hp.type = "highpass"; hp.frequency.value = 6000; hg.gain.value = .05;
+      noise(c).connect(hp).connect(hg).connect(out);
+    }
+    function cheer() {   // a far-off swell, as if the other side of the stadium spotted a roadie
+      const c = Sound.ctx, t = c.currentTime, bp = c.createBiquadFilter(), g = c.createGain(), n = noise(c);
+      bp.type = "bandpass"; bp.frequency.value = 1200 + Math.random() * 800; bp.Q.value = .7;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.35 + Math.random() * .25, t + 1.2); g.gain.linearRampToValueAtTime(0, t + 4);
+      n.connect(bp).connect(g).connect(out); n.stop(t + 4.1);
+    }
+    function update() {
+      if (!Sound.live) return;
+      try {
+        if (!out) build();
+        const want = S.phase === "lobby" ? (Host.speaking ? .3 : 1) * VOL : 0;
+        if (want !== target) { target = want; out.gain.setTargetAtTime(want, Sound.ctx.currentTime, want ? .8 : .35); }
+        const now = performance.now();
+        if (S.phase === "lobby" && now > cheerAt) { if (cheerAt) cheer(); cheerAt = now + 9000 + Math.random() * 14000; }
+      } catch {}
+    }
+    return { update };
+  })();
+
   // Preview links can change, so refresh them from Apple when the TV loads.
   (async () => {
     try {
@@ -973,6 +1054,12 @@
 
   // A game is a run of rounds. Scores carry over from round to round; each round can be a
   // different mode. Going back to the start screen ends the game.
+  // A tournament is three rounds in a set order, scores carried, ending on the final wager.
+  const TOUR = ["casual", "deep-songs", "deep"];
+  const TOUR_NAMES = { casual: "Casual Fan", "deep-songs": "Name That Song: Deep Cuts", deep: "Deep Cuts" };
+  const roundMode = () => (S.mode === "tournament" ? TOUR[(S.leg || 1) - 1] : S.mode);
+  const modeName = () => (S.mode === "tournament" ? `Tournament · ${TOUR_NAMES[roundMode()]}` : MODES.find(m => m.id === S.mode).name);
+
   function startGame() { startRound(true); }
   function nextRound() { startRound(false); }
 
@@ -981,18 +1068,27 @@
     if (!canStart()) return sync();
     // A new game drops anyone who left. Between rounds, someone whose phone is asleep keeps their seat and score.
     if (fresh) S.players = S.players.filter(p => p.local || p.connected);
-    S.deck = buildDeck(S.mode).map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) }));
+    // A tournament carries on to its next round; otherwise (new game, or after its last round) it starts over, scores and all.
+    let restart = fresh;
+    if (S.mode === "tournament") {
+      if (!fresh && S.inTour && S.leg < 3) S.leg++;
+      else { S.leg = 1; restart = true; }
+      S.inTour = true;
+    } else S.inTour = false;
+    S.deck = buildDeck(roundMode()).map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) }));
     S.deck.forEach(q => { if (q.cover) new Image().src = q.cover.art; });   // fetch the cover now so it's there when its question comes up
-    if (fresh || !S.round) { resetScores(); S.round = 1; }
+    if (restart || !S.round) { resetScores(); S.round = 1; }
     else {
       S.round++;
       S.players.forEach(p => Object.assign(p, { streak: 0, best: 0, correct: 0, answer: null, gain: 0, ok: false }));
     }
-    S.players.forEach(p => p.roundStart = p.score);
+    S.players.forEach(p => { p.roundStart = p.score; p.wager = null; });
+    // The last question is worth double, except at the end of a tournament: that's the final wager.
+    S.finale = S.mode === "tournament" && S.leg === 3 ? "wager" : "double";
     S.i = 0; S.game++; S.revealLines = 0; S.lastHostAt = -2; S.roundLines = new Set();
     Host.stop();
     // MacPhisto opens the round, then the count-in
-    const label = `Round ${S.round} · ${MODES.find(m => m.id === S.mode).name}`;
+    const label = S.mode === "tournament" ? `Tournament · Round ${S.leg} of 3 · ${TOUR_NAMES[roundMode()]}` : `Round ${S.round} · ${modeName()}`;
     // Round 2 gets "count us in... in Spanish... and BADLY" (once a night), right before the Vertigo count-in
     const opener = S.round === 1 ? LINES.round1 : S.round === 2 && Host.pick(LINES.round2, true) ? LINES.round2 : LINES.roundN;
     hostBeat(opener, label, countIn);
@@ -1023,6 +1119,36 @@
     sync();
   }
 
+  // ---------- the final wager: before the last question, everyone bets part of their score.
+  // Right wins the bet, wrong loses it (never below zero). Anyone under 200 can still bet 200,
+  // so whoever's behind always has a way back.
+  function wagerTiers(p) {
+    const max = Math.max(p.score, 200), r = x => Math.round(x / 10) * 10;
+    return [0, r(max / 4), r(max / 2), max];
+  }
+  function startWager() {
+    clearTimeout(qTimer); clearTimeout(rTimer);
+    Player.stop(); Host.stop();
+    S.phase = "wager";
+    S.players.forEach(p => p.wager = null);
+    S.wagerEndsAt = Date.now() + WAGER_SECS * 1000;
+    qTimer = setTimeout(endWager, WAGER_SECS * 1000 + 200);
+    sync();
+  }
+  function placeWager(p, k) {
+    if (S.phase !== "wager" || p.wager !== null || !Number.isInteger(k) || k < 0 || k > 3 || !p.member) return;
+    p.wager = wagerTiers(p)[k];
+    Sound.lock();
+    sync();
+    maybeAllAnswered();
+  }
+  function endWager() {
+    if (S.phase !== "wager") return;
+    S.players.forEach(p => { if (p.wager === null) p.wager = 0; });
+    beginQuestion();
+  }
+  const finaleNow = () => (S.i === S.deck.length - 1 ? S.finale : null);
+
   function submit(p, k) {
     if (S.phase !== "question" || p.answer || !Number.isInteger(k) || k < 0 || k > 3 || !p.member) return;
     p.answer = { k, at: Date.now() };
@@ -1032,6 +1158,11 @@
   }
 
   function maybeAllAnswered() {
+    if (S.phase === "wager") {
+      const live = active();
+      if (live.length && live.every(p => p.wager !== null)) { clearTimeout(qTimer); qTimer = setTimeout(endWager, 900); }
+      return;
+    }
     if (S.phase !== "question") return;
     const live = active();
     if (live.length && live.every(p => p.answer)) { clearTimeout(qTimer); qTimer = setTimeout(reveal, 700); }
@@ -1070,14 +1201,20 @@
     clearTimeout(qTimer);
     const q = S.deck[S.i], right = q.opts.indexOf(q.a);
     const was = { leader: leader(), streak: new Map(S.players.map(p => [p.pid, p.streak])) };
+    const fin = finaleNow();
     S.players.forEach(p => {
       p.ok = !!p.answer && p.answer.k === right;
       if (p.ok) {
         p.streak++; p.correct++; p.best = Math.max(p.best, p.streak);
         const frac = Math.max(0, Math.min(1, (S.endsAt - p.answer.at) / (SECS * 1000)));
         p.gain = 100 + Math.round(frac * 100) + Math.min(100, (p.streak - 1) * 25);
-        p.score += p.gain;
-      } else { p.streak = 0; p.gain = 0; }
+        if (fin === "double") p.gain *= 2;
+        if (fin === "wager") p.gain = p.wager || 0;
+      } else {
+        p.streak = 0;
+        p.gain = fin === "wager" ? -Math.min(p.wager || 0, p.score) : 0;   // a lost bet, never below zero
+      }
+      p.score += p.gain;
     });
     S.phase = "reveal";
     // MacPhisto comes in after the reveal sounds, and the reveal waits for him to finish.
@@ -1105,8 +1242,11 @@
     if (S.i < S.deck.length) {
       // A word from MacPhisto before the song, the album cover and the last question (each once a night)
       const q = S.deck[S.i], n = S.deck.length, of = `Question ${S.i + 1} of ${n}`;
-      if (S.i === n - 1) hostBeat(LINES.lastq, "Last question", beginQuestion, true);
-      else if (q.song && S.mode !== "songs") hostBeat(LINES.song, `${of} · Name that song`, beginQuestion, true);
+      if (S.i === n - 1) {
+        if (S.finale === "wager") hostBeat(LINES.lastq, "Last question · Final wager", startWager, true);
+        else hostBeat(LINES.lastq, "Last question · Double points", beginQuestion, true);
+      }
+      else if (q.song && !["songs", "deep-songs"].includes(roundMode())) hostBeat(LINES.song, `${of} · Name that song`, beginQuestion, true);
       else if (q.cover) hostBeat(LINES.cover, `${of} · Name the album`, beginQuestion, true);
       else beginQuestion();
     } else {
@@ -1130,7 +1270,7 @@
     clearTimeout(qTimer); clearTimeout(rTimer);
     S.round = 0;
     Player.stop(); Clip.stop(); Host.stop(); hostToken++;
-    S.phase = "lobby"; S.hostLine = null;
+    S.phase = "lobby"; S.hostLine = null; S.inTour = false;
     S.players = S.players.filter(p => p.local || p.connected);
     seatedCount = S.players.filter(p => p.member).length;
     resetScores();
@@ -1176,13 +1316,16 @@
       waiting: active().filter(x => !x.member).length,
     };
     if (S.phase === "host") v.host = { key: S.hostKey, label: S.hostLabel };
+    if (S.phase === "wager") v.wager = { tiers: wagerTiers(p), mine: p.wager, score: p.score, left: Math.max(0, S.wagerEndsAt - now), ms: WAGER_SECS * 1000 };
     if (S.phase === "countin") Object.assign(v, { countLeft: Math.max(0, S.countEndsAt - now), countMs: S.countMs, countAt });
     if (S.phase === "question" || S.phase === "reveal") {
-      v.q = { n: S.i + 1, total: S.deck.length, opts: q.opts, left: Math.max(0, S.endsAt - now), song: !!q.song, cover: !!q.cover };
+      v.q = { n: S.i + 1, total: S.deck.length, opts: q.opts, left: Math.max(0, S.endsAt - now), song: !!q.song, cover: !!q.cover,
+              finale: finaleNow(), wager: p.wager };
       v.my = p.answer ? p.answer.k : null;
     }
     if (S.phase === "reveal") v.rv = { right: q.opts.indexOf(q.a), ok: p.ok, gain: p.gain, streak: p.streak, place: placeOf(p), of: S.players.length, left: Math.max(0, S.revealEndsAt - now) };
-    if (S.phase === "final") v.fin = { place: placeOf(p), of: S.players.length, score: p.score, gained: p.score - (p.roundStart || 0), correct: p.correct, total: S.deck.length, rank: rankFor(p), round: S.round };
+    if (S.phase === "final") v.fin = { place: placeOf(p), of: S.players.length, score: p.score, gained: p.score - (p.roundStart || 0), correct: p.correct, total: S.deck.length, rank: rankFor(p), round: S.round,
+      tour: S.inTour ? { leg: S.leg, next: S.leg < 3 ? TOUR_NAMES[TOUR[S.leg]] : null } : null };
     return v;
   }
 
@@ -1210,6 +1353,7 @@
     st.classList.toggle("couch-on", S.players.some(p => p.local));
     const key = S.phase === "lobby" ? "lobby"
       : S.phase === "host" ? `host:${S.hostKey}`
+      : S.phase === "wager" ? `wager:${S.game}`
       : S.phase === "countin" ? `count:${S.game}`
       : S.phase === "final" ? `final:${S.game}`
       : `q:${S.game}:${S.i}`;
@@ -1226,10 +1370,12 @@
         setTimeout(() => el.classList.add("hold"), countAt[3] * 1000);
       }
       else if (S.phase === "host") { st.innerHTML = hostHtml(); Host.place($("host-slot"), ""); }
+      else if (S.phase === "wager") { st.innerHTML = wagerHtml(); Host.place($("host-slot"), "overlay"); Host.walls("PLACE YOUR BETS", WAGER_SECS * 1000); }
       else if (S.phase === "final") { st.innerHTML = finalHtml(); Host.place($("host-slot"), "overlay"); Touches.win(S.players.slice().sort((a, b) => b.score - a.score)[0]); }
       else { st.innerHTML = playShell(); lockSeen = new Set(); }
     }
     if (S.phase === "question" || S.phase === "reveal") updatePlay();
+    if (S.phase === "wager") updateWager();
     builtKey = key;
     document.body.dataset.phase = S.phase;
     if (S.phase !== "question") document.body.classList.remove("hurry");
@@ -1287,6 +1433,29 @@
     } catch {}
   }
 
+  function wagerHtml() {
+    const couch = S.players.find(p => p.local);
+    const picks = couch ? `<div class="wager-picks"><span class="label" style="margin:0">On this screen (${esc(shownName(couch))}): keys 1–4</span>${
+      wagerTiers(couch).map((a, k) => `<button type="button" class="pick" id="wager-${k}" data-wager="${k}">${k + 1} · ${k === 3 ? "Everything (" + a + ")" : a || "Nothing"}</button>`).join("")}</div>` : "";
+    return `<section class="wager">
+      <p class="label" style="margin:0">Round ${S.round} · the last question</p>
+      <h1>Final <em>wager</em></h1>
+      <p class="how">Bet on the last question from your phone. Get it right and win your bet. Get it wrong and lose it.</p>
+      <div class="wager-row"><div class="bets" id="bets"></div><div id="host-slot"></div></div>
+      <div class="wager-foot" style="display:flex;gap:1.4rem;align-items:center;flex-wrap:wrap">${picks}<span class="grow" style="flex:1"></span>
+        <span class="timer"><span class="meter"><i id="wbar"></i></span><span class="num" id="wnum">${WAGER_SECS}</span></span></div>
+    </section>`;
+  }
+  function updateWager() {
+    $("bets").innerHTML = S.players.map(p => {
+      const m = byId(p.member), away = !p.local && !p.connected;
+      return `<div class="bet${p.wager !== null ? " in" : ""}" style="--mc:${m.color}${away ? ";opacity:.45" : ""}">${avatar(p.member)}
+        <div><b>${esc(shownName(p))}</b><span>${p.wager !== null ? "Bet placed" : away ? "Away" : "Thinking…"} · ${p.score} pts</span></div></div>`;
+    }).join("");
+    const couch = S.players.find(p => p.local);
+    document.querySelectorAll("[data-wager]").forEach(b => { b.disabled = !couch || couch.wager !== null; });
+  }
+
   function hostHtml() {
     return `<section class="hostshow"><p class="label">${esc(S.hostLabel)}</p><div id="host-slot"></div>
       <button type="button" class="btn ghost" id="btn-skip">Skip (Enter)</button></section>`;
@@ -1299,7 +1468,7 @@
 
   function playShell() {
     const q = S.deck[S.i];
-    const mode = MODES.find(m => m.id === S.mode).name;
+    const mode = modeName();
     const answers = q.opts.map((o, k) =>
       `<button type="button" class="ans ch${k + 1}" id="ans-${k}" data-k="${k}"><span class="ch">${k + 1}</span><span>${esc(o)}</span><span class="pickers"></span></button>`).join("");
     const s = q.song, c = q.cover;
@@ -1312,7 +1481,8 @@
       ? `<div class="qbody"><div class="cover-frame framed"><img id="cover-img" src="${esc(c.art)}" alt="" style="transform-origin:${c.crop.x}% ${c.crop.y}%;transform:scale(${c.crop.zoom})"></div><div class="answers">${answers}</div></div>`
       : `<div class="answers">${answers}</div>`;
     return `<section class="play">
-      <div class="hud mono"><span class="tag">${mode}</span><span>Round <b>${S.round}</b></span><span>Question <b>${S.i + 1}</b> of ${S.deck.length}</span><span class="grow"></span><span id="hud-right"></span></div>
+      <div class="hud mono"><span class="tag">${mode}</span><span>Round <b>${S.round}</b></span><span>Question <b>${S.i + 1}</b> of ${S.deck.length}</span>${
+        finaleNow() ? `<span class="finale">${finaleNow() === "wager" ? "Final wager" : "Double points"}</span>` : ""}<span class="grow"></span><span id="hud-right"></span></div>
       <p class="question">${esc(q.q)}${s ? `<span class="listening" aria-label="Playing on the TV"><i></i><i></i><i></i><i></i><i></i></span>` : ""}</p>
       ${body}
       <div class="strip" id="strip"></div>
@@ -1358,7 +1528,7 @@
       st = p.answer ? "Locked in" : (p.local || p.connected) ? "Thinking…" : "Away";
       if (p.answer) { cls += " locked"; if (!lockSeen.has(p.pid)) { lockSeen.add(p.pid); cls += " just"; } }
     } else {
-      st = p.ok ? `+${p.gain}` : p.answer ? "Missed" : "No answer";
+      st = p.ok ? `+${p.gain}` : p.gain < 0 ? `−${-p.gain}` : p.answer ? "Missed" : "No answer";
       cls += p.ok ? " gain" : " miss";
     }
     if (!p.local && !p.connected) cls += " away";
@@ -1367,6 +1537,13 @@
     return `<div class="${cls}${fx.cls}" style="--mc:${m.color}${fx.style}"><span class="pav">${avatar(p.member)}${fx.av}</span>
       <div class="nm"><b>${esc(shownName(p))}</b></div>
       <div><span class="sc" data-pid="${esc(p.pid)}">${Math.round(shownScore.get(p.pid))}</span><span class="st mono">${st}</span></div>${fx.card}</div>`;
+  }
+
+  function tourTag(tie, n) {
+    const who = tie ? "Tie at the top" : n > 1 ? "Tonight's headliner" : "Final score";
+    if (!S.inTour) return `${S.round > 1 ? `After round ${S.round} · ` : ""}${who}`;
+    if (S.leg < 3) return `Round ${S.leg} of 3 · ${tie ? "tie at the top" : n > 1 ? "in the lead" : "so far"}`;
+    return tie ? "Tournament · tie at the top" : n > 1 ? "Tournament champion" : "Tournament · final score";
   }
 
   function finalHtml() {
@@ -1379,19 +1556,21 @@
         <span class="who"><b>${esc(shownName(p))}</b><span>${p.correct}/${S.deck.length} right · +${p.score - (p.roundStart || 0)}</span></span>
         <span class="pts">${p.score}</span></li>`;
     }).join("");
+    const midTour = S.inTour && S.leg < 3;
     const modes = MODES.map(m => `<button type="button" class="pick" id="next-${m.id}" data-mode="${m.id}" aria-pressed="${S.mode === m.id}">${m.name}</button>`).join("");
     return `<section class="final">
       <div class="winner">
         <span class="ring">${avatar(w.member)}</span>
-        <span class="tag">${S.round > 1 ? `After round ${S.round} · ` : ""}${tie ? "Tie at the top" : order.length > 1 ? "Tonight's headliner" : "Final score"}</span>
+        <span class="tag">${tourTag(tie, order.length)}</span>
         <h2 style="font-size:${Math.min(5, 48 / Math.max(1, shownName(w).length)).toFixed(2)}rem">${esc(shownName(w))}</h2>
         <p class="rank">Rank: <b>${rankFor(w)}</b></p>
       </div>
       <ol class="board">${board}</ol>
       <div class="host-col" id="host-slot"></div>
       <div class="final-actions">
-        <div class="next-mode"><span class="label">Next round</span><div class="picks">${modes}</div></div>
-        <button type="button" class="btn" id="btn-again">Start round ${S.round + 1}</button>
+        ${midTour ? `<div class="next-mode"><span class="label">Tournament · next up</span><b style="font-size:1.4rem">${TOUR_NAMES[TOUR[S.leg]]}</b></div>`
+          : `<div class="next-mode"><span class="label">Next round</span><div class="picks">${modes}</div></div>`}
+        <button type="button" class="btn" id="btn-again">${midTour ? `Start round ${S.leg + 1} of 3` : S.mode === "tournament" ? "New tournament" : `Start round ${S.round + 1}`}</button>
         <button type="button" class="btn ghost" id="btn-lobby">New game</button>
       </div>
     </section>`;
@@ -1414,6 +1593,11 @@
       const img = $("cover-img"), c = S.deck[S.i].cover;
       if (img && c && !REDUCE) img.style.transform = `scale(${c.crop.zoom * Math.pow(.5, 1 - left / (SECS * 1000))})`;
     }
+    if (S.phase === "wager" && $("wbar")) {
+      const left = Math.max(0, S.wagerEndsAt - now);
+      $("wbar").style.transform = `scaleX(${left / (WAGER_SECS * 1000)})`;
+      $("wnum").textContent = Math.ceil(left / 1000);
+    }
     if (S.phase === "reveal" && $("rv-bar")) $("rv-bar").style.transform = `scaleX(${Math.max(0, S.revealEndsAt - now) / (S.revealMs || REVEAL_MS)})`;
     document.querySelectorAll(".sc[data-pid]").forEach(el => {
       const p = S.players.find(x => x.pid === el.dataset.pid);
@@ -1426,6 +1610,7 @@
       }
     });
     Confetti.draw(dt);
+    Ambience.update();
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
@@ -1443,13 +1628,16 @@
     else if (t.id === "btn-again") nextRound();
     else if (t.id === "btn-lobby") toLobby(true);
     else if (t.id === "btn-skip") skipHost();
+    else if (t.dataset.wager !== undefined) { const c = S.players.find(p => p.local); if (c) placeWager(c, Number(t.dataset.wager)); }
     else if (t.id === "btn-retry") openRoom();
   });
   addEventListener("keydown", e => {
     if (e.target.tagName === "INPUT") return;
     const k = e.key.toLowerCase();
     if (k === "f") return toggleFull();
-    if (S.phase === "question" && ["1", "2", "3", "4"].includes(k)) {
+    if (S.phase === "wager" && ["1", "2", "3", "4"].includes(k)) {
+      const c = S.players.find(p => p.local); if (c) placeWager(c, Number(k) - 1);
+    } else if (S.phase === "question" && ["1", "2", "3", "4"].includes(k)) {
       const c = S.players.find(p => p.local); if (c) submit(c, Number(k) - 1);
     } else if (k === "enter" && document.activeElement?.tagName !== "BUTTON") {
       if (S.phase === "lobby") startGame();

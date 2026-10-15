@@ -6,6 +6,7 @@ window.U2 = (() => {
     { id: "casual", name: "Casual Fan", blurb: "The hits, the albums, the big moments. For anyone with a U2 song on a playlist." },
     { id: "deep",   name: "Deep Cuts",  blurb: "B-sides, studios, producers and tour lore. For people who own the box sets." },
     { id: "songs",  name: "Name That Song", blurb: "A clip plays on the TV. Name the song before everyone else does." },
+    { id: "tournament", name: "Tournament", blurb: "Three rounds: Casual, deep-cut Name That Song, then Deep Cuts. It ends on a final wager." },
   ];
 
   const CASUAL = [
@@ -117,6 +118,10 @@ window.U2 = (() => {
     { q: "The 2008 concert film U2 3D was shot on which tour?", a: "Vertigo Tour", w: ["Elevation Tour", "U2 360° Tour", "PopMart Tour"], f: "Most of it was filmed at stadium shows in Latin America in 2006, including Buenos Aires, São Paulo and Mexico City." },
     { q: "Which of these U2 singles went to No. 1 in the UK?", a: "Beautiful Day", w: ["With or Without You", "Pride (In the Name of Love)", "One"], f: "\"Beautiful Day\" topped the UK chart in October 2000. \"Pride\" peaked at No. 3, \"With or Without You\" at No. 4 and \"One\" at No. 7." },
     { q: "Bono wrote \"Sometimes You Can't Make It on Your Own\" for which family member?", a: "His father, Bob", w: ["His mother, Iris", "His wife, Ali", "His daughter, Jordan"], f: "Bob Hewson died of cancer in 2001, and Bono sang the song at his funeral. It won the Grammy for Song of the Year in 2006." },
+    { q: "Who said it? \u201cLook what you've done to me. You've made me very famous, and I thank you.\u201d", a: "MacPhisto", w: ["The Fly", "Mirror Ball Man", "Bono, in an interview"], f: "MacPhisto opened with it night after night on the 1993 legs of ZOO TV. Sound familiar? Your host borrows it." },
+    { q: "Who said it? \u201cI know you like your pop stars to be exciting, so I bought these.\u201d", a: "MacPhisto", w: ["The Fly", "Mirror Ball Man", "Bono, in an interview"], f: "MacPhisto, showing off his gold platform boots on ZOO TV in 1993." },
+    { q: "Who said it? \u201cOff with the horns, on with the show!\u201d", a: "MacPhisto", w: ["The Fly", "Mirror Ball Man", "Bono, in an interview"], f: "One of MacPhisto's favourite lines on the 1993 Zooropa and Zoomerang legs." },
+    { q: "Who said it? \u201cI have a vision: television!\u201d", a: "Mirror Ball Man", w: ["The Fly", "MacPhisto", "Bono, in an interview"], f: "Mirror Ball Man's cry in 1992. On his first night in 1993, MacPhisto turned it into \"I have a vision: Eurovision!\"" },
   ];
 
   const DEEP = [
@@ -240,6 +245,15 @@ window.U2 = (() => {
     { q: "Which of these B-sides came out first?", a: "J. Swallo", w: ["Trash, Trampoline and the Party Girl", "Endless Deep", "Boomerang II"], f: "\"J. Swallo\" backed \"Fire\" in 1981. Then came \"Trash, Trampoline…\" (1982), \"Endless Deep\" (1983) and \"Boomerang II\" (1984)." },
     { q: "Which of these did NOT produce tracks on Pop?", a: "Daniel Lanois", w: ["Flood", "Howie B", "Steve Osborne"], f: "Flood was the main producer. Nellee Hooper worked on early sessions but left in 1996 to score Romeo + Juliet, so he went uncredited." },
     { q: "Danesmoate, Melbeach, Elsinore: what's the connection?", a: "Houses U2 recorded albums in", w: ["Lypton Village nicknames", "Hotels Bono and Edge bought", "Instrumental U2 B-sides"], f: "Danesmoate and The Edge's house Melbeach hosted The Joshua Tree. The band rented Elsinore in Dalkey to finish Achtung Baby after Berlin." },
+    { q: "Who said it? \u201cWe love people when they're dead.\u201d", a: "The Fly", w: ["MacPhisto", "Mirror Ball Man", "Bono, in an interview"], f: "The Fly's greeting to the crowd at Bercy, Paris, on 7 May 1992, as reported in the NME." },
+    { q: "Who said it? \u201cSomebody's got to play the rock star.\u201d", a: "The Fly", w: ["MacPhisto", "Mirror Ball Man", "Bono, in an interview"], f: "The Fly, mocking, at the Rosemont Horizon outside Chicago on 31 March 1992." },
+    { q: "Who said it? \u201cAttention, bay-bee!\u201d", a: "The Fly", w: ["MacPhisto", "Mirror Ball Man", "Bono, in an interview"], f: "The Fly's pun on Achtung Baby at the Montreal Forum on 23 March 1992." },
+    { q: "Who said it? \u201cThere were reports of egomania, and I just decided to become everything they said I was.\u201d", a: "Bono, in an interview", w: ["The Fly", "MacPhisto", "Mirror Ball Man"], f: "Bono explaining The Fly to Rolling Stone in 1993. \"Might as well,\" he added." },
+    { q: "Who said it? \u201cThe Fly needs to feel mega to feel normal.\u201d", a: "Bono, in an interview", w: ["The Fly", "MacPhisto", "Mirror Ball Man"], f: "From the same 1993 Rolling Stone interview, where Bono also called The Fly \"a meltdown kind of a guy\"." },
+    { q: "Who said it? \u201cThe Fly was always headed to Las Vegas.\u201d", a: "Bono, in an interview", w: ["The Fly", "MacPhisto", "Mirror Ball Man"], f: "Bono to Zane Lowe in 2023, the year U2 opened the Sphere residency in Las Vegas." },
+    { q: "Who said it? \u201cThis is the sound of four men chopping down The Joshua Tree.\u201d", a: "Bono, in an interview", w: ["The Fly", "MacPhisto", "Mirror Ball Man"], f: "Bono on the harsher new sound of Achtung Baby and its first single, \"The Fly\", released in 1991." },
+    { q: "Who said it? \u201cWhen you're famous, people give you their telephone numbers.\u201d", a: "MacPhisto", w: ["The Fly", "Mirror Ball Man", "Bono, in an interview"], f: "MacPhisto's set-up for reading out phone numbers from the stage in 1993." },
+    { q: "Who said it? \u201cWhen you don't believe that I exist, that's when I do my best work.\u201d", a: "MacPhisto", w: ["The Fly", "Mirror Ball Man", "Bono, in an interview"], f: "MacPhisto, back on screen in 2018 on the eXPERIENCE + iNNOCENCE Tour." },
   ];
 
   const Q = [
