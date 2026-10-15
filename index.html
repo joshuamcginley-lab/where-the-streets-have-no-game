@@ -946,12 +946,11 @@
       if (!has(id)) return Promise.resolve();
       said.add(id); queued = null;
       const t = ++token;
-      if (duck) Player.fade(.07, 400);
+      if (duck) Player.fade(0, 400);   // nothing under his voice
       const safety = setTimeout(() => t === token && mp.stop(), (HOST_LINES[id].dur + 4) * 1000);
       return mp.say(id).then(played => { if (!played) said.delete(id); }, () => said.delete(id)).finally(() => {   // a blocked line can be tried again
         clearTimeout(safety);
         if (t !== token) return;
-        if (duck && S.phase === "reveal") Player.fade(.3, 600);
         const q = queued; queued = null;
         if (q && q.when()) say(q.id);
       });
@@ -1169,7 +1168,9 @@
     rTimer = setTimeout(function next() { if (Host.speaking && S.phase === "reveal") rTimer = setTimeout(next, 400); else nextQuestion(); }, ms);
     Sound.reveal();
     S.players.forEach(p => p.ok && Touches.right(p));
-    Player.fade(.3);   // the song keeps going quietly under the reveal
+    // The song keeps going quietly under the reveal, unless MacPhisto is about to talk: then it fades out first
+    if (line && q.song) { const g = S.game, i = S.i; Player.fade(0, 1000); setTimeout(() => { if (S.game === g && S.i === i) Player.stop(); }, 1150); }
+    else Player.fade(.3);
     sync();
     if (line) { const at = `${S.game}:${S.i}`; setTimeout(() => { if (S.phase === "reveal" && `${S.game}:${S.i}` === at) Host.say(line, { duck: true }); }, HOST_IN); }
   }
