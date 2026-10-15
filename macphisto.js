@@ -52,6 +52,24 @@ window.MacPhisto = (() => {
     "start-4": [{ p: 4, walls: { all: { static: 1 } } }],
     "last-q-3": [{ p: 3, walls: { all: { eyes: 1 } } }, { p: 4, walls: { all: { cameras: 1 } } }],
     "last-place-3": [{ p: 2, walls: { all: { text: "DECIBELS" } }, flash: 1 }, { p: 3, walls: { all: { face: 1 } } }],
+    // batch 5 (phrase numbers follow the script; check them against host-lines.js when the takes land)
+    "streak-any-1": [{ p: 0, walls: { all: { text: "4 IN A ROW" } } }, { p: 1, walls: { all: { face: 1 } } }],
+    "streak-any-2": [{ p: 0, walls: { all: { text: "4 IN A ROW" } } }, { p: 1, walls: { all: { static: 1 } } }, { p: 2, walls: { all: { face: 1 } } }],
+    "lead-change-2": [{ p: 1, walls: { all: { text: "CELEBRITY IS A JOB" } } }, { p: 3, zoom: "boots" }],
+    "lead-change-3": [{ p: 1, walls: { all: { text: "STUCK IN A MOMENT" } } }],
+    "streak-broken-2": [{ p: 2, walls: { all: { text: "DEATH IS A CAREER MOVE" } } }, { p: 3, walls: { all: { face: 1 } } }],
+    "winner-7": [{ p: 0, walls: { all: { text: "BEAUTIFUL DAY" } } }, { p: 2, walls: { all: { face: 1 } } }],
+    "round-start-4": [{ p: 1, walls: { all: { text: "TELEVISION" } } }, { p: 3, at: 0.3, horns: 1, walls: { all: { face: 1 } } }],
+    "round-start-5": [{ p: 1, walls: { all: { text: "WATCH MORE TV" } } }, { p: 2, walls: { all: { believe: 1 } } },
+                      { p: 3, walls: { all: { text: "EVERYTHING YOU KNOW IS WRONG" } } }],
+    "next-round-4": [{ p: 2, walls: { 0: { text: "UNOS" }, 1: { text: "DOS" }, 2: { text: "TRES" } } }, { p: 3, walls: { all: { text: "¡CATORCE!" } } }],
+    "welcome-2": [{ p: 0, walls: { all: { text: "ACHTUNG BABY" } } }, { p: 1, walls: { all: { face: 1 } } }],
+    "nobody-right-5": [{ p: 1, walls: { all: { text: "IGNORANCE IS BLISS" } } }, { p: 2, walls: { all: { text: "ADMIT NOTHING" } } }],
+    "all-right-4": [{ p: 1, walls: { all: { text: "ONE" } } }, { p: 2, walls: { all: { face: 1 } } }],
+    "song-3": [{ p: 0, walls: { all: { eq: 1 } } }],
+    "phone-3": [{ p: 1, phone: 1, walls: { all: { text: "10,000 PIZZAS" } } }],
+    "phone-2": [{ p: 1, phone: 1 }],
+    "goodnight-3": [{ p: 0, phone: 1 }],
   };
 
   const WALLS = [{ x: 52, y: 66, w: 72, h: 80 }, { x: 352, y: 46, w: 54, h: 54 }, { x: 374, y: 116, w: 56, h: 42 }];
@@ -292,8 +310,9 @@ window.MacPhisto = (() => {
       }
     }
     function wallsApply(spec) {
-      if (spec.all !== undefined) for (let i = 0; i < WALLS.length; i++) wallSet(i, spec.all);
-      for (let i = 0; i < WALLS.length; i++) if (spec[i] !== undefined) wallSet(i, spec[i]);
+      const copy = x => (x && typeof x === "object" ? { ...x } : x);   // each wall keeps its own state (e.g. the BELIEVE fade)
+      if (spec.all !== undefined) for (let i = 0; i < WALLS.length; i++) wallSet(i, copy(spec.all));
+      for (let i = 0; i < WALLS.length; i++) if (spec[i] !== undefined) wallSet(i, copy(spec[i]));
     }
     // Idle: each wall changes on its own random clock to a slogan no other wall is showing,
     // now and then a burst of static or a blank screen.
