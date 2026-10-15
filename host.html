@@ -85,7 +85,9 @@
       const b = document.createElement("button");
       b.type = "button"; b.className = "line"; b.setAttribute("aria-pressed", "false");
       b.innerHTML = `<b>${id}</b><span></span>`;
-      b.querySelector("span").textContent = line.phrases.map(p => p.text).join(" ");
+      // CAPS were stress marks for the voice; show them as italics, like the subtitles
+      b.querySelector("span").innerHTML = line.phrases.map(p => p.text).join(" ").replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/\b([A-Z]{2,}[A-Z']*)\b/g, w => (w === "TV" ? w : `<em>${w.toLowerCase()}</em>`));
       b.addEventListener("click", () => {
         if (playing === b) { host.stop(); return; }
         if (playing) playing.setAttribute("aria-pressed", "false");

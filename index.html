@@ -53,7 +53,8 @@
   /* ---------- lobby ---------- */
   .lobby { display: grid; grid-template-columns: 1fr 21rem; gap: 2rem; align-content: start; }
   .lobby-main { display: grid; gap: 1.25rem; align-content: start; min-width: 0; }
-  .lobby-top { display: grid; grid-template-columns: 1fr 23rem; gap: 1.6rem; align-items: center; }
+  .lobby-top { display: grid; grid-template-columns: 1fr 19rem; gap: 1.6rem; align-items: center; }
+  .lobby-top h1 { font-size: 3.7rem; }
   h1 {
     font-family: var(--font-display); font-weight: 900; text-transform: uppercase;
     font-size: 4.6rem; line-height: .84; margin: 0; letter-spacing: -.005em; text-wrap: balance;
@@ -89,8 +90,8 @@
     text-align: left; cursor: pointer; background: color-mix(in srgb, var(--screen) 88%, transparent); border: 2px solid var(--line);
     border-radius: .4rem; padding: .85rem 1.1rem; display: grid; gap: .25rem; transition: border-color .2s, background .2s, transform .15s;
   }
-  .mode b { font-family: var(--font-display); font-weight: 900; font-size: 2.1rem; text-transform: uppercase; line-height: 1; }
-  .mode span { color: var(--muted); font-size: .95rem; line-height: 1.35; }
+  .mode b { font-family: var(--font-display); font-weight: 900; font-size: 1.8rem; text-transform: uppercase; line-height: 1; }
+  .mode span { color: var(--muted); font-size: .9rem; line-height: 1.3; }
   .mode:hover { border-color: var(--muted); transform: translateY(-2px); }
   .mode[aria-pressed="true"] { border-color: var(--red); }
 
@@ -148,12 +149,12 @@
   .hostshow .host .mp-sub { font-size: 2rem; min-height: 2.6em; margin-top: .5rem; }
   .hostshow .btn { font-size: 1rem; }
   .fact .host-slot { width: 15rem; }
-  .fact .host-slot .mp-sub { font-size: .95rem; }
+  .fact .host-slot .mp-sub { font-size: 1.1rem; }
   /* while he's on, the question and answers tighten up to make room */
   .play.hosting .question { font-size: 3rem; }
   .play.hosting .ans { padding-block: .45rem; }
   .fact .host-slot:empty, .fact .host-slot[hidden] { display: none; }
-  .final .host-col { width: 23rem; align-self: center; }
+  .final .host-col { width: 21rem; align-self: center; }
 
   /* ---------- count-in: the whole screen goes to racing stripes ---------- */
   .countin { position: fixed; inset: 0; z-index: 3; display: grid; place-items: center; --sw: 1.6rem; }
@@ -235,16 +236,16 @@
   .fact .btn { font-size: 1.05rem; }
 
   /* ---------- final ---------- */
-  .final { display: grid; grid-template-columns: 1fr 1fr auto; gap: 2.4rem; align-content: center; }
+  .final { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 2.4rem; align-content: center; }
   .winner { display: grid; gap: .9rem; align-content: center; justify-items: start; }
   .winner .av { width: 11rem; animation: pop .8s cubic-bezier(.2,.9,.3,1.4) both; }
   .winner .ring { --sw: .45rem; padding: .6rem; border-radius: 50%; background: var(--stripes); display: inline-grid; }
   .winner .tag { font: 600 1.05rem var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-on-signal); background: var(--red); padding: .3rem .7rem; border-radius: .2rem; animation: rise .5s .3s backwards; }
-  .winner h2 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 6rem; line-height: .85; margin: 0; text-wrap: balance; animation: slam .7s .45s backwards; }
+  .winner h2 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 5rem; line-height: .85; margin: 0; text-wrap: balance; max-width: 100%; animation: slam .7s .45s backwards; }
   .winner .rank { font-size: 1.5rem; color: var(--muted); margin: 0; animation: rise .5s .7s backwards; }
   .winner .rank b { color: var(--fg); }
   .board { list-style: none; margin: 0; padding: 0; display: grid; gap: .8rem; align-content: center; }
-  .board li { display: grid; grid-template-columns: 2.6rem auto 1fr auto; gap: 1rem; align-items: center; background: var(--screen); border: 2px solid var(--line); border-radius: .45rem; padding: .8rem 1.1rem; animation: rise .5s backwards; }
+  .board li { display: grid; grid-template-columns: 2.6rem auto minmax(0, 1fr) auto; gap: 1rem; align-items: center; background: var(--screen); border: 2px solid var(--line); border-radius: .45rem; padding: .8rem 1.1rem; animation: rise .5s backwards; }
   .board li:nth-child(2) { animation-delay: .1s; }
   .board li:nth-child(3) { animation-delay: .2s; }
   .board li:nth-child(4) { animation-delay: .3s; }
@@ -252,7 +253,8 @@
   .board li:first-child { border-color: var(--red); }
   .board li:first-child .pos { color: var(--red); }
   .board .av { width: 3.4rem; }
-  .board .who b { display: block; font-size: 1.4rem; }
+  .board .who { min-width: 0; }
+  .board .who b { display: block; font-size: 1.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .board .who span { font: 500 .85rem var(--font-mono); letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
   .board .pts { font-family: var(--font-stencil); font-weight: 900; font-size: 2.8rem; }
   .final-actions { grid-column: 1 / -1; display: flex; gap: 1rem; justify-content: center; align-items: flex-end; flex-wrap: wrap; }
@@ -323,6 +325,16 @@
     body { overflow: auto; }
     .lobby, .final, .lobby-top { grid-template-columns: 1fr; }
     .final .host-col { width: min(23rem, 100%); justify-self: center; }
+    /* the page scrolls instead of squeezing everything into one screen */
+    .tv { flex: none; }
+    header.cover .title { font-size: 1.35rem; white-space: normal; text-align: center; }
+    .play { grid-template-rows: none; }
+    .hud { flex-wrap: wrap; row-gap: .4rem; }
+    .meter { width: 9rem; }
+    .question { font-size: 2.4rem; max-width: 100%; overflow-wrap: anywhere; }
+    .fact { grid-template-columns: 1fr; }
+    .fact .host-slot { width: min(100%, 22rem); justify-self: center; }
+    .fact .next { justify-items: stretch; }
     .slots, .strip { grid-template-columns: 1fr 1fr; }
     .answers { grid-template-columns: 1fr; }
     .qbody { grid-template-columns: 1fr; container-type: normal; }
@@ -401,7 +413,7 @@
         const say = (text, rate) => { const u = new SpeechSynthesisUtterance(text); u.lang = "es-ES"; u.rate = rate; u.pitch = .9; speechSynthesis.speak(u); };
         speechSynthesis.cancel();
         say("Unos, dos, tres", 1.3);
-        setTimeout(() => say("¡Catorce!", 1), countAt[3] * 1000);
+        Clip.robot = setTimeout(() => say("¡Catorce!", 1), countAt[3] * 1000);
       } catch {}
     },
   };
@@ -430,7 +442,7 @@
         countAt = CLIP_AT.slice();
       } catch {}
     },
-    stop() { try { this.src?.stop(); } catch {} this.src = null; try { speechSynthesis.cancel(); } catch {} },
+    stop() { try { this.src?.stop(); } catch {} this.src = null; clearTimeout(this.robot); try { speechSynthesis.cancel(); } catch {} },
     // From the top: the count-in, the band kicking in, then a fade into the first question.
     // The browser may still be switching sound on (it only allows it after a click), so wait
     // for that and start the clip at the matching point to stay in step with the words.
@@ -950,7 +962,7 @@
       S.players.forEach(p => Object.assign(p, { streak: 0, best: 0, correct: 0, answer: null, gain: 0, ok: false }));
     }
     S.players.forEach(p => p.roundStart = p.score);
-    S.i = 0; S.game++; S.revealLines = 0; S.lastHostAt = -2;
+    S.i = 0; S.game++; S.revealLines = 0; S.lastHostAt = -2; S.roundLines = new Set();
     Host.stop();
     // MacPhisto opens the round, then the count-in
     const label = `Round ${S.round} · ${MODES.find(m => m.id === S.mode).name}`;
@@ -1002,25 +1014,26 @@
     return o.length && o[0].score > 0 && (o.length === 1 || o[0].score > o[1].score) ? o[0] : null;
   }
 
-  // What MacPhisto says about this reveal, if anything. Big moments always get a line;
-  // the rest only sometimes, never two reveals running, and at most four a round.
+  // What MacPhisto says about this reveal, if anything. Four in a row always gets a line;
+  // anything else only if he didn't speak on the last reveal, at most four a round, and
+  // never the same line twice in a round.
   function revealLine(was) {
     const ps = S.players, multi = ps.length > 1, n = S.deck.length;
     if (S.i === n - 1) return null;   // the last reveal leads straight to the final scores and the winner line
     const four = ps.find(p => p.ok && p.streak === 4);
     if (four) return Host.pick([`streak-${four.member}-1`]);
-    const lead = leader();
-    if (multi && was.leader && lead && lead !== was.leader) return Host.pick(["lead-change-1"]);
-    if (ps.some(p => !p.ok && (was.streak.get(p.pid) || 0) >= 3)) return Host.pick(["streak-broken-1"]);
     if (S.lastHostAt === S.i - 1 || S.revealLines >= 4) return null;
-    const by = ps.slice().sort((a, b) => b.score - a.score);
-    const chance = (p, ids, fresh) => (Math.random() < p ? Host.pick(ids, fresh) : null);
-    if (multi && ps.every(p => p.ok)) return chance(.6, ["all-right-3"]);
-    if (!ps.some(p => p.answer)) return chance(.8, ["hurry-1"]);
-    if (!ps.some(p => p.ok)) return chance(.6, ["nobody-right-1", "nobody-right-2"]);
-    if (multi && S.i >= 4 && by[0].score - by[1].score <= 75) return chance(.5, ["close-2"]);
-    if (multi && S.i >= 5 && by[0].score - by[by.length - 1].score >= 450) return chance(.45, ["last-place-1", "last-place-2", "last-place-3"]);
-    return chance(.15, ["phone-1"], true);
+    const fresh = ids => ids.filter(id => !S.roundLines.has(id));
+    const pick = (p, ids, tonight) => (Math.random() < p && fresh(ids).length ? Host.pick(fresh(ids), tonight) : null);
+    const lead = leader(), by = ps.slice().sort((a, b) => b.score - a.score);
+    if (multi && was.leader && lead && lead !== was.leader) return pick(1, ["lead-change-1"]);
+    if (ps.some(p => !p.ok && (was.streak.get(p.pid) || 0) >= 3)) return pick(1, ["streak-broken-1"]);
+    if (multi && ps.every(p => p.ok)) return pick(.6, ["all-right-3"]);
+    if (!ps.some(p => p.answer)) return pick(.8, ["hurry-1"]);
+    if (!ps.some(p => p.ok)) return pick(.6, multi ? ["nobody-right-1", "nobody-right-2"] : ["nobody-right-2"]);   // "Not ONE of you?" needs company
+    if (multi && S.i >= 4 && by[0].score - by[1].score <= 75) return pick(.5, ["close-2"]);
+    if (multi && S.i >= 5 && by[0].score - by[by.length - 1].score >= 450) return pick(.45, ["last-place-1", "last-place-2", "last-place-3"]);
+    return pick(.15, ["phone-1"], true);
   }
 
   function reveal() {
@@ -1041,7 +1054,7 @@
     // MacPhisto comes in after the reveal sounds, and the reveal waits for him to finish.
     const line = Host.ready ? revealLine(was) : null, HOST_IN = 1300;
     S.hostLine = line;
-    if (line) { S.revealLines++; S.lastHostAt = S.i; }
+    if (line) { S.revealLines++; S.lastHostAt = S.i; S.roundLines.add(line); }
     const ms = line ? Math.max(REVEAL_MS, HOST_IN + Host.dur(line) * 1000 + 1800) : REVEAL_MS;
     S.revealMs = ms;
     S.revealEndsAt = Date.now() + ms;
@@ -1068,7 +1081,7 @@
       else if (q.cover) hostBeat(["cover-1"], `${of} · Name the album`, beginQuestion, true);
       else beginQuestion();
     } else {
-      S.phase = "final"; Player.stop(); Sound.win(); sync();
+      S.phase = "final"; S.finalAt = Date.now(); Player.stop(); Sound.win(); sync();
       // MacPhisto crowns the winner once the fanfare's done (a tie gets "neck and neck")
       const o = S.players.slice().sort((a, b) => b.score - a.score), tie = o.length > 1 && o[0].score === o[1].score;
       const line = Host.pick(tie ? ["close-2"] : ["winner-1", "winner-2", "winner-3", "winner-5"]), g = S.game;
@@ -1223,8 +1236,8 @@
         <div class="lobby-top"><h1>Where the Streets Have No <em>Game</em></h1><div id="host-slot"></div></div>
         <div><p class="label">Mode</p><div class="modes">${modes}</div></div>
         <div><p class="label">Pick a character · up to 4 players</p><div class="slots">${slots}</div></div>
-        <div class="lobby-foot"><button type="button" class="btn" id="btn-start" ${canStart() ? "" : "disabled"}>Start the show</button><span class="hint">${hint}</span></div>
-        ${navigator.userActivation && !navigator.userActivation.hasBeenActive ? `<p class="soundhint">Click anywhere on this screen once to switch the sound on.</p>` : ""}
+        <div class="lobby-foot"><button type="button" class="btn" id="btn-start" ${canStart() ? "" : "disabled"}>Start the show</button>${
+          navigator.userActivation && !navigator.userActivation.hasBeenActive ? `<span class="soundhint">Click anywhere on this screen once to switch the sound on.</span>` : `<span class="hint">${hint}</span>`}</div>
       </div>
       <aside class="joinbox framed">
         <p class="label" style="margin:0">Join on your phone</p>
@@ -1334,7 +1347,7 @@
     const tie = order.length > 1 && order[1].score === w.score;
     const board = order.map(p => {
       return `<li><span class="pos">${placeOf(p)}</span>${avatar(p.member)}
-        <span class="who"><b>${esc(shownName(p))}</b><span>${p.correct}/${S.deck.length} right this round · +${p.score - (p.roundStart || 0)}</span></span>
+        <span class="who"><b>${esc(shownName(p))}</b><span>${p.correct}/${S.deck.length} right · +${p.score - (p.roundStart || 0)}</span></span>
         <span class="pts">${p.score}</span></li>`;
     }).join("");
     const modes = MODES.map(m => `<button type="button" class="pick" id="next-${m.id}" data-mode="${m.id}" aria-pressed="${S.mode === m.id}">${m.name}</button>`).join("");
@@ -1342,7 +1355,7 @@
       <div class="winner">
         <span class="ring">${avatar(w.member)}</span>
         <span class="tag">${S.round > 1 ? `After round ${S.round} · ` : ""}${tie ? "Tie at the top" : order.length > 1 ? "Tonight's headliner" : "Final score"}</span>
-        <h2>${esc(shownName(w))}</h2>
+        <h2 style="font-size:${Math.min(5, 48 / Math.max(1, shownName(w).length)).toFixed(2)}rem">${esc(shownName(w))}</h2>
         <p class="rank">Rank: <b>${rankFor(w)}</b></p>
       </div>
       <ol class="board">${board}</ol>
@@ -1413,7 +1426,7 @@
       if (S.phase === "lobby") startGame();
       else if (S.phase === "host") skipHost();
       else if (S.phase === "reveal") nextQuestion();
-      else if (S.phase === "final") nextRound();
+      else if (S.phase === "final" && Date.now() - S.finalAt > 6000 && !Host.speaking) nextRound();   // let the winner have their moment
     }
   });
   function toggleFull() {
