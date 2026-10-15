@@ -30,3 +30,5 @@ Voice lines for the planned MacPhisto host. Not wired into the game yet.
 | winner-2.mp3 | Final winner | We have a WINNER! / Oh... I'm so proud. / Of course... I let you win. |
 | winner-3.mp3 | Final winner | Bravo! / You're nearly as rich and famous as me now. / Nearly. |
 | next-round-2.mp3 | Between rounds | Another round... / Just one more. / That's what they all say. |
+| phone-1.mp3 | Phone gag (a lull) | Round about now... I usually make a telephone call. / Shall I? / ...Engaged. |
+| goodnight-1.mp3 | Goodnight | Well... that's the show. / You've been wonderful. / Now... where's my taxi? |
