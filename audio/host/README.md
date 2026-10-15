@@ -57,3 +57,8 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | next-round-4.mp3 | Round 2 start (before the count-in) | Another round! / Somebody count us in... / in Spanish, preferably. / And BADLY. |
 | welcome-2.mp3 | New game | Achtung, baby! / Welcome to my little show. / Do sit down. Mind the Trabants. |
 | join-2.mp3 | A player joins | Hello, hello! / Ah... another one. / I knew you'd come. / They always do. |
+| nobody-right-5.mp3 | Nobody got it right | Nobody? / Ignorance is BLISS. / And remember... admit nothing. |
+| all-right-4.mp3 | Everyone got it right | Everybody? / Oh... we're all ONE. / Stop it. It's revolting. |
+| tie-1.mp3 | Final: a tie | A TIE! / With or without you... / I simply can't choose. |
+| song-3.mp3 | Song clip question | Listen... / Have you found what you're looking for? / I still haven't. And I've looked EVERYWHERE. |
+| cover-2.mp3 | Album cover question | Now... a little picture. / Judge the album by its cover. / Everybody else does. |

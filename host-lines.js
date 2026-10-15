@@ -1157,5 +1157,121 @@ window.HOST_LINES = {
   ],
   "fps": 25,
   "env": "000000sztivvpkmgwq0vwi7ljiaceacca7522000000000000000000000000025534653210000000000000048a7669a901e810000000000000000000000000000158jcgfeffkmfa72997010106543221000000000000000000004a8102ba9ac99700009cc77641000000000"
+ },
+ "nobody-right-5": {
+  "moment": "Nobody got it right",
+  "dur": 7.0,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Nobody?"
+   },
+   {
+    "t": 1.91,
+    "text": "Ignorance is BLISS."
+   },
+   {
+    "t": 4.15,
+    "text": "And remember..."
+   },
+   {
+    "t": 5.43,
+    "text": "admit nothing."
+   }
+  ],
+  "fps": 25,
+  "env": "00008fkmizvks83ki94ad910000000000000000000000000fsf029cb98621000000004d6000002100000000000000000000000007712475bcd7532100000000000000000420020484000000000244275000000000000000"
+ },
+ "all-right-4": {
+  "moment": "Everyone got it right",
+  "dur": 6.92,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Everybody?"
+   },
+   {
+    "t": 1.75,
+    "text": "Oh..."
+   },
+   {
+    "t": 2.75,
+    "text": "we're all ONE."
+   },
+   {
+    "t": 4.77,
+    "text": "Stop it. It's revolting."
+   }
+  ],
+  "fps": 25,
+  "env": "00049c633ezq0ilc609500000000000000000000000001355440000000000000000003793000057666653000345542000000000000000000000000000000nza0350000000000000000414szf601zzva00010000000000"
+ },
+ "tie-1": {
+  "moment": "Final: a tie",
+  "dur": 6.56,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A TIE!"
+   },
+   {
+    "t": 2.1,
+    "text": "With or without you..."
+   },
+   {
+    "t": 4.51,
+    "text": "I simply can't choose."
+   }
+  ],
+  "fps": 25,
+  "env": "005k50001213zq91adafloee73310000000000000000000000000002575000000567644620567630000011000000000000000000000000000109gc100000b62003980050hfb73100118a8ab6100000000000"
+ },
+ "song-3": {
+  "moment": "Song clip question",
+  "dur": 7.76,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Listen..."
+   },
+   {
+    "t": 1.5,
+    "text": "Have you found what you're looking for?"
+   },
+   {
+    "t": 4.28,
+    "text": "I still haven't."
+   },
+   {
+    "t": 6.0,
+    "text": "And I've looked EVERYWHERE."
+   }
+  ],
+  "fps": 25,
+  "env": "0000002310000000000000000000000000000045405bc30007eba962200503079748200772000365540000000000000000000000000041ljn430000ipepmhqld3862100000000000000000dkszgnd7a8b5001000000gmla6103200000000000000"
+ },
+ "cover-2": {
+  "moment": "Album cover question",
+  "dur": 7.52,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Now..."
+   },
+   {
+    "t": 1.5,
+    "text": "a little picture."
+   },
+   {
+    "t": 3.53,
+    "text": "Judge the album by its cover."
+   },
+   {
+    "t": 5.98,
+    "text": "Everybody else does."
+   }
+  ],
+  "fps": 25,
+  "env": "000046766756341021120000000000000000000054426721990002204000021000000000000000000000000007bch00100a60079750386513331000000210132000000000000000000000000ns87oc0gh7ca88e970000bc9644100000000"
  }
 };
