@@ -1,6 +1,8 @@
 // MacPhisto, the host: a little gold-lamé devil on a miniature ZOO TV stage.
 // Video walls, scaffold towers with orange lights, two hanging Trabants, monitors on the deck.
 // While he talks, the video walls show his face close up and his lips follow the voice.
+// The voice is a plain <audio> element (no Web Audio, which Safari mutes until clicked);
+// the lips follow a loudness envelope measured ahead of time (host-lines.js, "env").
 //
 //   const host = MacPhisto.mount(document.querySelector("#stage"));
 //   await host.say("join-1");   // plays audio/host/join-1.mp3 with subtitles and gags
@@ -10,6 +12,15 @@
 // Wall gags use the band's icons from members.js (window.U2M) when it's loaded.
 window.MacPhisto = (() => {
   const NS = "http://www.w3.org/2000/svg";
+  const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const SILENCE = (() => {   // 0.1 s of silence as a WAV file
+    const n = 800, b = new ArrayBuffer(44 + n * 2), v = new DataView(b);
+    const str = (o, x) => [...x].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+    str(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); str(8, "WAVEfmt "); v.setUint32(16, 16, true);
+    v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, 8000, true); v.setUint32(28, 16000, true);
+    v.setUint16(32, 2, true); v.setUint16(34, 16, true); str(36, "data"); v.setUint32(40, n * 2, true);
+    return URL.createObjectURL(new Blob([b], { type: "audio/wav" }));
+  })();
   // The ZOO TV screen slogans. "BELIEVE" is special: all but L-I-E fade away.
   const SLOGANS = ["TASTE IS THE ENEMY OF ART", "RELIGION IS A CLUB", "IGNORANCE IS BLISS", "REBELLION IS PACKAGED", "BELIEVE", "EVERYTHING YOU KNOW IS WRONG"];
 
@@ -204,28 +215,24 @@ window.MacPhisto = (() => {
     const bulbs = [...svg.querySelectorAll(".mp-bulb, .mp-lights circle")];
     const glass = [...svg.querySelectorAll(".mp-glass")];
 
-    // ---- audio and lip sync
+    // ---- the voice, and how open his mouth is
     const audio = new Audio();
     audio.preload = "auto";
-    let ctx = null, analyser = null, buf = null;
-    function wireAudio() {
-      if (ctx) return;
-      try {
-        ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const src = ctx.createMediaElementSource(audio);
-        analyser = ctx.createAnalyser();
-        analyser.fftSize = 1024;
-        buf = new Float32Array(analyser.fftSize);
-        src.connect(analyser); analyser.connect(ctx.destination);
-      } catch (e) { ctx = null; analyser = null; }
-    }
     function level() {
-      if (audio.paused) return 0;
-      if (!analyser) return 0.35 + 0.35 * Math.sin(performance.now() / 70); // no WebAudio: flap
-      analyser.getFloatTimeDomainData(buf);
-      let s = 0;
-      for (let i = 0; i < buf.length; i++) s += buf[i] * buf[i];
-      return Math.min(1, Math.max(0, (Math.sqrt(s / buf.length) - 0.012) * 9));
+      if (!cur || !cur.started || audio.paused) return 0;
+      const env = cur.line.env, fps = cur.line.fps || 25;
+      if (!env) return 0.35 + 0.35 * Math.sin(performance.now() / 70);   // no envelope: just flap
+      const c = env[Math.floor(audio.currentTime * fps)];
+      return c ? parseInt(c, 36) / 35 : 0;
+    }
+    // Safari only lets an element play by itself later if it was once started by a click or key.
+    // Call this from one: it plays a moment of silence on his voice element.
+    let unlocked = false;
+    function unlock() {
+      if (unlocked || cur) return;
+      unlocked = true;
+      audio.src = SILENCE;
+      audio.play().then(() => { if (!cur) audio.pause(); }, () => { unlocked = false; });
     }
 
     // ---- video walls
@@ -248,9 +255,9 @@ window.MacPhisto = (() => {
         [..."BELIEVE"].forEach((ch, k) => {
           const ts = el("tspan", {}, t);
           ts.textContent = ch;
-          if (k < 2 || k > 4) { ts.style.transition = "opacity 1.6s ease-in 1.4s"; fade.push(ts); }
+          if (k < 2 || k > 4) fade.push(ts);
         });
-        requestAnimationFrame(() => requestAnimationFrame(() => fade.forEach(ts => (ts.style.opacity = 0))));
+        spec.fade = { els: fade, at: performance.now() };   // the frame loop fades them
       } else if (spec.text != null) {
         const words = spec.text.split(" ");
         const maxChars = Math.max(4, Math.round(w.w / 7));
@@ -331,28 +338,30 @@ window.MacPhisto = (() => {
       stop();
       const line = lines[lineId];
       if (!line) return Promise.reject(new Error("No host line " + lineId));
-      wireAudio();
-      if (ctx && ctx.state === "suspended") ctx.resume();
       resetGags();
       for (let i = 0; i < WALLS.length; i++) wallSet(i, { face: 1 });
       const gags = (GAGS[lineId] || []).map(g => ({ ...g, t: (line.phrases[g.p] ? line.phrases[g.p].t : 0) + (g.at || 0) }))
         .sort((a, b) => a.t - b.t);
       audio.src = base + lineId + ".mp3";
       return new Promise(resolve => {
-        cur = { id: lineId, line, gags, next: 0, phrase: -1, resolve };
-        audio.onended = () => finish();
-        audio.onerror = () => finish();
-        audio.play().catch(() => finish());
+        // Only this line's own events may end it: a stopped line's play() can reject later.
+        const me = cur = { id: lineId, line, gags, next: 0, phrase: -1, resolve, started: false };
+        const done = () => { if (cur === me) finish(); };
+        audio.onplaying = () => { if (cur === me) me.started = true; };   // subtitles and gags wait for the sound
+        audio.onended = done;
+        audio.onerror = done;
+        audio.play().catch(done);
       });
     }
     function finish() {
       if (!cur) return;
-      const r = cur.resolve;
+      audio.pause();
+      const r = cur.resolve, played = cur.started;
       cur = null;
       showSub("");
       resetGags();
       wallNext.fill(0);
-      r();
+      r(played);   // true if any of it was heard
     }
     function stop() {
       audio.pause();
@@ -361,12 +370,16 @@ window.MacPhisto = (() => {
 
     // ---- the frame loop
     let lv = 0, blinkAt = performance.now() + 2000, blinkT = -1;
+    const headUse = $(".mp-headuse");
+    let lastSeed = -1;
     function frame(now) {
+      raf = requestAnimationFrame(frame);   // first, so nothing below can stop the loop
+      if (!svg.isConnected || document.hidden) return;   // off screen: nothing to draw
       const t = now / 1000;
       const raw = level();
       lv += (raw - lv) * (raw > lv ? 0.55 : 0.25);
 
-      if (cur) {
+      if (cur && cur.started) {
         const at = audio.currentTime;
         const ps = cur.line.phrases;
         let p = -1;
@@ -378,9 +391,9 @@ window.MacPhisto = (() => {
           if (g.horns) hornsOffAt = now;
           if (g.zoom !== undefined) zoomTarget = g.zoom ? 1 : 0;
           if (g.phone) setPhone(true);
-          if (g.flash) flashAt = now;
+          if (g.flash && !REDUCE) flashAt = now;
         }
-      } else idleWalls(now);
+      } else if (!cur) idleWalls(now);
 
       // mouth
       lips.setAttribute("ry", (1.1 + lv * 1.5).toFixed(2));
@@ -394,7 +407,7 @@ window.MacPhisto = (() => {
       const sway = Math.sin(t * 0.9) * 1.2 + (cur ? Math.sin(t * 2.3) * lv * 2 : 0);
       body.setAttribute("transform", `rotate(${sway.toFixed(2)}) translate(0 ${(Math.sin(t * 1.8) * 0.4).toFixed(2)})`);
       const nod = cur ? Math.sin(t * 5.1) * lv * 3 : Math.sin(t * 0.6) * 1.5;
-      $(".mp-headuse").setAttribute("transform", `translate(0 -112) rotate(${nod.toFixed(2)} 0 8)`);
+      headUse.setAttribute("transform", `translate(0 -112) rotate(${nod.toFixed(2)} 0 8)`);
       armR.setAttribute("transform", `rotate(${(-(4 + 26 * lv) + Math.sin(t * 1.3) * 2).toFixed(2)} 16 -91)`);
       // horns off: up, a twirl, fade; back on at the end of the line
       if (hornsOffAt > 0) {
@@ -411,7 +424,7 @@ window.MacPhisto = (() => {
       // flash
       if (flashAt > 0) {
         const k = (now - flashAt) / 600;
-        flashRect.setAttribute("opacity", k < 1 ? ((1 - k) * 0.55 * (Math.sin(k * 30) > 0 ? 1 : 0.3)).toFixed(2) : 0);
+        flashRect.setAttribute("opacity", k < 1 ? ((1 - k) * 0.45).toFixed(2) : 0);   // one soft flash, not a strobe
         if (k >= 1) flashAt = -1;
       }
       // stage lights twinkle; monitors and static flicker
@@ -421,24 +434,30 @@ window.MacPhisto = (() => {
         const g = glass[(Math.random() * glass.length) | 0];
         g.setAttribute("opacity", (0.55 + Math.random() * 0.45).toFixed(2));
       }
-      turb.setAttribute("seed", (now / 60) | 0);
-      svg.querySelectorAll(".mp-eqbar").forEach((bar, i) => {
+      const seed = (now / 60) | 0;
+      if (seed !== lastSeed && wallState.some(st => st && st.static)) { lastSeed = seed; turb.setAttribute("seed", seed); }
+      wallState.forEach(st => {
+        if (!st || !st.fade) return;
+        const o = Math.max(0, Math.min(1, 1 - (now - st.fade.at - 1400) / 1600));
+        st.fade.els.forEach(ts => ts.setAttribute("opacity", o.toFixed(2)));
+        if (o === 0) st.fade = null;
+      });
+      if (wallState.some(st => st && st.eq)) svg.querySelectorAll(".mp-eqbar").forEach((bar, i) => {
         const w = WALLS[0], h = (0.15 + lv * (0.5 + 0.5 * Math.abs(Math.sin(t * 7 + i * 1.7)))) * 0.8;
         const wall = bar.closest(".mp-wall-content"), wi = walls.indexOf(wall), ww = WALLS[wi] || w;
         bar.setAttribute("height", (ww.h * h).toFixed(1));
         bar.setAttribute("y", (ww.y + ww.h * (1 - h) - 2).toFixed(1));
       });
-      raf = requestAnimationFrame(frame);
     }
     let raf = requestAnimationFrame(frame);
 
     return {
-      say, stop,
+      say, stop, unlock,
       get speaking() { return !!cur; },
       lines: () => Object.keys(lines),
-      destroy() { stop(); cancelAnimationFrame(raf); svg.remove(); sub.remove(); },
+      destroy() { stop(); cancelAnimationFrame(raf); audio.removeAttribute("src"); audio.load(); svg.remove(); sub.remove(); },
     };
   }
 
-  return { mount, GAGS };
+  return { mount, GAGS, SILENCE };
 })();

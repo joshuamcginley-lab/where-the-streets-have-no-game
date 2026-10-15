@@ -408,6 +408,8 @@
   Sound.init();   // starts suspended; any click or key on the TV lets it play
   ["pointerdown", "keydown"].forEach(ev => addEventListener(ev, () => {
     Sound.init();
+    // Safari only lets MacPhisto's voice and the song clips play later if they were started once by a click or key
+    Host.unlock(); Player.unlock();
     if (S.phase === "lobby" && document.querySelector(".soundhint")) setTimeout(render, 0);
   }));
 
@@ -596,7 +598,7 @@
       }, at * 1000);
     }
 
-    // ---- the six characters
+    // ---- the four characters
     const T = {
       bono: {
         lock() { Sound.lock(); noise(0, .16, .03, [700, 4000], 1.2); },
@@ -725,6 +727,9 @@
   function onJoin(c, m) {
     const pid = String(m.pid || "").slice(0, 40);
     const name = String(m.name || "").replace(/\s+/g, " ").trim().slice(0, 14);
+    // One connection, one seat
+    const own = S.players.find(x => x.conn === c);
+    if (own && own.pid !== pid) return;
     let p = S.players.find(x => x.pid === pid && !x.local);
     if (!p) {
       if (S.phase !== "lobby") return c.send({ t: "reject", reason: "A game is in progress. You can join when it finishes." });
@@ -733,7 +738,7 @@
       S.players.push(p);
       Sound.join();
     } else if (S.phase === "lobby" && name) p.name = name;
-    if (p.conn && p.conn !== c) p.conn = null;
+    if (p.conn && p.conn !== c) { try { p.conn.send({ t: "reject", reason: "Your seat was picked up on another screen." }); } catch {} }
     Object.assign(p, { conn: c, connected: true, seen: Date.now(), lostAt: 0 });
     sync();
   }
@@ -818,14 +823,17 @@
       const deep = Used.take("song-deep", SONGS.filter(x => x.tier === "deep"), 4, songId);
       return shuffle([...hits, ...deep]).map(songQuestion);
     }
-    const deck = Used.take(mode, Q.filter(q => q.m === mode), ROUND, q => q.q);
     const tier = mode === "deep" ? "deep" : "hit";
     const pool = SONGS.filter(x => x.tier === tier);
-    const [songAt, coverAt] = shuffle([2, 3, 4, 5, 6, 7]);   // two different slots in the middle
-    if (pool.length) deck[songAt] = songQuestion(Used.take("song-" + tier, pool, 1, songId)[0]);
     // Casual gets the studio albums; Deep Cuts gets those plus the Deep Cuts-only covers.
     const covers = COVERS.filter(x => x.tier === "casual" || mode === "deep");
-    if (covers.length) deck[coverAt] = coverQuestion(Used.take("cover-" + mode, covers, 1, x => x.id)[0]);
+    const [songAt, coverAt] = shuffle([2, 3, 4, 5, 6, 7]);   // two different slots in the middle
+    const extras = [];
+    if (pool.length) extras.push([songAt, () => songQuestion(Used.take("song-" + tier, pool, 1, songId)[0])]);
+    if (covers.length) extras.push([coverAt, () => coverQuestion(Used.take("cover-" + mode, covers, 1, x => x.id)[0])]);
+    // Only deal (and mark as used) the trivia questions that will actually be asked
+    const deck = Used.take(mode, Q.filter(q => q.m === mode), ROUND - extras.length, q => q.q);
+    extras.sort((a, b) => a[0] - b[0]).forEach(([at, make]) => deck.splice(at, 0, make()));
     return deck;
   }
 
@@ -847,6 +855,13 @@
       }, 30);
     },
     stop() { clearInterval(this.fader); this.el.pause(); this.el.removeAttribute("src"); this.el.load(); },
+    unlocked: false,
+    unlock() {   // call from a click or key: play a moment of silence so Safari allows the clips later
+      if (this.unlocked || !this.el.paused || !window.MacPhisto) return;
+      this.unlocked = true;
+      this.el.src = MacPhisto.SILENCE;
+      this.el.play().then(() => { if (this.el.src === MacPhisto.SILENCE) this.stop(); }, () => { this.unlocked = false; });
+    },
   };
 
   // ---------- MacPhisto, the host (macphisto.js draws him; host-lines.js has his lines and their timings)
@@ -872,7 +887,7 @@
       const t = ++token;
       if (duck) Player.fade(.07, 400);
       const safety = setTimeout(() => t === token && mp.stop(), (HOST_LINES[id].dur + 4) * 1000);
-      return mp.say(id).catch(() => {}).finally(() => {
+      return mp.say(id).then(played => { if (!played) said.delete(id); }, () => said.delete(id)).finally(() => {   // a blocked line can be tried again
         clearTimeout(safety);
         if (t !== token) return;
         if (duck && S.phase === "reveal") Player.fade(.3, 600);
@@ -888,7 +903,7 @@
       box.className = "host " + cls;
       if (box.parentNode !== slot) slot.appendChild(box);
     }
-    return { ready: !!mp, pick, say, sayNext, stop, place, dur: id => (has(id) ? HOST_LINES[id].dur : 0) };
+    return { ready: !!mp, pick, say, sayNext, stop, place, unlock: () => mp?.unlock(), dur: id => (has(id) ? HOST_LINES[id].dur : 0), get speaking() { return !!mp?.speaking; } };
   })();
 
   // His own spot: the screen is his until the line ends (or someone skips), then then() carries on.
@@ -923,9 +938,10 @@
   function nextRound() { startRound(false); }
 
   function startRound(fresh) {
-    // Drop anyone who left; everyone still here must have a character.
-    S.players = S.players.filter(p => p.local || p.connected);
+    // Everyone still here must have a character.
     if (!canStart()) return sync();
+    // A new game drops anyone who left. Between rounds, someone whose phone is asleep keeps their seat and score.
+    if (fresh) S.players = S.players.filter(p => p.local || p.connected);
     S.deck = buildDeck(S.mode).map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) }));
     S.deck.forEach(q => { if (q.cover) new Image().src = q.cover.art; });   // fetch the cover now so it's there when its question comes up
     if (fresh || !S.round) { resetScores(); S.round = 1; }
@@ -943,6 +959,7 @@
 
   function countIn() {
     // "Unos, dos, tres, catorce!" before the first question
+    Host.stop();
     S.phase = "countin";
     Sound.countIn();   // picks the clip or the robot voice, and with it the word timing
     S.countMs = Math.round((countAt[3] + COUNT_HOLD) * 1000);
@@ -954,6 +971,7 @@
 
   function beginQuestion() {
     clearTimeout(rTimer);
+    Host.stop();   // never over a question
     S.phase = "question";
     const q = S.deck[S.i];
     if (q.song) Player.play(q.song.preview); else Player.stop();
@@ -965,7 +983,7 @@
   }
 
   function submit(p, k) {
-    if (S.phase !== "question" || p.answer || !(k >= 0 && k < 4) || !p.member) return;
+    if (S.phase !== "question" || p.answer || !Number.isInteger(k) || k < 0 || k > 3 || !p.member) return;
     p.answer = { k, at: Date.now() };
     Touches.lockIn(p);   // the character's own lock-in sound (and card effect)
     sync();
@@ -988,12 +1006,13 @@
   // the rest only sometimes, never two reveals running, and at most four a round.
   function revealLine(was) {
     const ps = S.players, multi = ps.length > 1, n = S.deck.length;
+    if (S.i === n - 1) return null;   // the last reveal leads straight to the final scores and the winner line
     const four = ps.find(p => p.ok && p.streak === 4);
     if (four) return Host.pick([`streak-${four.member}-1`]);
     const lead = leader();
     if (multi && was.leader && lead && lead !== was.leader) return Host.pick(["lead-change-1"]);
     if (ps.some(p => !p.ok && (was.streak.get(p.pid) || 0) >= 3)) return Host.pick(["streak-broken-1"]);
-    if (S.lastHostAt === S.i - 1 || S.revealLines >= 4 || S.i === n - 1) return null;   // the last reveal leads to the final scores
+    if (S.lastHostAt === S.i - 1 || S.revealLines >= 4) return null;
     const by = ps.slice().sort((a, b) => b.score - a.score);
     const chance = (p, ids, fresh) => (Math.random() < p ? Host.pick(ids, fresh) : null);
     if (multi && ps.every(p => p.ok)) return chance(.6, ["all-right-3"]);
@@ -1026,7 +1045,8 @@
     const ms = line ? Math.max(REVEAL_MS, HOST_IN + Host.dur(line) * 1000 + 1800) : REVEAL_MS;
     S.revealMs = ms;
     S.revealEndsAt = Date.now() + ms;
-    rTimer = setTimeout(nextQuestion, ms);
+    // If his line started late (a slow mp3), give him the time to finish it.
+    rTimer = setTimeout(function next() { if (Host.speaking && S.phase === "reveal") rTimer = setTimeout(next, 400); else nextQuestion(); }, ms);
     Sound.reveal();
     S.players.forEach(p => p.ok && Touches.right(p));
     Player.fade(.3);   // the song keeps going quietly under the reveal
@@ -1098,7 +1118,7 @@
     });
     if (S.phase === "lobby") {
       const keep = S.players.filter(p => p.local || p.connected || now - p.lostAt < LOBBY_GRACE_MS);
-      if (keep.length !== S.players.length) { S.players = keep; changed = true; }
+      if (keep.length !== S.players.length) { S.players = keep; seatedCount = keep.filter(p => p.member).length; changed = true; }
     }
     if (changed) { sync(); maybeAllAnswered(); }
   }, 2000);
@@ -1119,7 +1139,7 @@
       v.q = { n: S.i + 1, total: S.deck.length, opts: q.opts, left: Math.max(0, S.endsAt - now), song: !!q.song, cover: !!q.cover };
       v.my = p.answer ? p.answer.k : null;
     }
-    if (S.phase === "reveal") v.rv = { right: q.opts.indexOf(q.a), ok: p.ok, gain: p.gain, streak: p.streak, place: placeOf(p), of: S.players.length, left: Math.max(0, S.revealEndsAt - now), ms: S.revealMs || REVEAL_MS };
+    if (S.phase === "reveal") v.rv = { right: q.opts.indexOf(q.a), ok: p.ok, gain: p.gain, streak: p.streak, place: placeOf(p), of: S.players.length, left: Math.max(0, S.revealEndsAt - now) };
     if (S.phase === "final") v.fin = { place: placeOf(p), of: S.players.length, score: p.score, gained: p.score - (p.roundStart || 0), correct: p.correct, total: S.deck.length, rank: rankFor(p), round: S.round };
     return v;
   }
@@ -1163,7 +1183,7 @@
         const el = st.querySelector(".countin");
         setTimeout(() => el.classList.add("hold"), countAt[3] * 1000);
       }
-      else if (S.phase === "host") { st.innerHTML = hostHtml(); Host.place($("host-slot"), "big"); }
+      else if (S.phase === "host") { st.innerHTML = hostHtml(); Host.place($("host-slot"), ""); }
       else if (S.phase === "final") { st.innerHTML = finalHtml(); Host.place($("host-slot"), "overlay"); Touches.win(S.players.slice().sort((a, b) => b.score - a.score)[0]); }
       else { st.innerHTML = playShell(); lockSeen = new Set(); }
     }
@@ -1310,6 +1330,7 @@
   function finalHtml() {
     const order = S.players.slice().sort((a, b) => b.score - a.score);
     const w = order[0];
+    if (!w) return `<section class="final"></section>`;
     const tie = order.length > 1 && order[1].score === w.score;
     const board = order.map(p => {
       return `<li><span class="pos">${placeOf(p)}</span>${avatar(p.member)}
@@ -1371,6 +1392,7 @@
   $("stage").addEventListener("click", e => {
     const t = e.target.closest("button");
     if (!t) return;
+    if (e.detail) t.blur();   // a mouse click shouldn't leave focus behind for Enter to click again
     if (t.dataset.mode) setMode(t.dataset.mode);
     else if (t.dataset.member) toggleCouch(t.dataset.member);
     else if (t.dataset.k !== undefined) { const c = S.players.find(p => p.local); if (c) submit(c, Number(t.dataset.k)); }
@@ -1399,12 +1421,17 @@
     if (d.fullscreenElement) d.exitFullscreen?.().catch(() => {});
     else d.documentElement.requestFullscreen?.().catch(() => {});
   }
-  $("btn-full").onclick = toggleFull;
+  $("btn-full").onclick = e => { e.currentTarget.blur(); toggleFull(); };
   // The album-title band doubles as a home button: back to the start screen, same players, fresh scores.
-  $("btn-home").onclick = () => toLobby();
+  $("btn-home").onclick = e => { e.currentTarget.blur(); toLobby(); };
 
   // Keep the TV awake while hosting (not all browsers allow it).
-  try { navigator.wakeLock?.request("screen").catch(() => {}); } catch {}
+  // The lock is dropped whenever the page is hidden, and Safari wants a click, so ask again on both.
+  let tvLock = null;
+  const tvWake = () => { if (tvLock) return; try { navigator.wakeLock?.request("screen").then(l => { tvLock = l; l.addEventListener("release", () => tvLock = null); }).catch(() => {}); } catch {} };
+  tvWake();
+  addEventListener("pointerdown", tvWake);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") tvWake(); });
 
   window.__game = S; // handy for debugging from the console
   loadPhotos(() => { builtKey = ""; render(); });

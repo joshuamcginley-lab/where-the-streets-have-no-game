@@ -1,0 +1,4 @@
+# Cloudflare Pages: let browsers keep the voice lines and the count-in clip for a day,
+# so MacPhisto starts talking straight away instead of re-checking each file first.
+/audio/*
+  Cache-Control: public, max-age=86400

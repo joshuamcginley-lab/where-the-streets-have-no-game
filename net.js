@@ -50,7 +50,8 @@ window.Net = (() => {
     const peer = new Peer(PREFIX + code, { debug: 0 });
     peer.on("open", () => { opened = true; onOpen(); });
     peer.on("error", e => { if (!opened) onError(e.type || "error"); });
-    peer.on("disconnected", () => { if (!destroyed) try { peer.reconnect(); } catch {} });
+    // Lost the signalling server (Wi-Fi blip): try again every couple of seconds, not in a tight loop
+    peer.on("disconnected", () => setTimeout(() => { if (!destroyed && peer.disconnected) try { peer.reconnect(); } catch {} }, 2000));
     peer.on("connection", dc => {
       dc.on("open", () => {
         const c = wrap(dc.peer, d => dc.open && dc.send(d));

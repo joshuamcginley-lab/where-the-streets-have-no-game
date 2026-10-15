@@ -134,11 +134,15 @@
   const store = (k, v) => { try { v === undefined ? null : localStorage.setItem(k, v); return localStorage.getItem(k); } catch { return null; } };
   const ordinal = n => n + (["th", "st", "nd", "rd"][(n % 100 - 20) % 10] || ["th", "st", "nd", "rd"][n % 100] || "th");
 
-  // pid lives in sessionStorage so two tabs in one browser are two players,
-  // while a reload in the same tab gets your seat back.
+  // pid lives in sessionStorage so a reload in the same tab gets your seat back. On a real
+  // phone it's also kept in localStorage, so reopening the link (a new tab) gets it back too;
+  // in local test mode each tab stays its own player.
   let pid;
-  try { pid = sessionStorage.getItem("wtshng-pid") || Math.random().toString(36).slice(2, 12); sessionStorage.setItem("wtshng-pid", pid); }
-  catch { pid = Math.random().toString(36).slice(2, 12); }
+  try {
+    pid = sessionStorage.getItem("wtshng-pid") || (!Net.LOCAL && localStorage.getItem("wtshng-pid")) || Math.random().toString(36).slice(2, 12);
+    sessionStorage.setItem("wtshng-pid", pid);
+    if (!Net.LOCAL) localStorage.setItem("wtshng-pid", pid);
+  } catch { pid = Math.random().toString(36).slice(2, 12); }
 
   const params = new URLSearchParams(location.search);
   const C = {
@@ -150,9 +154,12 @@
   };
 
   // ---------- connection
+  let retryTimer = 0;
   function connect() {
-    if (C.handle) C.handle.close();
-    C.conn = null;
+    clearTimeout(retryTimer);
+    // Forget the old connection before closing it, so its close isn't taken for a new loss
+    const h = C.handle; C.handle = null; C.conn = null;
+    if (h) h.close();
     C.status = C.everJoined ? "lost" : "connecting";
     render();
     C.handle = Net.join(C.code, {
@@ -163,7 +170,9 @@
         conn.send({ t: "join", pid, name: C.name });
       },
       onError(type) {
-        if (type === "no-room") {
+        // Coming back to a room we were in: the TV may just be reconnecting itself, so keep trying for a while
+        if (type === "no-room" && C.everJoined && C.retries < 6) retry();
+        else if (type === "no-room") {
           C.status = "error";
           C.error = C.everJoined ? `Room ${C.code} has closed. If the TV started a new room, enter its code.` : `There's no room called ${C.code}. Check the code on the TV.`;
           C.everJoined = false; render();
@@ -175,7 +184,8 @@
   function retry() {
     C.status = "lost"; render();
     C.retries++;
-    setTimeout(connect, Math.min(8000, 1000 * C.retries));
+    clearTimeout(retryTimer);
+    retryTimer = setTimeout(connect, Math.min(8000, 1000 * C.retries));
   }
   function send(m) { if (C.conn) C.conn.send(m); }
 
@@ -187,6 +197,7 @@
   document.addEventListener("visibilitychange", () => {
     // Phones often drop the connection when the screen locks. Come straight back.
     if (document.visibilityState === "visible" && C.everJoined && !C.conn && C.status !== "error") { C.retries = 0; connect(); }
+    if (document.visibilityState === "visible" && C.status === "live") { lock = null; wake(); }   // the lock is dropped while hidden
   });
 
   function onMsg(m) {
@@ -198,7 +209,7 @@
     C.v = m; C.status = "live"; C.everJoined = true;
     if (m.q) C.deadline = Date.now() + m.q.left;
     if (m.rv) C.revealDeadline = Date.now() + m.rv.left;
-    if (m.phase !== "lobby") wake();
+    wake();   // in every phase: a phone that locks in the lobby loses its seat
     if (m.rv && prev?.phase !== "reveal") buzz(m.rv.ok ? buzzFor("right", [40, 60, 40]) : [160]);
     render();
   }
@@ -225,7 +236,7 @@
     const focusId = document.activeElement?.id;
     // Screens with entrance animations are only rebuilt when they change, so another
     // player's update doesn't replay them.
-    const key = C.status !== "live" ? C.status : v.phase === "question" || v.phase === "reveal" ? `${v.phase}:${v.q.n}`
+    const key = C.status !== "live" ? C.status : v.phase === "question" ? `question:${v.q.n}` : v.phase === "reveal" ? `reveal:${v.q.n}:${v.vip}`
       : v.phase === "final" ? `final:${v.fin.round}:${v.mode}:${v.vip}` : v.phase === "host" ? `host:${v.host.key}:${v.vip}` : v.phase;
     const fresh = key !== C.shownKey;
     C.shownKey = key;
