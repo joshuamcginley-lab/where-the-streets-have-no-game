@@ -199,13 +199,23 @@
     if (m.q) C.deadline = Date.now() + m.q.left;
     if (m.rv) C.revealDeadline = Date.now() + m.rv.left;
     if (m.phase !== "lobby") wake();
-    if (m.rv && prev?.phase !== "reveal") buzz(m.rv.ok ? [40, 60, 40] : [160]);
+    if (m.rv && prev?.phase !== "reveal") buzz(m.rv.ok ? buzzFor("right", [40, 60, 40]) : [160]);
     render();
   }
 
   let lock = null;
   function wake() { if (!lock && navigator.wakeLock) navigator.wakeLock.request("screen").then(l => { lock = l; l.addEventListener("release", () => lock = null); }).catch(() => {}); }
   function buzz(p) { try { navigator.vibrate?.(p); } catch {} }
+  // Each character's own buzz when they lock in and when they get one right
+  const BUZZ = {
+    bono:       { lock: [20, 40, 70], right: [45, 45, 90, 160, 45, 45, 90] },                       // "hello, hello"
+    edge:       { lock: [50, 110, 32, 110, 18, 110, 10], right: [80, 110, 50, 110, 30, 110, 16] },   // a fading echo
+    adam:       { lock: [90], right: [90, 90, 45, 70, 25] },                                         // a bass thump; the hat bouncing
+    larry:      { lock: [16, 22, 16, 22, 16, 22, 16, 22, 60], right: [16, 22, 16, 22, 16, 22, 16, 22, 16, 22, 50, 60, 90] },   // drum roll
+    macphisto:  { lock: [220, 120, 70], right: [220, 120, 220, 320, 220, 120, 220] },                // ring-ring
+    mirrorball: { lock: [12, 45, 12, 70, 12, 35, 12], right: [12, 35, 12, 55, 12, 30, 12, 70, 12, 40, 12] },   // glitter
+  };
+  const buzzFor = (kind, fallback) => BUZZ[C.v?.me?.member]?.[kind] || fallback;
 
   // ---------- views
   function render() {
@@ -345,7 +355,7 @@
     else if (b.dataset.mode) send({ t: "mode", mode: b.dataset.mode });
     else if (b.dataset.k !== undefined && C.v?.phase === "question" && C.v.my === null) {
       const k = Number(b.dataset.k);
-      C.v.my = k; render(); buzz(25);   // show it right away; the TV confirms
+      C.v.my = k; render(); buzz(buzzFor("lock", 25));   // show it right away; the TV confirms
       send({ t: "answer", k });
     }
     else if (b.id === "btn-start") send({ t: "start" });

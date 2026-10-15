@@ -16,12 +16,13 @@ window.U2M = (() => {
     },
     {
       id: "adam", name: "Adam Clayton", role: "Bass · PopMart", color: "#ff9b3d", photo: "img/adam.jpg",
-      // PopMart Adam: white hard hat, goggles and dust mask
+      // PopMart Adam: white hard hat (its own group, so it can bounce), goggles and dust mask
       icon: '<path d="M14 64c1-7 7-11 18-11s17 4 18 11z"/><rect x="27" y="47" width="10" height="8"/><ellipse cx="32" cy="38" rx="14" ry="16"/>' +
-        '<g fill="#f4f0e8"><path d="M13 27c0-12 8-20 19-20s19 8 19 20z"/><rect x="9" y="25" width="46" height="5" rx="2.5"/>' +
-        '<rect x="15" y="32" width="34" height="9" rx="4.5"/><path d="M21 43c7-3 15-3 22 0l-2 8c-5 4-13 4-18 0z"/></g>' +
-        '<rect x="30.5" y="8" width="3" height="17" rx="1.5"/><g style="fill:var(--mc)"><ellipse cx="24" cy="36.5" rx="5.5" ry="3"/><ellipse cx="40" cy="36.5" rx="5.5" ry="3"/></g>' +
-        '<g fill="#0a0909"><rect x="19" y="14" width="2" height="6" rx="1"/><rect x="24" y="12" width="2" height="6" rx="1"/><rect x="38" y="12" width="2" height="6" rx="1"/><rect x="43" y="14" width="2" height="6" rx="1"/></g>',
+        '<g fill="#f4f0e8"><rect x="15" y="32" width="34" height="9" rx="4.5"/><path d="M21 43c7-3 15-3 22 0l-2 8c-5 4-13 4-18 0z"/></g>' +
+        '<g style="fill:var(--mc)"><ellipse cx="24" cy="36.5" rx="5.5" ry="3"/><ellipse cx="40" cy="36.5" rx="5.5" ry="3"/></g>' +
+        '<g class="hat"><g fill="#f4f0e8"><path d="M13 27c0-12 8-20 19-20s19 8 19 20z"/><rect x="9" y="25" width="46" height="5" rx="2.5"/></g>' +
+        '<rect x="30.5" y="8" width="3" height="17" rx="1.5"/>' +
+        '<g fill="#0a0909"><rect x="19" y="14" width="2" height="6" rx="1"/><rect x="24" y="12" width="2" height="6" rx="1"/><rect x="38" y="12" width="2" height="6" rx="1"/><rect x="43" y="14" width="2" height="6" rx="1"/></g></g>',
     },
     {
       id: "larry", name: "Larry Mullen Jr.", role: "Drums · Heartthrob", color: "#a98bff", photo: "img/larry.jpg",
@@ -33,12 +34,12 @@ window.U2M = (() => {
         '<g style="fill:var(--mc)"><path d="M23 33.5l6.5-1 .2 1.6-6.4 1z"/><path d="M34.5 32.3l7 .6-.2 1.6-6.9-.4z"/>' +
         '<rect x="24" y="36.5" width="5.5" height="2" rx="1"/><rect x="35" y="36.5" width="5.5" height="2" rx="1"/>' +
         '<path d="M26.5 44.5c3.4 2.6 7.6 2.6 11 0l.9 1.3c-4 3.4-8.8 3.4-12.8 0z"/></g>' +
-        '<path d="M54 4l1.9 5.1L61 11l-5.1 1.9L54 18l-1.9-5.1L47 11l5.1-1.9z"/><path d="M9 17l1.2 3 3 1.2-3 1.2L9 25.5l-1.2-3.1-3-1.2 3-1.2z"/>',
+        '<g class="sparkles"><path d="M54 4l1.9 5.1L61 11l-5.1 1.9L54 18l-1.9-5.1L47 11l5.1-1.9z"/><path d="M9 17l1.2 3 3 1.2-3 1.2L9 25.5l-1.2-3.1-3-1.2 3-1.2z"/></g>',
     },
     {
       id: "macphisto", name: "MacPhisto", role: "Alter ego", color: "#d9a441", photo: "img/macphisto.jpg",
       // devil horns
-      icon: '<circle cx="32" cy="40" r="17"/><path d="M19 31C11 24 9 13 13 3c3 10 9 17 15 21zM45 31c8-7 10-18 6-28-3 10-9 17-15 21z"/><g style="fill:var(--mc)"><path d="M22 37l8 3-8 2zM42 37l-8 3 8 2z"/></g>',
+      icon: '<circle cx="32" cy="40" r="17"/><path class="horns" d="M19 31C11 24 9 13 13 3c3 10 9 17 15 21zM45 31c8-7 10-18 6-28-3 10-9 17-15 21z"/><g style="fill:var(--mc)"><path d="M22 37l8 3-8 2zM42 37l-8 3 8 2z"/></g>',
     },
     {
       id: "mirrorball", name: "Mirror Ball Man", role: "Alter ego", color: "#c4ccd6", photo: "img/mirrorball.jpg",
