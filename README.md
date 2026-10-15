@@ -77,6 +77,7 @@ Serve the folder with any static server, for example `python3 -m http.server 800
 | `questions.js` | Question bank for both modes |
 | `members.js` | The six playable characters |
 | `net.js` | Connection layer (PeerJS, or local test mode) |
+| `host.html`, `macphisto.js`, `host-lines.js` | MacPhisto, the host, on his miniature ZOO TV stage (preview page; lines in `audio/host/`) |
 | `shared.css` | Shared colours and type |
 | `vendor/` | PeerJS 1.5.4 and qrcode-generator 1.4.4 |
 
