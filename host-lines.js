@@ -5693,5 +5693,465 @@ window.HOST_LINES = {
   ],
   "fps": 25,
   "env": "0004420mwtjg40004aaa7400000000000000000000000000imi8433100000000000000000006dhjkngbdjspc53133111420000000000000760erjj78nfghgecccfdcb700000000"
+ },
+ "awards-intro-1": {
+  "moment": "Awards: intro",
+  "dur": 7.55,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "People of the living room!"
+   },
+   {
+    "t": 2.7,
+    "text": "Before I leave you... I have GIFTS."
+   },
+   {
+    "t": 6.02,
+    "text": "For SOME of you."
+   }
+  ],
+  "fps": 25,
+  "env": "00001qssj0bkifhidfeoq3100ov9778azz4dk634454300000000000000000000000000c6000aeddb98a7a96a7200000000010000000000000b7440278100007743000000000000000000000002755000000007a828a50000000000000000"
+ },
+ "awards-intro-2": {
+  "moment": "Awards: intro",
+  "dur": 8.52,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Oh, it's my favourite part..."
+   },
+   {
+    "t": 2.68,
+    "text": "The AWARDS!"
+   },
+   {
+    "t": 4.46,
+    "text": "I'd win them all myself, of course... but they won't let me play."
+   }
+  ],
+  "fps": 25,
+  "env": "000b211ur10ln75786000006bh800000089a9207c100000aacccc930000000000000066khsppzib62azzxnh84100000000000000000000006knk863ej6bb68d9411000000cji600000000000036300000000000000287000000143078420251003300002432100000000"
+ },
+ "award-fastest-1": {
+  "moment": "Award: fastest finger",
+  "dur": 8.12,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "To the fastest finger in the living room..."
+   },
+   {
+    "t": 3.36,
+    "text": "I give you... my ADMIRATION."
+   },
+   {
+    "t": 6.2,
+    "text": "Don't spend it all at once."
+   }
+  ],
+  "fps": 25,
+  "env": "0005l4ht50000mzzse00006a40000007w93337ghh7me54qh9a9zd9h766774100000000000000000002grjfg507d8104676432200000000003211000005ba0049864400000000000000000000000000134620000009acd9616979a730143320000000000000"
+ },
+ "award-fastest-2": {
+  "moment": "Award: fastest finger",
+  "dur": 7.08,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Such quick little fingers..."
+   },
+   {
+    "t": 2.78,
+    "text": "I could use fingers like those."
+   },
+   {
+    "t": 5.42,
+    "text": "Dialling the White House, mostly."
+   }
+  ],
+  "fps": 25,
+  "env": "00000002e7017c00522223lk00321b167300000ehf768f10000000000000000000001ciro07i7498a620201be95851368730069999b820000000000000000cg88qoqqfecbb9989mqjc00354310000belk300201455000000"
+ },
+ "award-confident-1": {
+  "moment": "Award: most confidently wrong",
+  "dur": 8.83,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "For the most CONFIDENTLY wrong..."
+   },
+   {
+    "t": 2.9,
+    "text": "Oh, I do love a believer."
+   },
+   {
+    "t": 5.54,
+    "text": "Believe everything... that's what I always say."
+   }
+  ],
+  "fps": 25,
+  "env": "0003et6sqdnzzg6000000633nzl5301kabj7514afgf99bfyxpe92000000000000000000005gc7953312235441000006cf9b679a999a6014101220112100100000000000000002465687893000009b100000000000000000000000001770000502278653000000000011001000000"
+ },
+ "award-confident-2": {
+  "moment": "Award: most confidently wrong",
+  "dur": 7.89,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Wrong... and so SURE of it!"
+   },
+   {
+    "t": 3.4,
+    "text": "You'd go far in my business, you know."
+   },
+   {
+    "t": 6.04,
+    "text": "I'll keep a seat warm for you."
+   }
+  ],
+  "fps": 25,
+  "env": "00024627lh8b4458876555510000002g1gg70000000cggdj911221118nhgb8cic1020000000000000000001dth40akoi3000ajhjhlhh89agdc714b501575001869975540000000000000000008fd000eg02b0003c700055520000000100000000000"
+ },
+ "award-bass-1": {
+  "moment": "Award: the bass player",
+  "dur": 8.75,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "The bass player award..."
+   },
+   {
+    "t": 2.34,
+    "text": "for the one who held it all together..."
+   },
+   {
+    "t": 5.32,
+    "text": "and got none of the credit. Just like the real thing."
+   }
+  ],
+  "fps": 25,
+  "env": "00013rzl61000vzrgc000001iztsolddec5aeh941000000000000000000004c0ac7117dk9556c40ac5100329aba507900000049cbc9203c138100000000000000000000c7351052002567866685101500075500000000000000000001630008f8400ccbeb99400896542000000"
+ },
+ "award-bass-2": {
+  "moment": "Award: the bass player",
+  "dur": 8.28,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Quietly reliable, weren't you?"
+   },
+   {
+    "t": 2.68,
+    "text": "Nobody noticed."
+   },
+   {
+    "t": 4.22,
+    "text": "I noticed. I notice EVERYTHING. I have cameras."
+   }
+  ],
+  "fps": 25,
+  "env": "00000003clfbb203fjf5gne97bacca6601200000009ijb2043110000000000000004kcdef3ci7orkkfed9263300000000000000018rlfvyrgb3312600000000000000005tge6g83520000005ef2002320000000000000000005cvi95010a1bkoda521000000000"
+ },
+ "award-buzzer-1": {
+  "moment": "Award: last second",
+  "dur": 8.59,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "At the very LAST second!"
+   },
+   {
+    "t": 2.94,
+    "text": "Every time!"
+   },
+   {
+    "t": 4.56,
+    "text": "Oh, you're a performer... aren't you? Like me."
+   }
+  ],
+  "fps": 25,
+  "env": "003643210000000od007i5000005gtfaolgceqpne600000000ekb03vu8672000000000006g0kp70004iml00000dcaaca78bc94431100000000240004ia0084431166659dc000c4000000499aa847a5320000000001794230003731000000000004kke10017777630000000"
+ },
+ "award-buzzer-2": {
+  "moment": "Award: last second",
+  "dur": 7.89,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "To the last-second hero..."
+   },
+   {
+    "t": 2.48,
+    "text": "I give you... a WATCH."
+   },
+   {
+    "t": 4.86,
+    "text": "It's eleven o'clock... tick tock."
+   }
+  ],
+  "fps": 25,
+  "env": "0003i5bzie538yzzvg30000000gg90da47803kppcgb5300000000000000001bkkih401794001332000000000000006d60885100000000000000000000002300033443330133210002654432100000000000000000220000000000121000000000000"
+ },
+ "award-streak-1": {
+  "moment": "Award: longest streak",
+  "dur": 9.72,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "The longest streak of the night!"
+   },
+   {
+    "t": 3.04,
+    "text": "Right... and right... and RIGHT again."
+   },
+   {
+    "t": 7.26,
+    "text": "Somebody's been reading my diary."
+   }
+  ],
+  "fps": 25,
+  "env": "00008dhjknkgkuozh7a6blf000000000002dswwa1ox505ze57fpc210000000000000000000000000222121000000000000000000065210000000014b54000000000000000jlc4733457dlka904a420b9641311000000000000000000247e8469555731003988668bb697557443300033342331000000000000"
+ },
+ "award-streak-2": {
+  "moment": "Award: longest streak",
+  "dur": 7.71,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Such a streak!"
+   },
+   {
+    "t": 2.16,
+    "text": "When I was young, I had streaks like that."
+   },
+   {
+    "t": 5.14,
+    "text": "Now I have... a reputation."
+   }
+  ],
+  "fps": 25,
+  "env": "0000000040jmg0044jh100000000378efawe30032000000000000000199bcdfc486003210011100000035ab1043000001500001100000111340000000000000047duqhmmpha9bde5357675200000000003221331001101037900000000000000"
+ },
+ "award-ears-1": {
+  "moment": "Award: golden ears",
+  "dur": 7.97,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Golden ears!"
+   },
+   {
+    "t": 2.28,
+    "text": "They knew every song before the singer did."
+   },
+   {
+    "t": 5.64,
+    "text": "Mind you... so did I."
+   }
+  ],
+  "fps": 25,
+  "env": "00000azzzpellk9ild974000cghwtqd962000000000000000000000000b1gflh6655ee300018e5000389700005fgc77654f3008b8197000086544630000000000000000000000024543230046543000000000000000000006761010013430000000000"
+ },
+ "award-ears-2": {
+  "moment": "Award: golden ears",
+  "dur": 8.36,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Two notes... and they KNEW."
+   },
+   {
+    "t": 3.16,
+    "text": "I'd sell my soul for ears like that."
+   },
+   {
+    "t": 6.08,
+    "text": "Well... someone's soul."
+   }
+  ],
+  "fps": 25,
+  "env": "00014431lxnog416888400000000000000009kh8429bbdba66968bdfha7520000000000000000000279000000157433310000000034ekjd820002202654200121000011100000000000000000gpvrp410000000000000000000gnmnj851011000034100010000000"
+ },
+ "award-comeback-1": {
+  "moment": "Award: the comeback",
+  "dur": 9.72,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "The comeback of the night!"
+   },
+   {
+    "t": 2.72,
+    "text": "From the bottom... where it's very WARM..."
+   },
+   {
+    "t": 6.18,
+    "text": "back up into the light. I know the journey well."
+   }
+  ],
+  "fps": 25,
+  "env": "0008g200020hzp4231quni302600lza210jub998fr7310000000000000000000000000008657c3007720000000000000000000000000000000000000001212210000000000000000000000000233d59oa407edb009h750940aa9fe964330000000000000000009gbb79fe91ch205dee999a631000000000000"
+ },
+ "award-comeback-2": {
+  "moment": "Award: the comeback",
+  "dur": 7.0,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Oh, how the mighty RISE..."
+   },
+   {
+    "t": 3.28,
+    "text": "Everybody loves a comeback, you know."
+   },
+   {
+    "t": 5.78,
+    "text": "I've had several."
+   }
+  ],
+  "fps": 25,
+  "env": "0006difggg86520001026bdffe914e99b9988fqlqj4011lmlb6bfd864321000000000000000000000002ed0hm169646377cejj21012076dguoi841000102120003000000000000026ckf800ef940000fea009210000000"
+ },
+ "award-sleeper-1": {
+  "moment": "Award: running to stand still",
+  "dur": 8.36,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "The Running to Stand Still award..."
+   },
+   {
+    "t": 3.04,
+    "text": "for all the questions left unanswered."
+   },
+   {
+    "t": 5.82,
+    "text": "Were you on the telephone? I was."
+   }
+  ],
+  "fps": 25,
+  "env": "0000affha79zzggi933759i900000dtpwe53410000000jvuehfa47852000000000000000000000054000589a8824701009910000353100356300036334000000000000000000000000009a7hjdbd32b70009h73000000123320000000000026hka86133440000000"
+ },
+ "award-sleeper-2": {
+  "moment": "Award: running to stand still",
+  "dur": 7.63,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "So many questions..."
+   },
+   {
+    "t": 2.94,
+    "text": "so few answers."
+   },
+   {
+    "t": 4.9,
+    "text": "You're my kind of people... aren't you?"
+   }
+  ],
+  "fps": 25,
+  "env": "00000000027mqn65i94b30242720000212000000000000000000000000000000000000000000599a4000014efca45664100000000000000000000000000001trlcdeptije07hpjidja40001rks500c7221000000000008kga7021664100000"
+ },
+ "champ-back-1": {
+  "moment": "Hall of Fame: the champion joins",
+  "dur": 7.24,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Well, well! The CHAMPION returns!"
+   },
+   {
+    "t": 3.74,
+    "text": "Look what you've done to them..."
+   },
+   {
+    "t": 5.76,
+    "text": "They're terrified."
+   }
+  ],
+  "fps": 25,
+  "env": "0003fd00zieqt76884cb8a766beca710000001101j50023479gki3301kelb56la00cmghc7a6300000000000000000000000000000001000000110000000100000000000000000000000662000000003768760000100000000000"
+ },
+ "champ-back-2": {
+  "moment": "Hall of Fame: the champion joins",
+  "dur": 8.75,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Ladies and gentlemen... the reigning champion!"
+   },
+   {
+    "t": 5.0,
+    "text": "I made them, you know."
+   },
+   {
+    "t": 6.78,
+    "text": "I can unmake them too."
+   }
+  ],
+  "fps": 25,
+  "env": "0000011dwkkj2bfa65204efik800000000bc800001100000000000000000006knc332211bslfoe07bd40000100002hwma20057641000000000000000000005f7734346376001400000000000000000000000000001010000210000675543000000000000000003431000000000"
+ },
+ "champ-back-3": {
+  "moment": "Hall of Fame: the champion joins",
+  "dur": 8.28,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "Oh, it's YOU."
+   },
+   {
+    "t": 2.24,
+    "text": "Back to defend the title, are we?"
+   },
+   {
+    "t": 4.5,
+    "text": "How brave. How very... foolish."
+   }
+  ],
+  "fps": 25,
+  "env": "0009nf6558b8311000007j000002bimtneddab61200000000000000000gbe3003e4j902pikhmi0226rpi80elk99acb77acef7000000000000279kjkj93012687bddc730000000000000000042ejkb8600afgggfedddb84000000000001jpk43200000100000000"
+ },
+ "record-1": {
+  "moment": "Hall of Fame: a new record",
+  "dur": 6.35,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A new RECORD!"
+   },
+   {
+    "t": 1.98,
+    "text": "Put it in the Hall of Fame..."
+   },
+   {
+    "t": 4.34,
+    "text": "right next to my portrait."
+   }
+  ],
+  "fps": 25,
+  "env": "0cqi6a84103pofebcba731are104ab52000000000000000000002yt7eb18i316860000blnnif5p800000hna50000000000000000000545566630006430000005666882000025200010000000000000"
+ },
+ "record-2": {
+  "moment": "Hall of Fame: a new record",
+  "dur": 8.36,
+  "phrases": [
+   {
+    "t": 0.0,
+    "text": "A RECORD!"
+   },
+   {
+    "t": 1.8,
+    "text": "I'll have it carved in stone."
+   },
+   {
+    "t": 4.04,
+    "text": "A very small stone. I'm saving the big ones for me."
+   }
+  ],
+  "fps": 25,
+  "env": "0002452000000009yrd68zzn22knoa3200000000000000017606gc7030008759a78600351000000026542000000000000000000a73326dba976950000000hfedhf973100000101000000000000000001di800grqa9a777200fl71332113200004456584200000000"
  }
 };

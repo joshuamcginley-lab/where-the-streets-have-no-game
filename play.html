@@ -137,7 +137,7 @@
 </style>
 </head>
 <body>
-<div class="ver" aria-hidden="true">v80 · Oct 15</div>
+<div class="ver" aria-hidden="true">v81 · Oct 16</div>
 <header class="cover"><span class="title">Everything You Know Is Wrong</span></header>
 <div class="app">
   <div class="top mono" id="top"></div>
@@ -265,11 +265,11 @@
     // player's update doesn't replay them.
     const key = C.status !== "live" ? C.status : v.phase === "question" ? `question:${v.q.n}:${v.my}` : v.phase === "reveal" ? `reveal:${v.q.n}:${v.vip}`
       : v.phase === "final" ? `final:${v.fin.round}:${v.vip ? v.mode : ""}:${v.vip}` : v.phase === "host" ? `host:${v.host.key}:${v.vip}`
-      : v.phase === "wager" ? `wager:${v.wager.mine}` : v.phase;
+      : v.phase === "wager" ? `wager:${v.wager.mine}` : v.phase === "awards" ? `awards:${v.aw.i}:${v.vip}` : v.phase;
     const fresh = key !== C.shownKey;
     C.shownKey = key;
     if (fresh) C.shownAt = Date.now();
-    if (!fresh && (key.startsWith("question") || key.startsWith("reveal") || key.startsWith("final") || key.startsWith("host") || key.startsWith("wager") || key === "countin")) return;
+    if (!fresh && (key.startsWith("question") || key.startsWith("reveal") || key.startsWith("final") || key.startsWith("host") || key.startsWith("wager") || key.startsWith("awards") || key === "countin")) return;
     s.classList.toggle("enter", fresh);
     s.classList.remove("calm");
     if (C.status === "form" || C.status === "error") s.innerHTML = formView();
@@ -278,6 +278,7 @@
     else if (v.phase === "lobby") s.innerHTML = lobbyView(v);
     else if (v.phase === "host") s.innerHTML = hostView(v);
     else if (v.phase === "wager") s.innerHTML = wagerView(v);
+    else if (v.phase === "awards") s.innerHTML = awardsView(v);
     else if (v.phase === "countin") s.innerHTML = countinView(v);
     else if (v.phase === "question") s.innerHTML = questionView(v);
     else if (v.phase === "reveal") s.innerHTML = revealView(v);
@@ -325,6 +326,16 @@
     return `<div class="hero"><div class="label">${esc(v.host.label.toUpperCase())}</div><h2>MacPhisto has the floor</h2>
         <p class="muted">Eyes on the TV.</p></div>
       ${v.vip ? `<button type="button" class="btn ghost" id="btn-skip">Skip him</button>` : ""}`;
+  }
+
+  // The awards at the end of the night: what's being given now, and what this player has won
+  function awardsView(v) {
+    const a = v.aw.cur;
+    return `<div class="hero"><div class="label">THE AWARDS${a ? ` · ${v.aw.i + 1} OF ${v.aw.total}` : ""}</div>
+        ${a ? `<h2>${esc(a.title)}</h2><div class="verdict ${a.mine ? "ok" : ""}" style="font-size:40px">${a.mine ? "That's you!" : esc(a.name)}</div>
+          <p class="muted">${esc(a.stat)}</p>` : `<h2>MacPhisto has the envelopes</h2><p class="muted">Eyes on the TV.</p>`}
+        ${v.aw.mine.length ? `<div class="label" style="margin-top:8px">YOUR AWARDS TONIGHT</div>${v.aw.mine.map(t => `<p><b>${esc(t)}</b></p>`).join("")}` : ""}</div>
+      ${v.vip ? `<button type="button" class="btn ghost" id="btn-skip">Next award</button>` : ""}`;
   }
 
   // The final wager: bet part of your score on the last question
@@ -424,11 +435,11 @@
         <div class="stats"><span>This round <b>${signed(f.gained)}</b></span><span>Right <b>${f.correct}/${f.total}</b></span></div></div>
       ${v.vip && f.tour?.next ? `<div class="vipbox"><span class="label">TOURNAMENT · NEXT UP: ${esc(f.tour.next.toUpperCase())}</span>
           <button type="button" class="btn" id="btn-again">Start round ${f.tour.leg + 1} of 3</button>
-          <button type="button" class="btn ghost" id="btn-lobby">New game</button></div>`
+          <button type="button" class="btn ghost" id="btn-lobby">Awards &amp; new game</button></div>`
         : v.vip ? `<div class="vipbox"><span class="label">NEXT ROUND</span>
           <div class="seg">${MODES.map(m => `<button type="button" id="mode-${m.id}" data-mode="${m.id}" aria-pressed="${v.mode === m.id}">${m.name}</button>`).join("")}</div>
           <button type="button" class="btn" id="btn-again">${v.mode === "tournament" ? "New tournament" : `Start round ${f.round + 1}`}</button>
-          <button type="button" class="btn ghost" id="btn-lobby">New game</button></div>`
+          <button type="button" class="btn ghost" id="btn-lobby">Awards &amp; new game</button></div>`
         : `<p class="muted" style="text-align:center">${f.tour?.next ? `Next up: ${esc(f.tour.next)}. The VIP starts it.` : "The VIP picks the next round."}</p>`}`;
   }
 

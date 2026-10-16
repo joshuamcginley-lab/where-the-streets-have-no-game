@@ -291,3 +291,26 @@ After adding a take here and a row to the table below, run `python3 tools/host-l
 | bet-lost-6.mp3 | Bet everything and lost | All in... / all gone. / I'll put it with the others. |
 | tie-3.mp3 | Final: a tie | A tie. / How very diplomatic. / I hate diplomacy. |
 | tie-4.mp3 | Final: a tie | Dead level. / Two winners. / Or no winners. Depends on your mood. |
+| awards-intro-1.mp3 | Awards: intro | People of the living room! / Before I leave you... I have GIFTS. / For SOME of you. |
+| awards-intro-2.mp3 | Awards: intro | Oh, it's my favourite part... / The AWARDS! / I'd win them all myself, of course... but they won't let me play. |
+| award-fastest-1.mp3 | Award: fastest finger | To the fastest finger in the living room... / I give you... my ADMIRATION. / Don't spend it all at once. |
+| award-fastest-2.mp3 | Award: fastest finger | Such quick little fingers... / I could use fingers like those. / Dialling the White House, mostly. |
+| award-confident-1.mp3 | Award: most confidently wrong | For the most CONFIDENTLY wrong... / Oh, I do love a believer. / Believe everything... that's what I always say. |
+| award-confident-2.mp3 | Award: most confidently wrong | Wrong... and so SURE of it! / You'd go far in my business, you know. / I'll keep a seat warm for you. |
+| award-bass-1.mp3 | Award: the bass player | The bass player award... / for the one who held it all together... / and got none of the credit. Just like the real thing. |
+| award-bass-2.mp3 | Award: the bass player | Quietly reliable, weren't you? / Nobody noticed. / I noticed. I notice EVERYTHING. I have cameras. |
+| award-buzzer-1.mp3 | Award: last second | At the very LAST second! / Every time! / Oh, you're a performer... aren't you? Like me. |
+| award-buzzer-2.mp3 | Award: last second | To the last-second hero... / I give you... a WATCH. / It's eleven o'clock... tick tock. |
+| award-streak-1.mp3 | Award: longest streak | The longest streak of the night! / Right... and right... and RIGHT again. / Somebody's been reading my diary. |
+| award-streak-2.mp3 | Award: longest streak | Such a streak! / When I was young, I had streaks like that. / Now I have... a reputation. |
+| award-ears-1.mp3 | Award: golden ears | Golden ears! / They knew every song before the singer did. / Mind you... so did I. |
+| award-ears-2.mp3 | Award: golden ears | Two notes... and they KNEW. / I'd sell my soul for ears like that. / Well... someone's soul. |
+| award-comeback-1.mp3 | Award: the comeback | The comeback of the night! / From the bottom... where it's very WARM... / back up into the light. I know the journey well. |
+| award-comeback-2.mp3 | Award: the comeback | Oh, how the mighty RISE... / Everybody loves a comeback, you know. / I've had several. |
+| award-sleeper-1.mp3 | Award: running to stand still | The Running to Stand Still award... / for all the questions left unanswered. / Were you on the telephone? I was. |
+| award-sleeper-2.mp3 | Award: running to stand still | So many questions... / so few answers. / You're my kind of people... aren't you? |
+| champ-back-1.mp3 | Hall of Fame: the champion joins | Well, well! The CHAMPION returns! / Look what you've done to them... / They're terrified. |
+| champ-back-2.mp3 | Hall of Fame: the champion joins | Ladies and gentlemen... the reigning champion! / I made them, you know. / I can unmake them too. |
+| champ-back-3.mp3 | Hall of Fame: the champion joins | Oh, it's YOU. / Back to defend the title, are we? / How brave. How very... foolish. |
+| record-1.mp3 | Hall of Fame: a new record | A new RECORD! / Put it in the Hall of Fame... / right next to my portrait. |
+| record-2.mp3 | Hall of Fame: a new record | A RECORD! / I'll have it carved in stone. / A very small stone. I'm saving the big ones for me. |
