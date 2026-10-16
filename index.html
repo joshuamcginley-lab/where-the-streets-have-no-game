@@ -429,7 +429,7 @@
 </style>
 </head>
 <body>
-<div class="ver" aria-hidden="true">v82 · Oct 16</div>
+<div class="ver" aria-hidden="true">v83 · Oct 16</div>
 <header class="cover"><button type="button" class="title" id="btn-home" title="Back to the start screen">Everything You Know Is Wrong</button></header>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <div class="fx" id="fx" aria-hidden="true"></div>
@@ -861,14 +861,18 @@
   }
 
   // ---------- room
-  function openRoom(tries = 0) {
+  // keep: reopen this room code (after a reload). The old one can take a few seconds to be let go,
+  // so keep asking for a while before giving up and opening a new room.
+  function openRoom(tries = 0, keep = null) {
     if (room) room.close();
-    S.code = Array.from({ length: 4 }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join("");
+    S.code = keep || Array.from({ length: 4 }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join("");
     S.net = "connecting"; render();
     room = Net.host(S.code, {
       onOpen() { S.net = "open"; render(); },
       onError(type) {
-        if (type === "unavailable-id" && tries < 5) return openRoom(tries + 1);
+        if (type === "unavailable-id" && keep && tries < 15) return setTimeout(() => openRoom(tries + 1, keep), 2000);
+        if (type === "unavailable-id" && keep) toast(`Couldn't get room ${keep} back. Phones need to join the new room.`);
+        if (type === "unavailable-id" && tries < 5) return openRoom(keep ? 0 : tries + 1);
         S.net = "failed"; S.netErr = type; render();
       },
       onConnection: handleConn,
@@ -1182,6 +1186,7 @@
   function hostBeat(ids, label, then, fresh = false) {
     const id = Host.ready && Host.pick(ids, fresh);
     if (!id) return then();
+    S.hostNext = then === countIn ? "countin" : then === startWager ? "wager" : "question";   // where a reload picks up
     const t = ++hostToken;
     Object.assign(S, { phase: "host", hostLine: id, hostLabel: label, hostKey: `${S.game}:${S.i}:${t}` });
     clearTimeout(qTimer); clearTimeout(rTimer);
@@ -1268,7 +1273,7 @@
     couchSeq = [];
     // MacPhisto reads the question out (not a song: the clip is the question); the clock starts when he's done.
     // Answers count from the start, so anyone who knows it while he's still talking gets full speed points.
-    const reading = Host.ready && readingOf(q), readMs = reading ? Math.round(Host.dur(reading) * 1000) + 300 : 0;
+    const reading = Host.ready && (navigator.userActivation?.hasBeenActive ?? true) && readingOf(q), readMs = reading ? Math.round(Host.dur(reading) * 1000) + 300 : 0;
     S.readingUntil = Date.now() + readMs;
     S.qShownAt = Date.now();
     S.endsAt = Date.now() + readMs + S.qSecs * 1000;
@@ -1685,6 +1690,60 @@
   function sync() {
     S.players.forEach(p => { if (p.conn) p.conn.send(viewFor(p)); });
     render();
+    saveGame();
+  }
+
+  // ---------- surviving a reload: the TV saves the game in this tab on every change. A reload within
+  // half an hour reopens the same room code and carries on from the same screen; phones reconnect by
+  // themselves (they keep retrying the room) and get their own seats back.
+  const SAVE = "wtshng-tv-game";
+  const SAVE_KEYS = ["code", "phase", "mode", "deck", "i", "game", "round", "leg", "inTour", "finale", "endsAt", "revealEndsAt", "revealMs", "qSecs",
+    "readingUntil", "qShownAt", "finalAt", "wagerEndsAt", "awards", "awardI", "gameId", "records", "revealLines", "lastHostAt", "hostNext", "hostLabel", "countMs"];
+  function saveGame() {
+    try {
+      const snap = { at: Date.now(), roundLines: [...(S.roundLines || [])], players: S.players.map(({ conn, ...p }) => p) };
+      SAVE_KEYS.forEach(k => { snap[k] = S[k]; });
+      sessionStorage.setItem(SAVE, JSON.stringify(snap));
+    } catch {}
+  }
+  function restoreGame() {
+    let snap = null;
+    try { snap = JSON.parse(sessionStorage.getItem(SAVE)); } catch {}
+    if (!snap || !snap.code || Date.now() - snap.at > 30 * 60000) return false;
+    SAVE_KEYS.forEach(k => { if (k in snap) S[k] = snap[k]; });
+    S.roundLines = new Set(snap.roundLines || []);
+    const now = Date.now();
+    S.players = (snap.players || []).map(p => ({ ...p, conn: null, connected: !!p.local, seen: now, lostAt: now }));
+    seatedCount = S.players.filter(p => p.member).length;
+    return true;
+  }
+  function resume() {
+    const now = Date.now(), ph = S.phase;
+    if (ph !== "lobby" || S.players.length) toast(`Game restored. Phones are reconnecting to room ${S.code}.${navigator.userActivation?.hasBeenActive ? "" : " Click the TV once to bring the sound back."}`);
+    if (ph === "host" || ph === "countin") {   // he was talking, or counting in: on to what came next
+      if (ph === "host" && S.hostNext === "countin") return countIn();
+      if (ph === "host" && S.hostNext === "wager") return startWager();
+      return beginQuestion();
+    }
+    if (ph === "question") {
+      if (S.endsAt <= now) return reveal();
+      const q = S.deck[S.i];
+      if (q?.song) Player.play(q.song.preview);   // the clip starts again; the clock carries on
+      qTimer = setTimeout(reveal, S.endsAt - now + 200);
+      return sync();
+    }
+    if (ph === "reveal") {
+      S.hostLine = null;
+      rTimer = setTimeout(nextQuestion, Math.max(2500, S.revealEndsAt - now));
+      return sync();
+    }
+    if (ph === "wager") {
+      if (S.wagerEndsAt <= now) return endWager();
+      qTimer = setTimeout(endWager, S.wagerEndsAt - now + 200);
+      return sync();
+    }
+    if (ph === "awards") { S.awardI = Math.max(-1, (S.awardI ?? 0) - 1); awardToken++; sync(); return awardNext(800); }   // the current award again
+    sync();
   }
 
   // ---------- rendering
@@ -2074,7 +2133,8 @@
 
   window.__game = S; // handy for debugging from the console
   loadPhotos(() => { builtKey = ""; render(); });
-  openRoom();
+  if (restoreGame()) { openRoom(0, S.code); resume(); }
+  else openRoom();
 })();
 </script>
 </body>

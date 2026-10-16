@@ -161,7 +161,7 @@
 </style>
 </head>
 <body>
-<div class="ver" aria-hidden="true">v82 · Oct 16</div>
+<div class="ver" aria-hidden="true">v83 · Oct 16</div>
 <header class="cover"><span class="title">Everything You Know Is Wrong</span></header>
 <div class="app">
   <div class="top mono" id="top"></div>
@@ -219,7 +219,7 @@
       },
       onError(type) {
         // Coming back to a room we were in: the TV may just be reconnecting itself, so keep trying for a while
-        if (type === "no-room" && C.everJoined && C.retries < 6) retry();
+        if (type === "no-room" && C.everJoined && C.retries < 20) retry();   // about a minute and a half
         else if (type === "no-room") {
           C.status = "error";
           C.error = C.everJoined ? `Room ${C.code} has closed. If the TV started a new room, enter its code.` : `There's no room called ${C.code}. Check the code on the TV.`;
