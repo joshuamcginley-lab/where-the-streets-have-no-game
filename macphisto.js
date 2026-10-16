@@ -228,6 +228,27 @@ window.MacPhisto = (() => {
     "tour-winner-3": [{ p: 0, walls: T("CHAMPION") }, { p: 1, walls: FACE }],
   });
   for (const k in MORE) GAGS[k] = [...(GAGS[k] || []), ...MORE[k]];
+  // Batch 12 rewrote some lines in his own voice; these gags replace the ones that no longer fit
+  Object.assign(GAGS, {
+    "streak-any-5": [{ p: 0, walls: T("ACHTUNG BABY") }, { p: 1, walls: FACE }, { p: 2, walls: { all: { cameras: 1 } } }],
+    "same-wrong-2": [{ p: 0, walls: T("WRONG") }, { p: 1, walls: FACE }, { p: 2, walls: T("FAITH") }],
+    "close-4": [{ p: 0, walls: { 0: { text: "NECK" }, 1: { text: "AND" }, 2: { text: "NECK" } } }, { p: 1, phone: 1, walls: FACE }],
+    "hurry-5": [{ p: 0, walls: { all: { static: 1 } } }, { p: 1, walls: FACE }, { p: 2, walls: T("TELEVISION") }],
+    "song-5": [{ p: 0, walls: { all: { eq: 1 } } }, { p: 1, walls: FACE }],
+    "song-6": [{ p: 0, walls: { all: { eq: 1 } } }, { p: 2, walls: SHOT("eyes", "red") }],
+    "double-5": [{ p: 0, walls: T("2X") }, { p: 1, walls: FACE }],
+    "winner-8": [{ p: 0, walls: T("WINNER") }, { p: 1, walls: FACE }, { p: 2, walls: { all: { cameras: 1 } } }],
+    "tie-2": [{ p: 0, walls: T("A TIE") }, { p: 1, walls: FACE }],
+    "round-two-4": [{ p: 2, walls: { all: { cameras: 1 } } }],
+    "winner-13": [{ p: 0, walls: T("WINNER") }, { p: 1, phone: 1, walls: FACE }],
+    "lead-change-11": [{ p: 2, walls: SHOT("eyes", "red") }],
+    "nobody-right-11": [{ p: 0, walls: T("0") }, { p: 2, walls: FACE }],
+    "lone-right-7": [{ p: 2, walls: T("1993") }],
+    "song-12": [{ p: 1, walls: T("1993") }, { p: 2, walls: T("GIGANTIC") }],
+    "goodnight-8": [{ p: 2, walls: { all: { cameras: 1 } } }],
+    "order-5": [{ p: 2, walls: T("ETERNAL") }],
+    "tour-winner-3": [{ p: 0, walls: T("CHAMPION") }, { p: 1, walls: FACE }],
+  });
 
   const WALLS = [{ x: 52, y: 66, w: 72, h: 80 }, { x: 352, y: 46, w: 54, h: 54 }, { x: 374, y: 116, w: 56, h: 42 }];
   const TOWERS = [38, 134, 336, 440];

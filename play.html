@@ -134,10 +134,34 @@
   .countin .w:last-child { background: var(--fg); color: var(--red); font-size: min(64px, 15vw); opacity: 1; animation: pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
   .countin.hold { animation-play-state: paused; }
   .row { display: grid; gap: 10px; }
+  /* Small phones (iPhone SE and the like): a slimmer header and keys, so all four answers fit without scrolling */
+  @media (orientation: portrait) and (max-height: 640px) {
+    header.cover { height: 44px; margin-bottom: 10px; }
+    header.cover .title { font-size: 14px; }
+    .app { gap: 10px; } .top { padding-bottom: 8px; } .screen { gap: 10px; }
+    .pad { gap: 8px; }
+    .key { min-height: 56px; padding: 9px 14px; font-size: 16px; }
+    .key .ch { font-size: 26px; }
+    .qfin { font-size: 20px; }
+    .verdict { font-size: 50px; } .big { font-size: 52px; }
+  }
+  /* A phone turned on its side: answers in two columns, everything a size down */
+  @media (orientation: landscape) and (max-height: 500px) {
+    header.cover { height: 34px; margin-bottom: 8px; }
+    header.cover .title { font-size: 13px; }
+    .app { max-width: 860px; gap: 8px; } .top { padding-bottom: 4px; } .screen { gap: 8px; }
+    .pad { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .key { min-height: 50px; padding: 7px 12px; font-size: 15px; gap: 10px; }
+    .key .ch { font-size: 22px; }
+    .qfin { font-size: 18px; }
+    .hero { gap: 6px; padding-block: 0; }
+    .verdict { font-size: 36px; } .big { font-size: 40px; } h1 { font-size: 30px; } h2 { font-size: 24px; }
+    .wagerv h2.cat { font-size: 18px; padding: 6px 10px; }
+  }
 </style>
 </head>
 <body>
-<div class="ver" aria-hidden="true">v81 · Oct 16</div>
+<div class="ver" aria-hidden="true">v82 · Oct 16</div>
 <header class="cover"><span class="title">Everything You Know Is Wrong</span></header>
 <div class="app">
   <div class="top mono" id="top"></div>
