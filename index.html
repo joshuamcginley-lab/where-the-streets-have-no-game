@@ -429,7 +429,7 @@
 </style>
 </head>
 <body>
-<div class="ver" aria-hidden="true">v83 · Oct 16</div>
+<div class="ver" aria-hidden="true">v84 · Oct 17</div>
 <header class="cover"><button type="button" class="title" id="btn-home" title="Back to the start screen">Everything You Know Is Wrong</button></header>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <div class="fx" id="fx" aria-hidden="true"></div>
@@ -566,7 +566,7 @@
   // banknotes. Drawn here (a note of our own, not a copy): they flutter down slowly, turning over.
   const Confetti = (() => {
     const cv = $("confetti"), cx = cv.getContext("2d");
-    let W = 0, H = 0, bits = [], front = null, back = null, nw = 0, nh = 0;
+    let W = 0, H = 0, bits = [], front = null, back = null, nw = 0, nh = 0, fade = 1;
     function size() { W = cv.width = innerWidth; H = cv.height = innerHeight; front = null; }
     addEventListener("resize", size); size();
     // One note, drawn once at the size it falls at; the back is the darker side
@@ -594,8 +594,9 @@
     function burst(n = 60) {
       if (REDUCE) return;
       if (!front) { nw = Math.round(Math.max(70, Math.min(130, W * .065))); nh = Math.round(nw * .5); front = note(false); back = note(true); }
+      fade = 1;
       for (let i = 0; i < n; i++) bits.push({
-        x: Math.random() * W, y: -nh - Math.random() * H * 1.1, vy: 38 + Math.random() * 42,
+        x: Math.random() * W, y: -nh - Math.random() * H * .7, vy: 55 + Math.random() * 45,
         sway: 18 + Math.random() * 40, sf: .6 + Math.random() * .7, sp: Math.random() * 6,
         flip: Math.random() * 6, vf: 1.6 + Math.random() * 1.8, tilt: (Math.random() - .5) * .9, t: 0,
       });
@@ -604,6 +605,10 @@
       if (!bits.length) return;
       if (!front) { nw = Math.round(Math.max(70, Math.min(130, W * .065))); nh = Math.round(nw * .5); front = note(false); back = note(true); }   // redrawn after a resize
       cx.clearRect(0, 0, W, H);
+      // They belong to the winner's screen: once the game moves on, the rest fade out
+      if (S.phase !== "final" && S.phase !== "awards") fade -= dt / .7;
+      if (fade <= 0) { bits = []; fade = 1; return; }
+      cx.globalAlpha = fade;
       bits = bits.filter(b => b.y < H + nh * 2);
       for (const b of bits) {
         b.t += dt; b.y += b.vy * dt; b.flip += b.vf * dt;
@@ -613,6 +618,7 @@
         cx.drawImage(turn >= 0 ? front : back, -nw / 2, -nh / 2);
         cx.restore();
       }
+      cx.globalAlpha = 1;
       if (!bits.length) cx.clearRect(0, 0, W, H);
     }
     return { burst, draw };
