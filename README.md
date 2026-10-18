@@ -85,5 +85,6 @@ Serve the folder with any static server, for example `python3 -m http.server 800
 | `host.html`, `macphisto.js`, `host-lines.js` | MacPhisto, the host, on his miniature ZOO TV stage (preview page; lines in `audio/host/`) |
 | `shared.css` | Shared colours and type |
 | `vendor/` | PeerJS 1.5.4 and qrcode-generator 1.4.4 |
+| `og.png` | Link-preview image (LinkedIn, iMessage, Slack): a 1200×630 screenshot of the lobby |
 
 A fan-made game. Not affiliated with U2 or Island Records.
