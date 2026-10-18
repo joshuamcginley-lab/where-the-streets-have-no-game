@@ -30,3 +30,21 @@ flaky. Consider a fallback server, or at least a clearer message telling people 
 
 Web Analytics counts page visits. A small counter for games started and finished, and players per game
 (like fishr's `usage.js`), would show how many people actually play.
+
+## Make solo on a phone the main way in
+
+Web Analytics, first hour of the r/U2Band post (Oct 18): 86 visits, 81 to `/` and only 5 to `/play`;
+68 mobile, 15 desktop, 3 tablet; nearly all from Reddit. So almost everyone plays solo on their phone,
+on the TV page. On a phone, lead with a big "Play solo" button (pick a character and start in one or two
+taps) and move the QR code / room code box below it or behind a "Playing on a TV?" link.
+
+## Shareable score
+
+After a solo game, offer a share button (Web Share API on phones, copy-to-clipboard otherwise) with
+something like "I got 8/10 on Deep Cuts in Where the Streets Have No Game. Can you beat it?" plus the link.
+Solo players posting scores back to Reddit is how the game keeps spreading.
+
+## Version stamp overlaps the lobby on phones
+
+On a phone-sized screen the `v86 · Oct 18` stamp (`.ver`) sits on top of The Edge's character card in the
+lobby. Move it or hide it on narrow screens.
