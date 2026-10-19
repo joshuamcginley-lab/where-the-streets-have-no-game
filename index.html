@@ -132,6 +132,12 @@
     position: absolute; top: -.6rem; right: .6rem; font: 700 .75rem var(--font-mono); letter-spacing: .12em;
     background: var(--fg); color: var(--bg); border-radius: .2rem; padding: .1rem .4rem;
   }
+  /* Play solo: only on a portrait screen (the TV page opened on a phone), where nearly everyone plays alone */
+  .solo { display: none; }
+  .solo .btn { width: 100%; font-size: 1.8rem; padding-block: 1.1rem; }
+  .solo p { margin: 0; color: var(--muted); text-align: center; }
+  .solo b { color: var(--mc, var(--fg)); }
+  .solo-2 { display: none; }
   .lobby-foot { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; font-size: 1.05rem; }
   .lobby-foot .btn { font-size: 1.35rem; }
   .lobby-foot .hint { color: var(--muted); }
@@ -435,11 +441,15 @@
     .answers { grid-template-columns: 1fr; }
     .qbody { grid-template-columns: 1fr; container-type: normal; }
     .cover-frame { width: min(22rem, 100%); justify-self: center; }
+    /* Play solo leads, and comes again under the characters in place of Start; Start comes back as soon as a phone joins */
+    .solo { display: grid; gap: .6rem; }
+    .lobby:has(.solo) :is(#btn-start, .lobby-foot .hint, .soundhint) { display: none; }
+    .lobby:has(.solo) .solo-2 { display: block; width: 100%; }
   }
 </style>
 </head>
 <body>
-<div class="ver" aria-hidden="true">v89 · Oct 19</div>
+<div class="ver" aria-hidden="true">v90 · Oct 19</div>
 <header class="cover"><button type="button" class="title" id="btn-home" title="Back to the start screen">Everything You Know Is Wrong</button></header>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <div class="fx" id="fx" aria-hidden="true"></div>
@@ -519,7 +529,8 @@
     Sound.init();
     // Safari only lets MacPhisto's voice and the song clips play later if they were started once by a click or key
     Host.unlock(); Player.unlock();
-    if (S.phase === "lobby" && document.querySelector(".soundhint")) setTimeout(render, 0);
+    // redraw (to drop the sound hint) once the press is over: replacing the buttons mid-press would swallow a mouse click
+    if (S.phase === "lobby" && document.querySelector(".soundhint")) addEventListener(ev === "keydown" ? "keyup" : "pointerup", () => setTimeout(render, 0), { once: true });
   }));
 
   // ---------- Bono's count-in, from the top of "Vertigo"
@@ -968,6 +979,27 @@
     lobbyChatter();
   }
 
+  // Play solo (phones, while no phone holds a seat): the character already picked on this screen, else the
+  // one played solo last time, else Bono. Then straight into the game.
+  function soloMember() {
+    const couch = S.players.find(p => p.local);
+    if (couch?.member) return couch.member;
+    const taken = new Set(S.players.map(p => p.member));
+    let last = null;
+    try { last = localStorage.getItem("wtshng-solo"); } catch {}
+    return [last, ...MEMBERS.map(m => m.id)].find(id => id && byId(id) && !taken.has(id));
+  }
+  function playSolo() {
+    if (S.phase !== "lobby" || S.players.some(p => !p.local)) return;
+    const id = soloMember();
+    if (!id) return;
+    let couch = S.players.find(p => p.local);
+    if (!couch) { couch = newPlayer("tv", "On the TV", true); S.players.push(couch); }
+    couch.member = id;
+    try { localStorage.setItem("wtshng-solo", id); } catch {}
+    startGame();
+  }
+
   // ---------- game flow
   function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
@@ -1074,19 +1106,20 @@
   // clock runs. So the current and next two clips (about 1 MB each) are fetched ahead and played from
   // memory; one that hasn't arrived yet streams as before.
   const Clips = {
-    ready: new Map(), busy: new Set(),
+    ready: new Map(), want: [], cur: null,
     url(u) { return this.ready.get(u) || u; },
     ahead(from) {
-      (S.deck || []).slice(from, from + 3).forEach(q => {
-        const u = q.song?.preview;
-        if (!u || this.ready.has(u) || this.busy.has(u)) return;
-        this.busy.add(u);
-        fetch(u).then(r => (r.ok ? r.blob() : null))
-          .then(b => { if (b) this.ready.set(u, URL.createObjectURL(new Blob([b], { type: "audio/mp4" }))); })
-          .catch(() => {}).finally(() => this.busy.delete(u));
-      });
+      this.want = (S.deck || []).slice(from, from + 3).map(q => q.song?.preview).filter(u => u && !this.ready.has(u) && u !== this.cur);
+      this.next();
     },
-    clear() { this.ready.forEach(b => URL.revokeObjectURL(b)); this.ready.clear(); },
+    next() {   // one at a time, in question order, so on a slow connection the next clip isn't sharing it with the ones after
+      if (this.cur || !this.want.length) return;
+      const u = this.cur = this.want.shift();
+      fetch(u).then(r => (r.ok ? r.blob() : null))
+        .then(b => { if (b) this.ready.set(u, URL.createObjectURL(new Blob([b], { type: "audio/mp4" }))); })
+        .catch(() => {}).finally(() => { this.cur = null; this.next(); });
+    },
+    clear() { this.ready.forEach(b => URL.revokeObjectURL(b)); this.ready.clear(); this.want = []; },
   };
 
   const Player = {
@@ -1857,6 +1890,11 @@
     const hint = !active().length ? "Scan the code to join on your phone, or click a character to play on this screen."
       : unpicked ? `Waiting for ${unpicked} player${unpicked > 1 ? "s" : ""} to pick a character.`
       : `${active().length} of 4 on stage. ${v ? esc(displayName(v)) + " (VIP) can start from their phone." : "Press Enter to start."}`;
+    const soloAs = byId(soloMember() || "bono");
+    const solo = S.players.some(p => !p.local) ? "" : `<div class="solo">
+          <button type="button" class="btn" id="btn-solo">Play solo</button>
+          <p>${esc(MODES.find(m => m.id === S.mode)?.name || "")} as <b style="--mc:${soloAs.color}">${esc(soloAs.name)}</b> · change the mode or character below</p>
+        </div>`;
     const u = joinUrl();
     const net = S.net === "open" ? `<div class="netmsg">Scan the code, or open the link and type the room code.</div>`
       : S.net === "connecting" ? `<div class="netmsg">Opening the room…</div>`
@@ -1864,9 +1902,10 @@
     return `<section class="lobby${builtKey !== "lobby" ? " intro" : ""}">
       <div class="lobby-main">
         <div class="lobby-top"><h1>Where the Streets Have No <em>Game</em></h1><div id="host-slot"></div></div>
+        ${solo}
         <div><p class="label">Mode</p><div class="modes">${modes}</div></div>
         <div><p class="label">Pick a character · up to 4 players</p><div class="slots">${slots}</div></div>
-        <div class="lobby-foot"><button type="button" class="btn" id="btn-start" ${canStart() ? "" : "disabled"}>Start the show</button>${
+        <div class="lobby-foot"><button type="button" class="btn" id="btn-start" ${canStart() ? "" : "disabled"}>Start the show</button>${solo ? `<button type="button" class="btn solo-2" id="btn-solo-2">Play solo</button>` : ""}${
           navigator.userActivation && !navigator.userActivation.hasBeenActive ? `<span class="soundhint">Click anywhere on this screen once to switch the sound on.</span>` : `<span class="hint">${hint}</span>`}</div>
       </div>
       <aside class="joinbox framed">
@@ -2129,6 +2168,7 @@
     else if (t.dataset.member) toggleCouch(t.dataset.member);
     else if (t.dataset.k !== undefined) couchTap(Number(t.dataset.k));
     else if (t.id === "btn-start") startGame();
+    else if (t.id === "btn-solo" || t.id === "btn-solo-2") playSolo();
     else if (t.id === "btn-next") nextQuestion();
     else if (t.id === "btn-again") nextRound();
     else if (t.id === "btn-lobby") endGame();
