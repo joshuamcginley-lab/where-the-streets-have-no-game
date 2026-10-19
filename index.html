@@ -137,7 +137,6 @@
   .solo .btn { width: 100%; font-size: 1.8rem; padding-block: 1.1rem; }
   .solo p { margin: 0; color: var(--muted); text-align: center; }
   .solo b { color: var(--mc, var(--fg)); }
-  .solo-2 { display: none; }
   .lobby-foot { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; font-size: 1.05rem; }
   .lobby-foot .btn { font-size: 1.35rem; }
   .lobby-foot .hint { color: var(--muted); }
@@ -441,15 +440,14 @@
     .answers { grid-template-columns: 1fr; }
     .qbody { grid-template-columns: 1fr; container-type: normal; }
     .cover-frame { width: min(22rem, 100%); justify-self: center; }
-    /* Play solo leads, and comes again under the characters in place of Start; Start comes back as soon as a phone joins */
+    /* Play solo leads, in place of Start; Start comes back as soon as a phone joins */
     .solo { display: grid; gap: .6rem; }
-    .lobby:has(.solo) :is(#btn-start, .lobby-foot .hint, .soundhint) { display: none; }
-    .lobby:has(.solo) .solo-2 { display: block; width: 100%; }
+    .lobby:has(.solo) .lobby-foot { display: none; }
   }
 </style>
 </head>
 <body>
-<div class="ver" aria-hidden="true">v90 · Oct 19</div>
+<div class="ver" aria-hidden="true">v91 · Oct 19</div>
 <header class="cover"><button type="button" class="title" id="btn-home" title="Back to the start screen">Everything You Know Is Wrong</button></header>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <div class="fx" id="fx" aria-hidden="true"></div>
@@ -1905,7 +1903,7 @@
         ${solo}
         <div><p class="label">Mode</p><div class="modes">${modes}</div></div>
         <div><p class="label">Pick a character · up to 4 players</p><div class="slots">${slots}</div></div>
-        <div class="lobby-foot"><button type="button" class="btn" id="btn-start" ${canStart() ? "" : "disabled"}>Start the show</button>${solo ? `<button type="button" class="btn solo-2" id="btn-solo-2">Play solo</button>` : ""}${
+        <div class="lobby-foot"><button type="button" class="btn" id="btn-start" ${canStart() ? "" : "disabled"}>Start the show</button>${
           navigator.userActivation && !navigator.userActivation.hasBeenActive ? `<span class="soundhint">Click anywhere on this screen once to switch the sound on.</span>` : `<span class="hint">${hint}</span>`}</div>
       </div>
       <aside class="joinbox framed">
@@ -2168,7 +2166,7 @@
     else if (t.dataset.member) toggleCouch(t.dataset.member);
     else if (t.dataset.k !== undefined) couchTap(Number(t.dataset.k));
     else if (t.id === "btn-start") startGame();
-    else if (t.id === "btn-solo" || t.id === "btn-solo-2") playSolo();
+    else if (t.id === "btn-solo") playSolo();
     else if (t.id === "btn-next") nextQuestion();
     else if (t.id === "btn-again") nextRound();
     else if (t.id === "btn-lobby") endGame();
