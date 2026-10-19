@@ -132,11 +132,25 @@
     position: absolute; top: -.6rem; right: .6rem; font: 700 .75rem var(--font-mono); letter-spacing: .12em;
     background: var(--fg); color: var(--bg); border-radius: .2rem; padding: .1rem .4rem;
   }
-  /* Play solo: only on a portrait screen (the TV page opened on a phone), where nearly everyone plays alone */
-  .solo { display: none; }
-  .solo .btn { width: 100%; font-size: 1.8rem; padding-block: 1.1rem; }
-  .solo p { margin: 0; color: var(--muted); text-align: center; }
-  .solo b { color: var(--mc, var(--fg)); }
+  /* Phones (a portrait screen) where nearly everyone plays alone: the games are the buttons, the character is
+     optional, and the TV's room code folds away. Shown only in the portrait rules below. */
+  .solo, .tvjoin { display: none; }
+  .go { grid-template-columns: auto 1fr; column-gap: 1rem; align-items: center; width: 100%; padding-block: 1rem; }
+  .go::before { content: ""; grid-row: 1 / 3; width: 0; height: 0; border-left: 1.25rem solid var(--red); border-block: .8rem solid transparent; margin-left: .2rem; }
+  .go b { font-size: 2.1rem; }
+  .go span { font-size: 1rem; }
+  .gos { display: grid; gap: .7rem; }
+  .as { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6rem; }
+  .as-jump { display: inline-block; padding: 1.1rem .4rem; margin: -1.1rem 0; background: none; border: 0; cursor: pointer;
+    font: inherit; letter-spacing: inherit; text-transform: inherit; color: var(--mc); text-decoration: underline; text-underline-offset: .25em; }
+  .as button { --mc: var(--muted); cursor: pointer; display: grid; justify-items: center; gap: .35rem; padding: .6rem .2rem; border-radius: .4rem;
+    background: color-mix(in srgb, var(--screen) 88%, transparent); border: 2px solid transparent; color: var(--muted);
+    font: 700 .95rem var(--font-body); }
+  .as .av { width: 3rem; opacity: .35; filter: grayscale(.8); }
+  .as button[aria-pressed="true"] { border-color: var(--mc); color: var(--fg); background: color-mix(in srgb, var(--mc) 14%, var(--screen)); }
+  .as button[aria-pressed="true"] .av { opacity: 1; filter: none; }
+  .tvjoin { justify-self: center; min-height: 44px; background: none; border: 0; padding: .4rem 1rem; cursor: pointer; color: var(--muted);
+    font: 500 1rem var(--font-body); text-decoration: underline; text-underline-offset: .2em; }
   .lobby-foot { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; font-size: 1.05rem; }
   .lobby-foot .btn { font-size: 1.35rem; }
   .lobby-foot .hint { color: var(--muted); }
@@ -440,14 +454,16 @@
     .answers { grid-template-columns: 1fr; }
     .qbody { grid-template-columns: 1fr; container-type: normal; }
     .cover-frame { width: min(22rem, 100%); justify-self: center; }
-    /* Play solo leads, in place of Start; Start comes back as soon as a phone joins */
-    .solo { display: grid; gap: .6rem; }
-    .lobby:has(.solo) .lobby-foot { display: none; }
+    /* Until a phone joins: pick a game to play it; the TV parts (mode cards, seats, Start, room code) step aside */
+    .solo { display: grid; gap: 1.4rem; }
+    .tvjoin { display: block; }
+    .solo-mode :is(.pick-mode, .pick-char, .lobby-foot) { display: none; }
+    .solo-mode:not(.join-open) .joinbox, .solo-mode .joinbox .hall { display: none; }
   }
 </style>
 </head>
 <body>
-<div class="ver" aria-hidden="true">v91 · Oct 19</div>
+<div class="ver" aria-hidden="true">v92 · Oct 19</div>
 <header class="cover"><button type="button" class="title" id="btn-home" title="Back to the start screen">Everything You Know Is Wrong</button></header>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <div class="fx" id="fx" aria-hidden="true"></div>
@@ -977,18 +993,28 @@
     lobbyChatter();
   }
 
-  // Play solo (phones, while no phone holds a seat): the character already picked on this screen, else the
-  // one played solo last time, else Bono. Then straight into the game.
+  // Playing alone on a phone (while no phone holds a seat): tap a game to play it, as the character picked on
+  // this screen, else the one picked or played solo last time, else Bono.
+  let soloChoice = null, joinOpen = false;   // joinOpen: the room code is unfolded on a phone
+  const SOLO_BLURB = { casual: "The hits, the albums, the big moments", deep: "B-sides, producers, studios and tour lore", songs: "Hear a clip, name the song", tournament: "Three rounds and a final wager" };
   function soloMember() {
     const couch = S.players.find(p => p.local);
     if (couch?.member) return couch.member;
     const taken = new Set(S.players.map(p => p.member));
     let last = null;
     try { last = localStorage.getItem("wtshng-solo"); } catch {}
-    return [last, ...MEMBERS.map(m => m.id)].find(id => id && byId(id) && !taken.has(id));
+    return [soloChoice, last, ...MEMBERS.map(m => m.id)].find(id => id && byId(id) && !taken.has(id));
   }
-  function playSolo() {
+  function soloPick(id) {
+    if (S.phase !== "lobby" || !byId(id)) return;
+    soloChoice = id;
+    try { localStorage.setItem("wtshng-solo", id); } catch {}
+    const couch = S.players.find(p => p.local);
+    if (couch) { couch.member = id; sync(); } else render();
+  }
+  function playSolo(mode) {
     if (S.phase !== "lobby" || S.players.some(p => !p.local)) return;
+    if (MODES.some(m => m.id === mode)) S.mode = mode;
     const id = soloMember();
     if (!id) return;
     let couch = S.players.find(p => p.local);
@@ -1888,21 +1914,23 @@
     const hint = !active().length ? "Scan the code to join on your phone, or click a character to play on this screen."
       : unpicked ? `Waiting for ${unpicked} player${unpicked > 1 ? "s" : ""} to pick a character.`
       : `${active().length} of 4 on stage. ${v ? esc(displayName(v)) + " (VIP) can start from their phone." : "Press Enter to start."}`;
-    const soloAs = byId(soloMember() || "bono");
-    const solo = S.players.some(p => !p.local) ? "" : `<div class="solo">
-          <button type="button" class="btn" id="btn-solo">Play solo</button>
-          <p>${esc(MODES.find(m => m.id === S.mode)?.name || "")} as <b style="--mc:${soloAs.color}">${esc(soloAs.name)}</b> · change the mode or character below</p>
+    const soloMode = !S.players.some(p => !p.local), soloAs = soloMember() || "bono";
+    const solo = !soloMode ? "" : `<div class="solo">
+          <div><p class="label">Pick a game · as <button type="button" class="as-jump" id="btn-asjump" style="--mc:${byId(soloAs).color}">${esc(byId(soloAs).name.replace(/^The /, "").split(" ")[0])}</button></p><div class="gos">${MODES.map(m => `<button type="button" class="mode go" id="go-${m.id}" data-go="${m.id}"><b>${m.name}</b><span>${SOLO_BLURB[m.id] || ""}</span></button>`).join("")}</div></div>
+          <div><p class="label">You're playing as</p><div class="as">${MEMBERS.map(m => `<button type="button" id="as-${m.id}" data-as="${m.id}" aria-pressed="${m.id === soloAs}" style="--mc:${m.color}">${avatar(m.id)}${esc(m.name.replace(/^The /, "").split(" ")[0])}</button>`).join("")}</div></div>
+          ${hallHtml()}
+          <button type="button" class="tvjoin" id="btn-tvjoin" aria-expanded="${joinOpen}">${joinOpen ? "Hide the room code" : "Playing on a TV with friends? Show the room code"}</button>
         </div>`;
     const u = joinUrl();
     const net = S.net === "open" ? `<div class="netmsg">Scan the code, or open the link and type the room code.</div>`
       : S.net === "connecting" ? `<div class="netmsg">Opening the room…</div>`
       : `<div class="netmsg bad">Phones can't connect right now (${esc(S.netErr)}). You can still play on this screen. <button type="button" class="btn ghost" id="btn-retry">Try again</button></div>`;
-    return `<section class="lobby${builtKey !== "lobby" ? " intro" : ""}">
+    return `<section class="lobby${builtKey !== "lobby" ? " intro" : ""}${soloMode ? " solo-mode" : ""}${joinOpen ? " join-open" : ""}">
       <div class="lobby-main">
         <div class="lobby-top"><h1>Where the Streets Have No <em>Game</em></h1><div id="host-slot"></div></div>
         ${solo}
-        <div><p class="label">Mode</p><div class="modes">${modes}</div></div>
-        <div><p class="label">Pick a character · up to 4 players</p><div class="slots">${slots}</div></div>
+        <div class="pick-mode"><p class="label">Mode</p><div class="modes">${modes}</div></div>
+        <div class="pick-char"><p class="label">Pick a character · up to 4 players</p><div class="slots">${slots}</div></div>
         <div class="lobby-foot"><button type="button" class="btn" id="btn-start" ${canStart() ? "" : "disabled"}>Start the show</button>${
           navigator.userActivation && !navigator.userActivation.hasBeenActive ? `<span class="soundhint">Click anywhere on this screen once to switch the sound on.</span>` : `<span class="hint">${hint}</span>`}</div>
       </div>
@@ -2166,7 +2194,10 @@
     else if (t.dataset.member) toggleCouch(t.dataset.member);
     else if (t.dataset.k !== undefined) couchTap(Number(t.dataset.k));
     else if (t.id === "btn-start") startGame();
-    else if (t.id === "btn-solo") playSolo();
+    else if (t.dataset.go) playSolo(t.dataset.go);
+    else if (t.dataset.as) soloPick(t.dataset.as);
+    else if (t.id === "btn-asjump") $("stage").querySelector(".as")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    else if (t.id === "btn-tvjoin") { joinOpen = !joinOpen; render(); if (joinOpen) $("stage").querySelector(".joinbox")?.scrollIntoView({ behavior: "smooth", block: "start" }); }
     else if (t.id === "btn-next") nextQuestion();
     else if (t.id === "btn-again") nextRound();
     else if (t.id === "btn-lobby") endGame();
