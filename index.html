@@ -439,7 +439,7 @@
 </style>
 </head>
 <body>
-<div class="ver" aria-hidden="true">v86 · Oct 18</div>
+<div class="ver" aria-hidden="true">v89 · Oct 19</div>
 <header class="cover"><button type="button" class="title" id="btn-home" title="Back to the start screen">Everything You Know Is Wrong</button></header>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <div class="fx" id="fx" aria-hidden="true"></div>
@@ -1070,13 +1070,35 @@
     return deck;
   }
 
+  // Song clips stream from Apple, and on a phone the start can take several seconds to arrive while the
+  // clock runs. So the current and next two clips (about 1 MB each) are fetched ahead and played from
+  // memory; one that hasn't arrived yet streams as before.
+  const Clips = {
+    ready: new Map(), busy: new Set(),
+    url(u) { return this.ready.get(u) || u; },
+    ahead(from) {
+      (S.deck || []).slice(from, from + 3).forEach(q => {
+        const u = q.song?.preview;
+        if (!u || this.ready.has(u) || this.busy.has(u)) return;
+        this.busy.add(u);
+        fetch(u).then(r => (r.ok ? r.blob() : null))
+          .then(b => { if (b) this.ready.set(u, URL.createObjectURL(new Blob([b], { type: "audio/mp4" }))); })
+          .catch(() => {}).finally(() => this.busy.delete(u));
+      });
+    },
+    clear() { this.ready.forEach(b => URL.revokeObjectURL(b)); this.ready.clear(); },
+  };
+
   const Player = {
     el: new Audio(), fader: null,
     play(url) {
       this.stop();
       if (!url) return;
-      this.el.src = url; this.el.volume = 1;
-      this.el.play().catch(() => toast("The TV couldn't play the clip. Click anywhere on the TV screen once so it can play sound."));
+      this.el.src = Clips.url(url); this.el.volume = 1;
+      this.el.play().catch(e => {
+        if (e.name === "NotAllowedError") toast("The TV couldn't play the clip. Click anywhere on the TV screen once so it can play sound.");
+        else if (e.name !== "AbortError") toast("The song clip wouldn't play in this browser. Chrome and Safari play them.");   // AbortError: stopped before it started
+      });
     },
     fade(to, ms = 800) {
       clearInterval(this.fader);
@@ -1249,6 +1271,7 @@
     if (restart) S.players = S.players.filter(p => p.local || p.connected);
     S.deck = buildDeck(roundMode()).map(q => (q.order ? q : { ...q, opts: shuffle([q.a, ...q.w]) }));
     S.deck.forEach(q => { if (q.cover) new Image().src = q.cover.art; });   // fetch the cover now so it's there when its question comes up
+    Clips.clear(); Clips.ahead(0);   // and the first song clips
     if (restart || !S.round) { resetScores(); S.round = 1; }
     else {
       S.round++;
@@ -1284,6 +1307,7 @@
     S.phase = "question";
     const q = S.deck[S.i];
     if (q.song) Player.play(q.song.preview); else Player.stop();
+    Clips.ahead(S.i + 1);
     S.players.forEach(p => { p.answer = null; p.gain = 0; p.ok = false; p.placed = 0; });
     S.qSecs = q.order ? ORDER_SECS : SECS;   // sorting four things takes longer than picking one
     couchSeq = [];
@@ -1745,6 +1769,7 @@
       if (S.endsAt <= now) return reveal();
       const q = S.deck[S.i];
       if (q?.song) Player.play(q.song.preview);   // the clip starts again; the clock carries on
+      Clips.ahead(S.i + 1);
       qTimer = setTimeout(reveal, S.endsAt - now + 200);
       return sync();
     }
